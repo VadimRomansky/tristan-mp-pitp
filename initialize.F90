@@ -119,37 +119,37 @@ subroutine initialize()
 
 	call mkdir("output",ierr)
 	call mkdir("restart",ierr)
-
+	print *, "make dir"
 	call set_default_values() ! sets default values for the main global variables
-
+	print *, "set default values"
 	call inputpar_open(input_file_name)	! parse the input file
-	
+	print *, "inputpar_open"
 	call read_input_communications()
-		
+	print *, "read_input_communications"
 	call init_communications() ! inits the MPI library and MPI data structures
-
+	print *, "init_communications"
         if(rank .eq. 0) print *, "Using input file ", input_file_name
 	call read_input_file()		! have all modules read the required variables
-	
+	print *, "read_input_file"
 	if(writetestlec)  call mkdir("output/tracking_elec",ierr)
 	if(writetestion)  call mkdir("output/tracking_ion",ierr)
-	
+	print *, "mkdir"
 	if(rank.eq.0) time_beg=mpi_wtime()
-	
+
 	call initialize_restart()  ! Initializes Restart related variables
-	
+	print *, "initialize_restart"
 	call initialize_outputs()  ! Initializes variables for the outputs module
-	
+	print *, "initialize_outputs"
 	call initialize_random_seed() 	!initialize random numbers on each rank
-
+	print *, "initialize_random_seed"
 	call allocate_fields()  ! allocates memory for grid related variables (it DOES NOT SET the EM fields)
-
+	print *, "allocate_fields"
 	call allocate_particles() ! allocates & initalizes particle-related variables
-	
+	print *, "allocate_particles"
 	call initialize_domain() ! Initalizes m_domain related variables
-	
+	print *, "initialize_domain"
 	if (irestart .ne. 1) call init_particle_distribution() ! sets the initial particle distribution
-	
+	print *, "init_particle_distribution"
 	call init_EMfields()		 ! Sets the initial EM fields
 	
 	if(debug)print *,rank,": before barrier"
@@ -337,7 +337,7 @@ subroutine read_input_file()
 
 	call read_input_user()
 
-
+	print *, "finish read_input_file"
 end subroutine read_input_file
 
 

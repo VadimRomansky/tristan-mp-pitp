@@ -308,6 +308,8 @@ subroutine Diagnostics()
 
 		if(debug) print *,rank,": b4 diagnost", "step=", lap
 
+
+
 		call do_diagnostics()
 
 end subroutine Diagnostics
@@ -420,7 +422,7 @@ subroutine save_spectrum()
 		mxmin=3
 		mxmax=mx0-2
 		
-		nbins=max((mxmax-mxmin)/100,1)
+		nbins=max((mxmax-mxmin)/1,1)
 	
 		allocate(spece(nbins,gambins),specp(nbins,gambins))
 		allocate(xgamma(gambins),xslice(nbins))
@@ -2582,31 +2584,31 @@ subroutine output_tot()
      !ken,keni:particle total energy
 #ifdef twoD
   if (sigma .eq. 0. .and. pcosthmult .eq. 0) then 
-     nvars=15
+     nvars=17
      dsetname(1:nvars)=(/&
           'dens  ','densi '&
 !          ,'bdens ','bdensi'&
-          ,'v3x   ','v3xi  ','v3y   ','v3yi  '&
-!          ,'v4x   ','v4xi  ','v4y   ','v4yi  ','ken   ','keni  '&
+!          ,'v3x   ','v3xi  ','v3y   ','v3yi  '&
+          ,'v4x   ','v4xi  ','v4y   ','v4yi  ','ken   ','keni  '&
           ,'ex    ','ey    ','ez    ','bx    ','by    ','bz    ','jx    ','jy    ','jz    '&
        /)
   else
-  nvars=17!27!19
+  nvars=19!27!19
   dsetname(1:nvars)=(/&
        'dens  ','densi '&
 !       ,'bdens ','bdensi'&
-       ,'v3x   ','v3xi  ','v3y   ','v3yi  ','v3z   ','v3zi  '&
-!       ,'v4x   ','v4xi  ','v4y   ','v4yi  ','v4z   ','v4zi  ','ken   ','keni  '&
+!       ,'v3x   ','v3xi  ','v3y   ','v3yi  ','v3z   ','v3zi  '&
+       ,'v4x   ','v4xi  ','v4y   ','v4yi  ','v4z   ','v4zi  ','ken   ','keni  '&
        ,'ex    ','ey    ','ez    ','bx    ','by    ','bz    ','jx    ','jy    ','jz    '&
        /)
   endif
 #else
-  nvars=17
+  nvars=19
   dsetname(1:nvars)=(/&
        'dens  ','densi '&
 !       ,'bdens ','bdensi'&
-       ,'v3x   ','v3xi  ','v3y   ','v3yi  ','v3z   ','v3zi  '&
-!       ,'v4x   ','v4xi  ','v4y   ','v4yi  ','v4z   ','v4zi  ','ken   ','keni  '&
+!       ,'v3x   ','v3xi  ','v3y   ','v3yi  ','v3z   ','v3zi  '&
+       ,'v4x   ','v4xi  ','v4y   ','v4yi  ','v4z   ','v4zi  ','ken   ','keni  '&
        ,'ex    ','ey    ','ez    ','bx    ','by    ','bz    ','jx    ','jy    ','jz    '&
        /)
 #endif
@@ -2863,7 +2865,7 @@ subroutine output_tot()
         if(varname.eq.'v4xi' ) call meanq_fld_cur('imomx')
         if(varname.eq.'v4yi' ) call meanq_fld_cur('imomy')
         if(varname.eq.'v4zi' ) call meanq_fld_cur('imomz')
-        if(varname.eq.'ken'  ) call meanq_fld_cur('tener')
+        if(varname.eq.'ken'  ) call meanq_fld_cur('eener')
         if(varname.eq.'keni' ) call meanq_fld_cur('iener')     
         !electric currents
         if(varname.eq.'jx'.or.varname.eq.'jy'.or.varname.eq.'jz') then 
@@ -2938,6 +2940,9 @@ subroutine output_tot()
                  case('ken','v3x','v3y','v3z','v4x','v4y','v4z',&
                       'keni','v3xi','v3yi','v3zi','v4xi','v4yi','v4zi')
                     temporary1(nx,ny,nz)=real(curx(i,j,k),4)
+					 !if(varname .eq. 'ken') then
+					!		 print *, temporary1(nx,ny,nz);
+					!end if
                  end select
  
               enddo
@@ -2991,6 +2996,23 @@ subroutine output_tot()
               offset(1) = 0
               offset(2) = 0
               offset(3) = 0
+
+
+
+			  !if(varname .eq. 'ken') then
+			  !	  print* , 'temporary0', temporary0(2,2,0)
+			  !endif
+
+			  !print *, 'mx1', mx1
+			  !print *, 'mx1list', mx1list(procn+1)
+			  !print *, 'dimsfi1', dimsfi(1);
+			  !print *, 'dimsfi2', dimsfi(2);
+			  !print *, 'dimsfi3', dimsfi(3);
+			  !print *, 'dimsfi4', dimsfi(4);
+			  !print *, 'dimsfi5', dimsfi(5);
+			  !print *, 'dimsfi6', dimsfi(6);
+			  !print *, 'dimsfi7', dimsfi(7);
+
 #ifndef twoD
               !     z offset
               if(procn/(sizex*sizey) .gt. 0) then 
@@ -3031,17 +3053,20 @@ subroutine output_tot()
                    filespace(iv),"memspace",memspace
               
 #ifdef MPI
+			  !print *, 'def MPI'
               call h5dwrite_f(dset_id(iv), H5T_NATIVE_REAL,  &
                    temporary0(1:mx1list(procn+1),1:my1list(procn+1), &
                    1:mz1list(procn+1)),dimsfi,error,mem_space_id= &
                    memspace,file_space_id = filespace(iv))
-            !               call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, 
-              !     &                   temporary0(:,:,:),dimsfi,error,file_space_id = 
-              !     &                   filespace(iv), mem_space_id=memspace)
+                           !call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, &
+							!	   temporary0(:,:,:),dimsfi,error,file_space_id = &
+							!			   filespace(iv), mem_space_id=memspace)
 #else
+			  !print *, 'no def MPI'
               call h5dwrite_f(dset_id(iv),H5T_NATIVE_REAL, &
-                   temporary(:,:,:) ,dimsfi,error)
-#endif 
+                   temporary0(:,:,:) ,dimsfi,error)
+                   !temporary(:,:,:) ,dimsfi,error)
+#endif
               
               !closing dataset and memory space
               if(debug)print *, rank, ": ", iv, "closing d"
@@ -5202,6 +5227,9 @@ subroutine meanq_fld_cur(totname)
     	if(nn0 .ge. maxhlf+1) then
         addprtx=(1./gamprt-1.)*p(nn0)%ch
         addprty=p(nn0)%ch
+			!print *, 'gamprt'
+			!print *, gamprt
+			!print *, addprtx
         endif
      case('iener')
         if(nn0 .le. ions) then
@@ -5311,13 +5339,18 @@ subroutine meanq_fld_cur(totname)
 
   !to compute average 3-velocity, 4-velocity and energy
   if (totname .ne. 'tdens' .and. totname .ne. 'idens' .and. &
-  	  totname .ne. 'hdens' .and. totname .ne. 'ldens') then 
+  	  totname .ne. 'hdens' .and. totname .ne. 'ldens') then
+	  !print *, 'eener'
+		!print *, curx(2,0,0);
+	  !print *, curx(2,1,0);
+	  !print *, curx(2,2,0);
      where(cury .ne. 0.) 
         curx=curx/cury
      elsewhere 
         curx=0.
      endwhere
   endif
+  !print *, curx(2,0,0);
 
   deallocate(buffer,bufferout)
   

@@ -799,6 +799,7 @@ subroutine advance_e_fullstep()
 				jm1=j-1
 				do i=i1,i2		!2,mx !3,mx-3 !2,mx
 					im1=i-1
+					!print *, 'i', i
 					ex(i,j,k)=ex(i,j,k)+const*(by(i,j,km1)-by(i,j,k)-bz(i,jm1,k)+bz(i,j,k))
 					ey(i,j,k)=ey(i,j,k)+const*(bz(im1,j,k)-bz(i,j,k)-bx(i,j,km1)+bx(i,j,k))
 					ez(i,j,k)=ez(i,j,k)+const*(bx(i,jm1,k)-bx(i,j,k)-by(im1,j,k)+by(i,j,k))
@@ -816,6 +817,8 @@ subroutine advance_e_fullstep()
 				im1=i-1
 #ifdef ABSORB
 				iglobv=i+mxcum
+				!print *, 'i', i
+				!print *, 'mxcum', mxcum
 				lam=0.5*lambda(iglobv+.5,jglobv*1.,0.)
 				ex(i,j,k)=(ex(i,j,k)*(1+lam)+const*(-bz(i,jm1,k)+bz(i,j,k)))/(1-lam)
 				lam=0.5*lambda(iglobv*1.,jglobv+0.5,0.)
@@ -823,7 +826,7 @@ subroutine advance_e_fullstep()
 				lam=0.5*lambda(iglobv*1.,jglobv*1.,0.)
 				ez(i,j,k)=(ez(i,j,k)*(1+lam)+const*(bx(i,jm1,k)-bx(i,j,k)-by(im1,j,k)+by(i,j,k)))/(1-lam)
 #else
-
+				!print *, 'i', i
 				ex(i,j,k)=ex(i,j,k)+const*(-bz(i,jm1,k)+bz(i,j,k))
 				ey(i,j,k)=ey(i,j,k)+const*(bz(im1,j,k)-bz(i,j,k))
 				ez(i,j,k)=ez(i,j,k)+const*(bx(i,jm1,k)-bx(i,j,k)- &

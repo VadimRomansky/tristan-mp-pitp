@@ -286,7 +286,8 @@ subroutine mainloop()
 		
 		call timer(10,tmstop=tmstop)
 			
-		call Diagnostics()		
+		call Diagnostics()
+		call energy()
 		
 		call timer(11)
 		
@@ -393,7 +394,7 @@ subroutine energy()
 	
 	
 	! to be checked for electron-ion shocks and with receding injector; also, not sure if using the total energy instead of the kinetic energy is making any difference
-	
+	!print *, 'energy evaluation'
 	elap=5 
 	
 	if(periodicx.eq.1) then
@@ -405,23 +406,31 @@ subroutine energy()
 			i2=min(mx-3,int(xinject2))
 		endif
 	endif
-	
+
+	print*, 'write energy'
+	write(fnamen,"(a6)") "energy"
 	if(rank.eq.0 .and. lap .lt. lapst+elap) then !first time
-		write(fnamen,"(a6)") "energy"
-		if(irestart.eq.0) then 
+		print*, 'write energy 2'
+
+		if(irestart.eq.0) then
+			print *, 'restart=0'
 			open(unit=21,file=fnamen)
-			close(21,status='delete') 
+			close(21,status='delete')
 			open(unit=21,file=fnamen)
+			close(21,status='keep')
 		endif
 	
-		if(irestart.eq.1) then 
+		if(irestart.eq.1) then
+			print *, 'restart=1'
 			inquire(file=fnamen,exist=ext)
 			statusfile=0
 			if(ext) statusfile=1
-			if(statusfile .eq. 0) then 
-				open(unit=21,file=fnamen)
+			if(statusfile .eq. 0) then
+				print *, 'statusfile = 0'
+				!open(unit=21,file=fnamen)
 			else
-				open(unit=21,file=fnamen,status='old',position='APPEND')
+				print *, 'statusfile = 1'
+				!open(unit=21,file=fnamen,status='old',position='APPEND')
 			endif
 		endif
 	
@@ -475,11 +484,14 @@ subroutine energy()
 				ben=.5*enarred(2)/((i2-i1+1)*(my0-5)*(mz0-5))
 				ken=enarred(3)/((i2-i1+1)*(my0-5)*(mz0-5))
 #endif
-			
-			
+
+			print *, 'before write'
+			open(unit=21,file=fnamen,status='old',position='APPEND')
 			write(21,fmt="(i7,' ',4(E15.6,' '))")lap &
 			,een,ben,ken,een+ben+ken
-			
+			close(21)
+
+			print *, ken
 			print *, "energy_params",lap,i1,i2,my0,mz0
 			
 		endif                     !if(rank.eq.0)

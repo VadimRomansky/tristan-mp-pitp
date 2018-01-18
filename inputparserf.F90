@@ -180,7 +180,11 @@ subroutine inputpar_getd_def_sprec(blockname, name, def, value)
     call par_getd_def_f(blockname_c, name_c, def, readvalue)
     
     value=readvalue
-
+    print *, blockname
+    print *, name
+    print *, def
+    print *, value
+	print *, "finish inputpar_getd_def_sprec"
 end subroutine inputpar_getd_def_sprec
 
 !------------------------------------------------------------------------
@@ -200,13 +204,18 @@ subroutine inputpar_getd_def_dprec(blockname, name, def, value)
     character(len=len_trim(blockname)+1) :: blockname_c
     character(len=len_trim(name)+1) :: name_c
 
-    
+    print *, "start inputpar_getd_def_dprec"
+    print *, blockname
+    print *, name
+    print *, def
+    print *, value
     ! Make shure this is a proper C string
     
     blockname_c = trim(blockname)//char(0)
     name_c = trim(name)//char(0)
            
     call par_getd_def_f(blockname_c, name_c, def, value)
+    print *, "finish inputpar_getd_def_dprec"
 
 end subroutine inputpar_getd_def_dprec
 

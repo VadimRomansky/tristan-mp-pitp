@@ -292,11 +292,16 @@ subroutine allocate_particles()
 	buffsize = max(3*int(ppc0*max(upsamp_e,upsamp_i)*c*max((mx-5),(my-5))),60000)
 !        if (splitparts) buffsize=buffsize*150 
 #endif
+	print *, "start allocate particles"
+	print *, "buffsize"
+	print *, buffsize
 	
 	! allocate particle buffers
 	
 	allocate(p(maxptl),tempp(maxhlf))
+	print *, "allocate 1"
         allocate(pind(maxhlf)) !for optimization
+	print *, "allocate 2"
 	p%x=0
 	p%y=0
 	p%z=0
@@ -309,10 +314,10 @@ subroutine allocate_particles()
 	allocate(poutup(buffsize),poutdwn(buffsize),pinblw(buffsize),pinabv(buffsize) &
 	,poutlft(buffsize),poutrgt(buffsize),pinlft(buffsize),pinrgt(buffsize) &
 	,poutminus(buffsize),poutplus(buffsize),pinminus(buffsize),pinplus(buffsize))
-	
+	print *, "allocate 3"
 	! lot = mx*my for 2D ; total cells/processor
 	allocate(pall(lot)) ! this is used in the particle module to reorder particles
- 
+	print *, "allocate 4"
         splitratio=10. !legacy splitting -- should not be used 
 	splitnmax=15            ! max number of levels when splitting is used
 		
@@ -327,6 +332,7 @@ subroutine allocate_particles()
 	
 !	allocate(split_E_ions(splitnmax))
 !	allocate(split_E_lecs(splitnmax))	
+	print *, "finish allocate_particles"
 	
 end subroutine allocate_particles
 

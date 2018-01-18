@@ -13,7 +13,6 @@ subroutine apply_filter1_opt()
 	
 !	real wtm1,wt,wtp1,winv
 	integer :: istr, ifin, i, j, k, n
-
  real wtl,wtr,wtu,wtb,wtlt,wtrt,wtlb,wtrb,wt, winv
 #ifndef twoD
  real wtlz,wtrz,wtuz,wtbz,wtltz,wtrtz,wtlbz,wtrbz, wtz
@@ -25,6 +24,7 @@ subroutine apply_filter1_opt()
 ! filtering is repeated ntimes	
 	
 	n=1
+    print*, 'filtering'
 	
 	istr=2  +1
 	ifin=mx-1 -2

@@ -123,11 +123,11 @@ subroutine read_input_user()
 !inputpar_getd_def -- read real parameter; input_geti_def -- read integer parameter
 
 	call inputpar_getd_def("problem", "temperature_ratio", 1._sprec, Temperature_ratio)
-
+	print *, "inputpar_getd_def"
 	call inputpar_getd_def("problem","sigma_ext",0._sprec,sigma_ext)
-
+	print *, "inputpar_getd_def"
 	call inputpar_geti_def("problem","external_fields",0,lextflds)
-
+	print *, "inputpar_geti_def"
 	if(lextflds .eq. 1) then 
 	   external_fields =.true.
 	else
@@ -137,7 +137,7 @@ subroutine read_input_user()
 	if(external_fields) bz_ext0 = sqrt((gamma0)*.5*ppc0*c**2*me*(1+me/mi)*sigma_ext)
 
 	call inputpar_geti_def("problem","user_part_bcs",0,luserpartbcs)
-
+	print *, "inputpar_geti_def"
 	if(luserpartbcs .eq. 1) then 
 	   user_part_bcs = .true.
 	else
@@ -145,7 +145,7 @@ subroutine read_input_user()
 	endif
 
 	call inputpar_geti_def("problem", "wall", 0, lwall)
-	
+	print *, "inputpar_geti_def"
 	if (lwall==1) then
 		wall=.true.
 	else
@@ -155,7 +155,7 @@ subroutine read_input_user()
 	if(wall) user_part_bcs=.true.
 
 !read_input_user is called last, so any parameter can be overwritten here
-	
+	print *, "finish read_input_user"
 end subroutine read_input_user
 
 !-------------------------------------------------------------
