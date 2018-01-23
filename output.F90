@@ -10,7 +10,7 @@
 #ifdef twoD 
 
 module m_output
-  
+
 	use m_system
 	use m_aux
 	use m_communications
@@ -40,7 +40,7 @@ module m_output_3d
 
 #ifdef HDF5
 	use hdf5
-#endif	
+#endif
 
 	implicit none
 	
@@ -2424,7 +2424,7 @@ subroutine save_param()
                 error)
            call h5dcreate_f(file_id, dsetnamei(i), H5T_NATIVE_INTEGER, &
                 filespace(1),dset_id(1), error)
-           call h5dwrite_integer_1(dset_id(1),H5T_NATIVE_INTEGER &
+           call h5dwrite_f(dset_id(1),H5T_NATIVE_INTEGER &
                 ,intdata(i),dimsf,error)
            call h5dclose_f(dset_id(1), error)
            call h5sclose_f(filespace(1), error)
@@ -2436,7 +2436,7 @@ subroutine save_param()
                 error)
            call h5dcreate_f(file_id, dsetnamer(i), H5T_NATIVE_REAL, &
                 filespace(1),dset_id(1), error)
-           call h5dwrite_real_1(dset_id(1),H5T_NATIVE_REAL,realdata(i) &
+           call h5dwrite_f(dset_id(1),H5T_NATIVE_REAL,realdata(i) &
                 ,dimsf,error)
            call h5dclose_f(dset_id(1), error)
            call h5sclose_f(filespace(1), error)
@@ -2450,7 +2450,7 @@ subroutine save_param()
                 error)
         call h5dcreate_f(file_id, dsetnamei(22), H5T_NATIVE_INTEGER, &
                 filespace(1),dset_id(1), error)
-        call h5dwrite_integer_1(dset_id(1),H5T_NATIVE_INTEGER &
+        call h5dwrite_f(dset_id(1),H5T_NATIVE_INTEGER &
                 ,mxl(1:sizex),dimsf,error)
         call h5dclose_f(dset_id(1), error)
         call h5sclose_f(filespace(1), error)
@@ -2464,7 +2464,7 @@ subroutine save_param()
                 error)
         call h5dcreate_f(file_id, dsetnamei(23), H5T_NATIVE_INTEGER, &
                 filespace(1),dset_id(1), error)
-        call h5dwrite_integer_1(dset_id(1),H5T_NATIVE_INTEGER &
+        call h5dwrite_f(dset_id(1),H5T_NATIVE_INTEGER &
                 ,myl(1:(sizey-1)*sizex+1:sizex),dimsf,error)
         call h5dclose_f(dset_id(1), error)
         call h5sclose_f(filespace(1), error)
@@ -3058,7 +3058,7 @@ subroutine output_tot()
                    temporary0(1:mx1list(procn+1),1:my1list(procn+1), &
                    1:mz1list(procn+1)),dimsfi,error,mem_space_id= &
                    memspace,file_space_id = filespace(iv))
-                           !call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, &
+                           !call h5dwrite_f(dset_id(iv), H5T_NATIVE_REAL, &
 							!	   temporary0(:,:,:),dimsfi,error,file_space_id = &
 							!			   filespace(iv), mem_space_id=memspace)
 #else
@@ -3168,9 +3168,9 @@ subroutine output_tot()
              ),memspace
         
 #ifdef MPI
-        call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, temporary1(:,: &
-             ,:),dimsfi,error,file_space_id = filespace(iv), mem_space_id &
-             =memspace,xfer_prp = h5p_default_f)
+        call h5dwrite_f(dset_id(iv), H5T_NATIVE_REAL, temporary1(:,: &
+             ,:),dimsfi,error,filespace(iv), &
+             memspace,h5p_default_f)
 #else
         call h5dwrite_f(dset_id(iv),H5T_NATIVE_REAL,TEMPORARY1(:,: &
              ,:) ,dimsfi,error)
@@ -3573,16 +3573,17 @@ subroutine output_tot()
               
               !writing
 #ifdef MPI
-              if(i .le. midvars) then 
-                 call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+			  !print *, 'mpi'
+              if(i .le. midvars) then
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
                       temporary0_vec(1:all_ions_lng(procn+1)/stride),  &
-                      dimsfiions,error,file_space_id = filespace(i),  &
-                      mem_space_id=memspace)
-              else 
-                 call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+                      dimsfiions,error,filespace(i),  &
+                      memspace)
+              else
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
                       temporary0_vec(1:all_lecs_lng(procn+1)/stride),  &
-                      dimsfilecs,error,file_space_id = filespace(i),  &
-                      mem_space_id=memspace)
+                      dimsfilecs,error,filespace(i),  &
+                      memspace)
               endif
               
 #else
@@ -3659,15 +3660,15 @@ subroutine output_tot()
         
 #ifdef MPI
         if(i .le. midvars) then 
-           call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
                 temporary_vec(1:max(ions/stride,1)), dimsfiions,error &
-                ,file_space_id = filespace(i), mem_space_id=memspace &
-                ,xfer_prp = h5p_default_f)
+                ,filespace(i), memspace &
+                ,h5p_default_f)
         else 
-           call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
                 temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error &
-                ,file_space_id = filespace(i), mem_space_id=memspace &
-                ,xfer_prp = h5p_default_f)
+                ,filespace(i), memspace &
+                ,h5p_default_f)
         endif
         
 #else
@@ -4245,7 +4246,7 @@ subroutine output_hug()
                    temporary0(1:mx0/istep,1:my1list(procn+1), &
                    1:mz1list(procn+1)),dimsfi,error,mem_space_id= &
                    memspace,file_space_id = filespace(iv))
-              !               call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, 
+              !               call h5dwrite_f(dset_id(iv), H5T_NATIVE_REAL, 
               !     &                   temporary0(:,:,:),dimsfi,error,file_space_id = 
               !     &                   filespace(iv), mem_space_id=memspace)
 #else
@@ -4347,9 +4348,9 @@ subroutine output_hug()
              ),memspace
         
 #ifdef MPI
-        call h5dwrite_real_1(dset_id(iv), H5T_NATIVE_REAL, temporary1(:,: &
-             ,:),dimsfi,error,file_space_id = filespace(iv), mem_space_id &
-             =memspace,xfer_prp = h5p_default_f)
+        call h5dwrite_f(dset_id(iv), H5T_NATIVE_REAL, temporary1(:,: &
+             ,:),dimsfi,error,filespace(iv), &
+             memspace,h5p_default_f)
 #else
         call h5dwrite_f(dset_id(iv),H5T_NATIVE_REAL,TEMPORARY1(:,: &
              ,:) ,dimsfi,error)

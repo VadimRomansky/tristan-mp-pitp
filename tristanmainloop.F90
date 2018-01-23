@@ -407,7 +407,7 @@ subroutine energy()
 		endif
 	endif
 
-	print*, 'write energy'
+	!print*, 'write energy'
 	write(fnamen,"(a6)") "energy"
 	if(rank.eq.0 .and. lap .lt. lapst+elap) then !first time
 		print*, 'write energy 2'
@@ -485,7 +485,7 @@ subroutine energy()
 				ken=enarred(3)/((i2-i1+1)*(my0-5)*(mz0-5))
 #endif
 
-			print *, 'before write'
+			!print *, 'before write'
 			open(unit=21,file=fnamen,status='old',position='APPEND')
 			write(21,fmt="(i7,' ',4(E15.6,' '))")lap &
 			,een,ben,ken,een+ben+ken
