@@ -1,6 +1,6 @@
 clear;
-np = hdf5read('./output/flds.tot.017','densi');
-ne = hdf5read('./output/flds.tot.017','dens');
+np = hdf5read('./output/flds.tot.022','densi');
+ne = hdf5read('./output/flds.tot.022','dens');
 
 Nx = size(np, 1);
 Ny = size(np, 2);

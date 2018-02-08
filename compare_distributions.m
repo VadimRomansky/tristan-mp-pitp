@@ -93,5 +93,5 @@ hold on;
 for j=1:10,
     plot (1+g(1:Np,j),Fe(1:Np,j),'color',Color{j});
 end;
-legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 70^{\circ}','{\theta} = 90^{\circ}', 'maxwell','maxwell-juttner','Location','southeast');
+legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 60^{\circ}','{\theta} = 70^{\circ}','{\theta} = 80^{\circ}','{\theta} = 90^{\circ}','Location','southeast');
 grid ;
