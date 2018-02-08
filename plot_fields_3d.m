@@ -1,10 +1,10 @@
 clear;
-Bx = hdf5read('./output/flds.tot.008','bx');
-By = hdf5read('./output/flds.tot.008','by');
-Bz = hdf5read('./output/flds.tot.008','bz');
-Ex = hdf5read('./output/flds.tot.008','ex');
-Ey = hdf5read('./output/flds.tot.008','ey');
-Ez = hdf5read('./output/flds.tot.008','ez');
+Bx = hdf5read('./output/flds.tot.002','bx');
+By = hdf5read('./output/flds.tot.002','by');
+Bz = hdf5read('./output/flds.tot.002','bz');
+Ex = hdf5read('./output/flds.tot.002','ex');
+Ey = hdf5read('./output/flds.tot.002','ey');
+Ez = hdf5read('./output/flds.tot.002','ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);
@@ -28,6 +28,7 @@ tau = c1*rho/c0;
 fieldFactor = me*rho/(q*tau*tau);
 
 figure(1);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, Bx*fieldFactor);
 shading interp;
@@ -38,6 +39,7 @@ zlabel ('Bx');
 grid ;
 
 figure(2);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, By*fieldFactor);
 shading interp;
@@ -48,6 +50,7 @@ zlabel ('By');
 grid ;
 
 figure(3);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, Bz*fieldFactor);
 shading interp;
@@ -58,6 +61,7 @@ zlabel ('Bz');
 grid ;
 
 figure(4);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, Ex*fieldFactor);
 shading interp;
@@ -68,6 +72,7 @@ zlabel ('Ex');
 grid ;
 
 figure(5);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, Ey*fieldFactor);
 shading interp;
@@ -78,6 +83,7 @@ zlabel ('Ey');
 grid ;
 
 figure(6);
+colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, Ez*fieldFactor);
 shading interp;

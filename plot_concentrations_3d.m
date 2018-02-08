@@ -1,6 +1,6 @@
 clear;
-np = hdf5read('./output/flds.tot.005','densi');
-ne = hdf5read('./output/flds.tot.005','dens');
+np = hdf5read('./output/flds.tot.002','densi');
+ne = hdf5read('./output/flds.tot.002','dens');
 
 Nx = size(np, 1);
 Ny = size(np, 2);
@@ -22,7 +22,7 @@ c1=0.45;
 tau = c1*rho/c0;
 
 densityFactor = 1.0/(rho*rho*rho);
-
+set(0,'DefaultFigureColormap',feval('jet'));
 figure(1);
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
 surf(X, Y, np*densityFactor);
