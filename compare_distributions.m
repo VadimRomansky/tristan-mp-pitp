@@ -35,6 +35,8 @@ Np = size(fp0,2);
 
 Fp(1:Np,1:10)=0;
 Fe(1:Np,1:10)=0;
+Pp(1:Np,1:10)=0;
+Pe(1:Np,1:10)=0;
 g(1:Np,1:10) = 0;
 
 Color = {[.7,.3,.3],'red','green','blue','black','yellow',[.5,.5,.5],'cyan',[.3,.7,.3], 'magenta',[1.0,.5,0],[.75,0.0,.7]};
@@ -50,6 +52,10 @@ for i = 1:Np,
     g(i,8)=g7(i);
     g(i,9)=g8(i);
     g(i,10)=g9(i);
+    for k = 1:10,
+        Pp(i,k) = sqrt((g(i,k)+1)^2 - 1);
+        Pe(i,k) = sqrt((g(i,k)+1)^2 - 1);
+    end;
     for j = 1:Nx,
         Fp(i,1) = Fp(i,1) + fp0(j,i);
         Fe(i,1) = Fe(i,1) + fe0(j,i);
@@ -73,8 +79,8 @@ for i = 1:Np,
         Fe(i,10) = Fe(i,10) + fe9(j,i);
     end;
     for j=1:10,
-        Fp(i,j)=Fp(i,j)*(g(i,j) + 1)^2;
-        Fe(i,j)=Fe(i,j)*(g(i,j) + 1)^2;
+        Fp(i,j)=Fp(i,j)*(Pp(i,j)^3)/(1+g(i,j));
+        Fe(i,j)=Fe(i,j)*(Pe(i,j)^3)/(1+g(i,j));;
     end;
 end;
 
@@ -83,10 +89,10 @@ set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman');
 figure(1);
 hold on;
 title ('F_p');
-xlabel ('gamma');
-ylabel ('F_p*{\gamma}^2');
+xlabel ('p/{m_p c}');
+ylabel ('Fp*p^4');
 for j=1:10,
-    plot (1+g(1:Np,j),Fp(1:Np,j),'color',Color{j});
+    plot (Pp(1:Np,j),Fp(1:Np,j),'color',Color{j});
 end;
 legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 60^{\circ}','{\theta} = 70^{\circ}', '{\theta} = 80^{\circ}','{\theta} = 90^{\circ}','Location','southeast');
 grid ;
@@ -94,10 +100,10 @@ grid ;
 figure(2);
 hold on;
 title ('F_e');
-xlabel ('gamma');
-ylabel ('F_e*{\gamma}^2');
+xlabel ('p/{m_e c}');
+ylabel ('F_e*p^4');
 for j=1:10,
-    plot (1+g(1:Np,j),Fe(1:Np,j),'color',Color{j});
+    plot (Pe(1:Np,j),Fe(1:Np,j),'color',Color{j});
 end;
 legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 60^{\circ}','{\theta} = 70^{\circ}','{\theta} = 80^{\circ}','{\theta} = 90^{\circ}','Location','southeast');
 grid ;
