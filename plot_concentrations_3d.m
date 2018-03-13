@@ -14,7 +14,7 @@ me = mp/mass_ratio;
 q = 4.80320427*10^-10;
 n = 10^-4;
 
-omega = 4*pi*n*q*q/me;
+omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;

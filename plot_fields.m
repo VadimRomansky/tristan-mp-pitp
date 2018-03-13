@@ -1,10 +1,10 @@
 clear;
-Bx = hdf5read('./output/flds.tot.002','bx');
-By = hdf5read('./output/flds.tot.002','by');
-Bz = hdf5read('./output/flds.tot.002','bz');
-Ex = hdf5read('./output/flds.tot.002','ex');
-Ey = hdf5read('./output/flds.tot.002','ey');
-Ez = hdf5read('./output/flds.tot.002','ez');
+Bx = hdf5read('./output/flds.tot.001','bx');
+By = hdf5read('./output/flds.tot.001','by');
+Bz = hdf5read('./output/flds.tot.001','bz');
+Ex = hdf5read('./output/flds.tot.001','ex');
+Ey = hdf5read('./output/flds.tot.001','ey');
+Ez = hdf5read('./output/flds.tot.001','ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);
@@ -18,7 +18,7 @@ me = mp/mass_ratio;
 q = 4.80320427*10^-10;
 n = 10^-4;
 
-omega = 4*pi*n*q*q/me;
+omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;

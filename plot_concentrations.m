@@ -1,6 +1,6 @@
 clear;
-np = hdf5read('./output/flds.tot.022','densi');
-ne = hdf5read('./output/flds.tot.022','dens');
+np = hdf5read('./output/flds.tot.005','densi');
+ne = hdf5read('./output/flds.tot.005','dens');
 
 Nx = size(np, 1);
 Ny = size(np, 2);
@@ -14,7 +14,7 @@ me = mp/mass_ratio;
 q = 4.80320427*10^-10;
 n = 10^-4;
 
-omega = 4*pi*n*q*q/me;
+omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;
