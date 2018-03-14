@@ -395,7 +395,7 @@ subroutine energy()
 	
 	! to be checked for electron-ion shocks and with receding injector; also, not sure if using the total energy instead of the kinetic energy is making any difference
 	!print *, 'energy evaluation'
-	elap=5 
+	elap=50 
 	
 	if(periodicx.eq.1) then
 		i1=3
