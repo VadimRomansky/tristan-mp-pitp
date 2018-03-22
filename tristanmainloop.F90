@@ -109,7 +109,7 @@ subroutine mainloop()
 
 		call pre_bc_b()
 !		print *, "advance b half" !hack		
-		call advance_Bhalfstep()
+		call advance_Bhalfstep(lap*1.0)
 				
 !		print *, "bc_b1" !hack
 		call bc_b1() !periodic bcs, no surface
@@ -130,7 +130,7 @@ subroutine mainloop()
 		call timer(4)
 
 		call timer(14) !hack
-		call advance_Bhalfstep()
+		call advance_Bhalfstep(lap + 0.5)
 				
 		if(debug) print *,rank,"b4 bc_b2", "step=", lap
 		call timer(14,tmstop=tmstop) !hack
@@ -150,7 +150,7 @@ subroutine mainloop()
 		if(debug) print *,rank,": advanced b2", "step=", lap
 		call pre_bc_e()
 			
-		call advance_Efield()
+		call advance_Efield(lap*1.0)
 							
 		call field_bc_user()
 		
@@ -410,7 +410,7 @@ subroutine energy()
 	!print*, 'write energy'
 	write(fnamen,"(a6)") "energy"
 	if(rank.eq.0 .and. lap .lt. lapst+elap) then !first time
-		print*, 'write energy 2'
+		!print*, 'write energy 2'
 
 		if(irestart.eq.0) then
 			print *, 'restart=0'

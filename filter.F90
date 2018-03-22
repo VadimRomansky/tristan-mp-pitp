@@ -24,7 +24,7 @@ subroutine apply_filter1_opt()
 ! filtering is repeated ntimes	
 	
 	n=1
-    print*, 'filtering'
+    !print*, 'filtering'
 	
 	istr=2  +1
 	ifin=mx-1 -2
