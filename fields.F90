@@ -587,7 +587,7 @@ subroutine advance_b_halfstep(time)
 
 	v = beta*c
 	kw = 2*3.1415927/100;
-	x = xglob(mx-1)
+	x = xglob(mx-1.0)
 
 	if(periodicx.eq.1) then
 		i1=3
@@ -801,7 +801,7 @@ subroutine advance_e_fullstep(time)
 
 	v = beta*c
 	kw = 2*3.1415927/100;
-	x = xglob(mx)
+	x = xglob(mx*1.0)
 	
 	if(periodicx.eq.1) then
 		i1=3

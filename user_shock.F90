@@ -225,12 +225,12 @@ subroutine init_EMfields_user()
 ! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 #ifdef turbulence
 				bx(i,j,k)=B0x;
-				by(i,j,k)=B0y + turbulenceBy*sin(kw*xglob(i));
-				bz(i,j,k)=B0z + turbulenceBz*sin(kw*xglob(i));
+				by(i,j,k)=B0y + turbulenceBy*sin(kw*xglob(i*1.0));
+				bz(i,j,k)=B0z + turbulenceBz*sin(kw*xglob(i*1.0));
 
 				ex(i,j,k)=E0x;
-				ey(i,j,k)=E0y + turbulenceEy*sin(kw*xglob(i));
-				ez(i,j,k)=E0z + turbulenceEz*sin(kw*xglob(i));
+				ey(i,j,k)=E0y + turbulenceEy*sin(kw*xglob(i*1.0));
+				ez(i,j,k)=E0z + turbulenceEz*sin(kw*xglob(i*1.0));
 #else
 				bx(i,j,k)=B0x;
 				by(i,j,k)=B0y;
