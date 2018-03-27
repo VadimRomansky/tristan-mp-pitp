@@ -190,6 +190,8 @@ subroutine init_EMfields_user()
 	! local variables
 	
 	integer :: i, j, k
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw, v
 
 ! sqrt(sigma)=omega_c/omega_p = (qe B / gamma0 me c)/sqrt( qe 0.5 ppc0 (1+me/mi)/gamma0)  !4 pi=1, qe/me = 1 
 ! B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
@@ -202,19 +204,42 @@ subroutine init_EMfields_user()
 	btheta=btheta/180.*pi
 	bphi=bphi/180.*pi
 
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	turbulenceBy = B0y;
+	turbulenceBz = B0z;
+	turbulenceEy = E0y;
+	turbulenceEz = E0z;
+
+	kw = 2*3.1415927/100;
+
 	do  k=1,mz
 		do  j=1,my
 			do  i=1,mx
 ! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-				
-				bx(i,j,k)=Binit*cos(btheta) 
-				by(i,j,k)=Binit*sin(btheta)*sin(bphi)
-				bz(i,j,k)=Binit*sin(btheta)*cos(bphi)
+#ifdef turbulence
+				bx(i,j,k)=B0x;
+				by(i,j,k)=B0y + turbulenceBy*sin(kw*xglob(i*1.0));
+				bz(i,j,k)=B0z + turbulenceBz*sin(kw*xglob(i*1.0));
 
-				ex(i,j,k)=0.
-				ey(i,j,k)=(-beta)*bz(i,j,k) 
-				ez(i,j,k)=-(-beta)*by(i,j,k)
+				ex(i,j,k)=E0x;
+				ey(i,j,k)=E0y + turbulenceEy*sin(kw*xglob(i*1.0));
+				ez(i,j,k)=E0z + turbulenceEz*sin(kw*xglob(i*1.0));
+#else
+				bx(i,j,k)=B0x;
+				by(i,j,k)=B0y;
+				bz(i,j,k)=B0z;
 
+				ex(i,j,k)=E0x;
+				ey(i,j,k)=E0y;
+				ez(i,j,k)=E0z;
+#endif
 			enddo
 		enddo
 	enddo

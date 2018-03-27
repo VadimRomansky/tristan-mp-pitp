@@ -555,19 +555,40 @@ end subroutine read_restart_Ncell_info
 !							
 !-------------------------------------------------------------------------------
 
-subroutine advance_b_halfstep()
+subroutine advance_b_halfstep(time)
 
 	implicit none
+	real time
 
 	! local variables
 		
 	integer ::k1,k2,j1,j2,i1,i2, kp1, ip1, jp1, km1, jm1, im1, i, j, k
 	real betx, alpx, const, const2, const3
 	logical :: pukhov
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw, x, v
 #ifdef ABSORB
 	real lam
 	integer iglobv,jglobv,kglobv
-#endif	
+#endif
+
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	turbulenceBy = B0y;
+	turbulenceBz = B0z;
+	turbulenceEy = E0y;
+	turbulenceEz = E0z;
+
+	v = beta*c
+	kw = 2*3.1415927/100;
+	x = xglob(mx-1.0)
+
 	if(periodicx.eq.1) then
 		i1=3
 		i2=mx-3
@@ -586,7 +607,21 @@ subroutine advance_b_halfstep()
 			i1=1
 			i2=mx-1
 		endif
-	endif		
+	endif
+
+#ifdef turbulence
+	if(periodicx.eq.1) then
+		i1=3
+		i2=mx-3
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+			i1=3;
+			i2=mx-2;
+		endif
+	endif
+#endif
+
+
 		
 	
 	if(periodicy.eq.1) then
@@ -691,6 +726,40 @@ subroutine advance_b_halfstep()
 				enddo
 #endif
 
+#ifdef turbulence
+	if(periodicx.eq.1) then
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+#ifndef twoD
+			do k=k1,k2           !3,mz-3 !1,mz-1 !3,mz-3
+				kp1=k+1
+				do j=j1,j2       !3,my-3 !1,my-1 !3,my-3
+					jp1=j+1
+					i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
+					ip1=i+1
+					bx(i,j,k)=bx(i,j,k)
+					by(i,j,k)=B0y + turbulenceBy*sin(kw*(x+v*time))
+					bz(i,j,k)=B0z + turbulenceBz*sin(kw*(x+v*time))
+				enddo
+			enddo
+
+#else
+			k=1
+			do j=j1,j2			!3,my-3 !1,my-1 !3,my-3
+				jp1=j+1
+				i = mx-1		!1,mx-1 !3,mx-3 !1,mx-1
+				ip1=i+1
+
+				bx(i,j,k)=bx(i,j,k)
+				by(i,j,k)=B0y + turbulenceBy*sin(kw*(x+v*time))
+				bz(i,j,k)=B0z + turbulenceBz*sin(kw*(x+v*time))
+
+			enddo
+#endif
+		end if
+	end if
+#endif
+
 end subroutine advance_b_halfstep
 
 
@@ -702,18 +771,37 @@ end subroutine advance_b_halfstep
 !							
 !-------------------------------------------------------------------------------
 
-subroutine advance_e_fullstep()
+subroutine advance_e_fullstep(time)
 
 	implicit none
-	
+	real time
 	! local variables
 
 	integer ::k1,k2,j1,j2,i1,i2, kp1, jp1, ip1, km1, jm1, im1, i, j, k
 	real const
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw, x, v
 #ifdef ABSORB
 	real lam
 	integer iglobv,jglobv,kglobv
 #endif
+
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	turbulenceBy = B0y;
+	turbulenceBz = B0z;
+	turbulenceEy = E0y;
+	turbulenceEz = E0z;
+
+	v = beta*c
+	kw = 2*3.1415927/100;
+	x = xglob(mx*1.0)
 	
 	if(periodicx.eq.1) then
 		i1=3
@@ -733,8 +821,20 @@ subroutine advance_e_fullstep()
 			i1=2
 			i2=mx
 		endif
-	endif		
-	
+	endif
+
+#ifdef turbulence
+	if(periodicx.eq.1) then
+		i1=3
+		i2=mx-3
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+			i1=3;
+			i2=mx-1;
+		endif
+	endif
+#endif
+
 	
 	if(periodicy.eq.1) then
 		j1=3
@@ -834,6 +934,39 @@ subroutine advance_e_fullstep()
 #endif
 			enddo
 		enddo
+#endif
+
+#ifdef turbulence
+	if(periodicx.eq.1) then
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+#ifndef twoD
+			do k=k1,k2		!3,mz-3 !2,mz !3,mz-3
+				km1=k-1
+				do j=j1,j2		!3,my-3 !2,mz !3,my-3
+					jm1=j-1
+					i=mx	!2,mx !3,mx-3 !2,mx
+					im1=i-1
+						!print *, 'i', i
+					ex(i,j,k)=ex(i,j,k)
+					ey(i,j,k)=E0y + turbulenceEy*sin(kw*(x+ v*time));
+					ez(i,j,k)=E0z + turbulenceEz*sin(kw*(x+ v*time));
+				enddo
+			enddo
+#else
+			k=1
+			do j=j1,j2			!3,my-3 !2,mz !3,my-3
+				jm1=j-1
+				i=mx	!2,mx !3,mx-3 !2,mx
+				im1=i-1
+				!print *, 'i', i
+				ex(i,j,k)=ex(i,j,k)
+				ey(i,j,k)=E0y + turbulenceEy*sin(kw*(x+ v*time));
+				ez(i,j,k)=E0z + turbulenceEz*sin(kw*(x+ v*time));
+			enddo
+#endif
+		endif
+	endif
 #endif
 
 end subroutine advance_e_fullstep
@@ -1364,12 +1497,12 @@ end subroutine add_current
 !
 !-------------------------------------------------------------------------------
 
-subroutine advance_Bhalfstep()
+subroutine advance_Bhalfstep(time)
 
 	implicit none
-
+	real time
 	if(.not. highorder) then 
-		call advance_b_halfstep()
+		call advance_b_halfstep(time)
 	else
 		call advance_b_halfstep_42()
 	endif
@@ -1385,13 +1518,13 @@ end subroutine
 !
 !-------------------------------------------------------------------------------
 
-subroutine advance_Efield()
+subroutine advance_Efield(time)
 
 	implicit none
-
+	real time
 	
 	if(.not. highorder) then 
-		call advance_e_fullstep()
+		call advance_e_fullstep(time)
 	else
 		call advance_e_fullstep_42()
 	endif
