@@ -47,7 +47,7 @@ interval	= 20000		# plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 1 		# downsampling factor for grid output
-stride		= 1		# particle stride for particle output
+stride		= 100		# particle stride for particle output?
 
 ###############################################################
 writetestlec    = 0             # write test electrons for tracking 
