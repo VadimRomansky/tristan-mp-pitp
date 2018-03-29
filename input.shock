@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 28                    # number of cpus in x direction
+sizex	= 140                    # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -20,7 +20,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 15000 		# number of actual grid points in the x direction
+mx0 	= 100000 		# number of actual grid points in the x direction
 my0 	= 1000			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
@@ -73,21 +73,21 @@ enlarge		= 0 			# if 1, enlarge box in the x direction if injector is close to r
 
 <fields>
 
-btheta	= 33			# bfield angle bphi=0 -> bz, bphi=90 in x-y plane, btheta=0-> parallel
+btheta	= 90			# bfield angle bphi=0 -> bz, bphi=90 in x-y plane, btheta=0-> parallel
 bphi	= 90 			#
 
 <particles>
 
-sigma	= 0.03		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
-maxptl0 = 1e8		# max number of particles in the simulation
+sigma	= 0.3		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+maxptl0 = 5e9		# max number of particles in the simulation
 ppc0 	= 16		# number of particles per cell
 
 
-delgam 	= 2.e-5	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
-me	= 1.			# electron mass
-mi	= 100. 			# ion mass (actually mass to charge ratio)
+delgam 	= 9.e-6	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
+me	= 18.36			# electron mass
+mi	= 1836.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 0.15			# flow drift gamma. If < 1, interpreted as v/c. 
+gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction
 c_omp	= 10			# electron skin depth in cells
 
