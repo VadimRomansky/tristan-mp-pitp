@@ -33,11 +33,13 @@ g9=hdf5read('./output/spect9.007','gamma');
 Nx = size(fp0,1);
 Np = size(fp0,2);
 
-Fp(1:Np,1:10)=0;
-Fe(1:Np,1:10)=0;
-Pp(1:Np,1:10)=0;
-Pe(1:Np,1:10)=0;
-g(1:Np,1:10) = 0;
+Nd = 10;
+
+Fp(1:Np,1:Nd)=0;
+Fe(1:Np,1:Nd)=0;
+Pp(1:Np,1:Nd)=0;
+Pe(1:Np,1:Nd)=0;
+g(1:Np,1:Nd) = 0;
 
 Color = {[.7,.3,.3],'red','green','blue','black','yellow',[.5,.5,.5],'cyan',[.3,.7,.3], 'magenta',[1.0,.5,0],[.75,0.0,.7]};
 
@@ -52,7 +54,7 @@ for i = 1:Np,
     g(i,8)=g7(i);
     g(i,9)=g8(i);
     g(i,10)=g9(i);
-    for k = 1:10,
+    for k = 1:Nd,
         Pp(i,k) = sqrt((g(i,k)+1)^2 - 1);
         Pe(i,k) = sqrt((g(i,k)+1)^2 - 1);
     end;
@@ -78,7 +80,7 @@ for i = 1:Np,
         Fp(i,10) = Fp(i,10) + fp9(j,i);
         Fe(i,10) = Fe(i,10) + fe9(j,i);
     end;
-    for j=1:10,
+    for j=1:Nd,
         Fp(i,j)=Fp(i,j)*(Pp(i,j)^3)/(1+g(i,j));
         Fe(i,j)=Fe(i,j)*(Pe(i,j)^3)/(1+g(i,j));;
     end;
@@ -91,7 +93,7 @@ hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
-for j=1:10,
+for j=1:Nd,
     plot (Pp(1:Np,j),Fp(1:Np,j),'color',Color{j});
 end;
 legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 60^{\circ}','{\theta} = 70^{\circ}', '{\theta} = 80^{\circ}','{\theta} = 90^{\circ}','Location','southeast');
@@ -102,7 +104,7 @@ hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
-for j=1:10,
+for j=1:Nd,
     plot (Pe(1:Np,j),Fe(1:Np,j),'color',Color{j});
 end;
 legend('{\theta} = 0^{\circ}','{\theta} = 10^{\circ}','{\theta} = 20^{\circ}','{\theta} = 30^{\circ}','{\theta} = 40^{\circ}','{\theta} = 50^{\circ}','{\theta} = 60^{\circ}','{\theta} = 70^{\circ}','{\theta} = 80^{\circ}','{\theta} = 90^{\circ}','Location','southeast');
