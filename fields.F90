@@ -1750,3 +1750,21 @@ end module m_fields
 #else
 end module m_fields_3d
 #endif
+
+
+subroutine evaluate_turbulence_b_right_boundary()
+implicit none
+	real time
+
+	! local variables
+		
+	integer ::k1,k2,j1,j2,i1,i2, kp1, ip1, jp1, km1, jm1, im1, i, j, k
+	real betx, alpx, const, const2, const3
+	logical :: pukhov
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw, x, v
+
+	
+
+
+end subroutine evaluate_turbulence_b_right_boundary()

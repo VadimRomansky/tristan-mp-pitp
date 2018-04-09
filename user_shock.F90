@@ -224,15 +224,7 @@ subroutine init_EMfields_user()
 		do  j=1,my
 			do  i=1,mx
 ! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-#ifdef turbulence
-				bx(i,j,k)=B0x + turbulemceBx*sin(kw*yglob(i*1.0));
-				by(i,j,k)=B0y;
-				bz(i,j,k)=B0z;
 
-				ex(i,j,k)=E0x;
-				ey(i,j,k)=E0y;
-				ez(i,j,k)=E0z;
-#else
 				bx(i,j,k)=B0x;
 				by(i,j,k)=B0y;
 				bz(i,j,k)=B0z;
@@ -240,10 +232,12 @@ subroutine init_EMfields_user()
 				ex(i,j,k)=E0x;
 				ey(i,j,k)=E0y;
 				ez(i,j,k)=E0z;
-#endif
 			enddo
 		enddo
 	enddo
+#ifdef turbulence
+	call init_turbulent_field()
+#endif
 
 end subroutine init_EMfields_user
 
@@ -479,6 +473,80 @@ end subroutine inject_particles_user
    implicit none
 
  end subroutine shift_domain_user
+
+subroutine init_turbulent_field
+	implicit none
+	integer :: i, j, k, ki, kj, kk
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw
+	real kx, ky, kz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	integer randomseed;
+
+	randomseed = 10
+
+
+	do ki = 0, mx0-1
+		do kj = 0, my0-1
+			do kk = 0, mz0-1
+
+			if ki + kj + kk .ne. 0 then
+	
+				phase1 = rand(randomseed);
+				phase2 = rand(randomseed);
+
+				kx = ki*2*3.1415927/mx0;
+				ky = kj*2*3.1415927/my0;
+				kz = kk*2*3.1415927/mz0;
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kxy = sqrt(kx*kx + ky*ky);
+				cosTheta = kz/kw;
+				sinTheta = kxy/kw;
+				if(ki + kj .ne. 0) then
+					cosPhi = kx/kxy;
+					sinPhi = ky/kxy;
+				else 
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+	
+				Bturbulent = evaluateTurbulentB(ki, kj, kk);
+	
+	
+				do  k=1,mz
+					do  j=1,my
+						do  i=1,mx
+							! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+							kmultr = sinTheta*sin(kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
+							localB1 = Bturbulent*(kmultr + phase1);
+							localB2 = Bturbulent*(kmultr + phase2);
+
+							bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
+							by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
+							bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
+
+							ex(i,j,k)=ex(i,j,k);
+							ey(i,j,k)=ey(i,j,k) - beta*( - localB1*cosTheta*sinPhi + localB2*cosPhi);
+							ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*cosPhi - localB2*sinPhi);
+						enddo
+					enddo
+				enddo
+			endif
+		enddo
+	enddo
+enddo
+	
+
+	
+end subroutine init_turbulent_field
+
+subroutine evaluateTurbulentB(ki, kj, kk)
+end subroutine evaluateTurbulentB
  
 #ifdef twoD
 end module m_user
