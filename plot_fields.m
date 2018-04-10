@@ -1,10 +1,10 @@
 clear;
-!Bx = hdf5read('./output/flds.tot.005','bx');
-!By = hdf5read('./output/flds.tot.005','by');
-Bz = hdf5read('./output/flds.tot.005','bz');
-!Ex = hdf5read('./output/flds.tot.001','ex');
-!Ey = hdf5read('./output/flds.tot.001','ey');
-!Ez = hdf5read('./output/flds.tot.001','ez');
+Bx = hdf5read('./output/flds.tot.001','bx');
+By = hdf5read('./output/flds.tot.001','by');
+Bz = hdf5read('./output/flds.tot.001','bz');
+Ex = hdf5read('./output/flds.tot.001','ex');
+Ey = hdf5read('./output/flds.tot.001','ey');
+Ez = hdf5read('./output/flds.tot.001','ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);

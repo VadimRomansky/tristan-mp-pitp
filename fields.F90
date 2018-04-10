@@ -113,6 +113,10 @@ module m_fields_3d
 	public :: advance_Efield, advance_Bhalfstep, add_current, allocate_fields, read_input_grid, &
 	read_input_fields, reset_currents
 
+	real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
+
+
+
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
 			  beta, xinject, xinject2, xinject3, yinject, yinject2, mx, my, mz, mxl, myl, mzl, &
@@ -760,6 +764,10 @@ subroutine advance_b_halfstep(time)
 	end if
 #endif
 
+#ifdef turbulence
+	call evaluate_turbulence_b_right_boundary()
+#endif
+
 end subroutine advance_b_halfstep
 
 
@@ -967,6 +975,10 @@ subroutine advance_e_fullstep(time)
 #endif
 		endif
 	endif
+#endif
+
+#ifdef turbulence
+	call evaluate_turbulence_e_right_boundary()
 #endif
 
 end subroutine advance_e_fullstep
@@ -1753,18 +1765,166 @@ end module m_fields_3d
 
 
 subroutine evaluate_turbulence_b_right_boundary()
-implicit none
-	real time
-
-	! local variables
-		
-	integer ::k1,k2,j1,j2,i1,i2, kp1, ip1, jp1, km1, jm1, im1, i, j, k
-	real betx, alpx, const, const2, const3
-	logical :: pukhov
+	implicit none
+	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
-	real kw, x, v
+	real kw, v
+	real kx, ky, kz, kxy
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	integer randomseed;
+
+	randomseed = 10
+	call srand(randomseed)
+
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	turbulenceBy = B0y;
+	turbulenceBz = B0z;
+	turbulenceEy = E0y;
+	turbulenceEz = E0z;
+
+	v = beta*c
+	kw = 2*3.1415927/100;
+	x = xglob(mx-1.0)
+
+	do  k=1,mz
+		do  j=1,my
+			i = mx - 1
+			bx(i,j,k)=B0x;
+			by(i,j,k)=B0y;
+			bz(i,j,k)=B0z;
+
+		enddo
+	
+	enddo
+
+	if(periodicx.eq.1)then
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+
+			do ki = 0, mx0-1
+				do kj = 0, my0-1
+					do kk = 0, mz0-1
+
+						if ((ki + kj + kk) .ne. 0) then
+	
+							phase1 = rand();
+							phase2 = rand();
+		
+							kx = ki*2*3.1415927/mx0;
+							ky = kj*2*3.1415927/my0;
+							kz = kk*2*3.1415927/mz0;
+
+							kw = sqrt(kx*kx + ky*ky + kz*kz);
+							kxy = sqrt(kx*kx + ky*ky);
+							cosTheta = kz/kw;
+							sinTheta = kxy/kw;
+							if((ki + kj) .ne. 0) then
+								cosPhi = kx/kxy;
+								sinPhi = ky/kxy;
+							else 
+								cosPhi = 1.0
+								sinPhi = 0.0
+							endif
+	
+							Bturbulent = evaluate_turbulent_b(ki, kj, kk);
+	
+	
+							do  k=1,mz
+								do  j=1,my
+									i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
+
+									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+									kmultr = sinTheta*sin((kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
+									localB1 = Bturbulent*(kmultr + phase1);
+									localB2 = Bturbulent*(kmultr + phase2);
+
+									bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
+									by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
+									bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
+								enddo
+							enddo
+						endif
+					enddo
+				enddo
+			enddo
+		endif
+	endif
 
 	
 
 
-end subroutine evaluate_turbulence_b_right_boundary()
+end subroutine evaluate_turbulence_b_right_boundary
+
+subroutine evaluate_turbulence_e_right_boundary()
+	implicit none
+	integer :: i, j, k, ki, kj, kk
+	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real kw, v
+	real kx, ky, kz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	integer randomseed;
+
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	turbulenceBy = B0y;
+	turbulenceBz = B0z;
+	turbulenceEy = E0y;
+	turbulenceEz = E0z;
+
+	v = beta*c
+	kw = 2*3.1415927/100;
+	x = xglob(mx-1.0)
+
+	do  k=1,mz
+		do  j=1,my
+			i = mx - 1
+			bx(i,j,k)=B0x;
+			by(i,j,k)=B0y;
+			bz(i,j,k)=B0z;
+
+		enddo
+	
+	enddo
+
+	if(periodicx.eq.1)then
+	else
+		if(modulo(rank,sizex).eq.sizex-1)then
+			do  k=1,mz
+				do  j=1,my
+					i = mx  !1,mx-1 !3,mx-3 !1,mx-1
+
+					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+					ex(i,j,k)=E0x;
+					ey(i,j,k)=- beta*ez(i-1,j,k);
+					ez(i,j,k)= bet*ey(i-1,j,k);
+				enddo
+			enddo
+		endif
+	endif
+end subroutine evaluate_turbulence_e_right_boundary
+
+real function evaluate_turbulent_b(ki, kj, kk)
+	integer ki, kj, kk
+	evaluate_turbulent_b = 0.1/(mx0*my0*mz0)
+end function evaluate_turbulent_b

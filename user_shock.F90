@@ -479,7 +479,7 @@ subroutine init_turbulent_field
 	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
 	real kw
-	real kx, ky, kz
+	real kx, ky, kz, kxy
 	real phase1, phase2
 	real cosTheta, sinTheta, cosPhi, sinPhi
 	real Bturbulent
@@ -487,7 +487,8 @@ subroutine init_turbulent_field
 	real localB1, localB2
 	integer randomseed;
 
-	randomseed = 10
+	call randomseed = 10
+	srand(randomseed)
 
 
 	do ki = 0, mx0-1
@@ -496,8 +497,8 @@ subroutine init_turbulent_field
 
 			if ki + kj + kk .ne. 0 then
 	
-				phase1 = rand(randomseed);
-				phase2 = rand(randomseed);
+				phase1 = rand();
+				phase2 = rand();
 
 				kx = ki*2*3.1415927/mx0;
 				ky = kj*2*3.1415927/my0;
@@ -515,7 +516,7 @@ subroutine init_turbulent_field
 					sinPhi = 0.0
 				endif
 	
-				Bturbulent = evaluateTurbulentB(ki, kj, kk);
+				Bturbulent = evaluate_turbulent_b(ki, kj, kk);
 	
 	
 				do  k=1,mz
@@ -544,9 +545,6 @@ enddo
 
 	
 end subroutine init_turbulent_field
-
-subroutine evaluateTurbulentB(ki, kj, kk)
-end subroutine evaluateTurbulentB
  
 #ifdef twoD
 end module m_user
