@@ -1812,18 +1812,18 @@ subroutine evaluate_turbulence_b_right_boundary()
 	else
 		if(modulo(rank,sizex).eq.sizex-1)then
 
-			do ki = 0, mx0-1
-				do kj = 0, my0-1
-					do kk = 0, mz0-1
+			do ki = 0, mx0-5
+				do kj = 0, my0-5
+					do kk = 0, mz0-5
 
 						if ((ki + kj + kk) .ne. 0) then
 	
 							phase1 = rand();
 							phase2 = rand();
 		
-							kx = ki*2*3.1415927/mx0;
-							ky = kj*2*3.1415927/my0;
-							kz = kk*2*3.1415927/mz0;
+							kx = ki*2*3.1415927/(mx0-4);
+							ky = kj*2*3.1415927/(my0-4);
+							kz = kk*2*3.1415927/(mz0-4);
 
 							kw = sqrt(kx*kx + ky*ky + kz*kz);
 							kxy = sqrt(kx*kx + ky*ky);
@@ -1926,5 +1926,16 @@ end subroutine evaluate_turbulence_e_right_boundary
 
 real function evaluate_turbulent_b(ki, kj, kk)
 	integer ki, kj, kk
+	real turbulentE, Bamplitude, pi
+	pi = 3.1415927;
+	kx = ki*2/(mx0-4);
+	ky = kj*2/(my0-4);
+	kz = kk*2/(mz0-4);
+
+	kw = sqrt(kx*kx + ky*ky + kz*kz);
+	kxy = sqrt(kx*kx + ky*ky);
+
+	turbulentE = 0.1*Binit*Binit/(8*pi)
+
 	evaluate_turbulent_b = 0.1/(mx0*my0*mz0)
 end function evaluate_turbulent_b

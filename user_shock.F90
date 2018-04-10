@@ -491,18 +491,18 @@ subroutine init_turbulent_field
 	srand(randomseed)
 
 
-	do ki = 0, mx0-1
-		do kj = 0, my0-1
-			do kk = 0, mz0-1
+	do ki = 0, mx0-5
+		do kj = 0, my0-5
+			do kk = 0, mz0-5
 
 			if ki + kj + kk .ne. 0 then
 	
 				phase1 = rand();
 				phase2 = rand();
 
-				kx = ki*2*3.1415927/mx0;
-				ky = kj*2*3.1415927/my0;
-				kz = kk*2*3.1415927/mz0;
+				kx = ki*2*3.1415927/(mx0-4);
+				ky = kj*2*3.1415927/(my0-4);
+				kz = kk*2*3.1415927/(mz0-4);
 
 				kw = sqrt(kx*kx + ky*ky + kz*kz);
 				kxy = sqrt(kx*kx + ky*ky);
