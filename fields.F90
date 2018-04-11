@@ -1834,15 +1834,25 @@ real function evaluate_turbulent_b(ki, kj, kk)
 	real kw, v
 	real kx, ky, kz, kxy
 	pi = 3.1415927;
-	kx = ki*2/(mx0-4);
-	ky = kj*2/(my0-4);
-	kz = kk*2/(mz0-4);
+	kx = ki*2/(mx0-5);
+	ky = kj*2/(my0-5);
+#ifdef twoD
+	kz = 0
+#else
+	kz = kk*2/(mz0-5);
+#endif
 
 	kw = sqrt(kx*kx + ky*ky + kz*kz);
 
 	turbulentE = 0.1*Binit*Binit/(8*pi)
-
-	evaluate_turbulent_b = 0.1/((mx0-4)*(my0-4)*(mz0-4))
+#ifdef twoD
+	Bamplitude = 0.1*Binit/sqrt(1.0*(mx0-5)*(my0-5))
+#else
+	Bamplitude = 0.1*Binit/sqrt(1.0*(mx0-5)*(my0-5)*(mz0-5))
+#endif
+	!print *, 'Binit', Binit
+	!print *, 'Bamplitude', Bamplitude
+	evaluate_turbulent_b = Bamplitude
 end function evaluate_turbulent_b
 
 #ifdef twoD

@@ -218,6 +218,8 @@ subroutine init_EMfields_user()
 
 	kw = 2*3.1415927/50;
 
+	print *, 'init fields'
+
 	do  k=1,mz
 		do  j=1,my
 			do  i=1,mx
@@ -488,10 +490,16 @@ subroutine init_turbulent_field
 	randomseed = 10
 	call srand(randomseed)
 
+	print *, 'start initializing turbulence'
 
+	print *, mx0, my0, mz0
 	do ki = 0, mx0-5
 		do kj = 0, my0-5
+#ifdef twoD
+			kk = 0
+#else
 			do kk = 0, mz0-5
+#endif
 
 				if ((ki + kj + kk) .ne. 0) then
 	
@@ -516,14 +524,14 @@ subroutine init_turbulent_field
 	
 					Bturbulent = evaluate_turbulent_b(ki, kj, kk);
 	
-	
+					!print *, 'Bturbulent', Bturbulent
 					do  k=1,mz
 						do  j=1,my
 							do  i=1,mx
 								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-								kmultr = sinTheta*sin(kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
-								localB1 = Bturbulent*(kmultr + phase1);
-								localB2 = Bturbulent*(kmultr + phase2);
+								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+								localB1 = Bturbulent*sin(kmultr + phase1);
+								localB2 = Bturbulent*sin(kmultr + phase2);
 
 								bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
 								by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
@@ -536,7 +544,9 @@ subroutine init_turbulent_field
 						enddo
 					enddo	
 				endif
+#ifndef twoD
 			enddo
+#endif
 		enddo
 	enddo
 	
