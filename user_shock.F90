@@ -78,6 +78,9 @@ module m_user_3d
 	public :: init_EMfields_user, init_particle_distribution_user, &
 	inject_particles_user, read_input_user, field_bc_user, get_external_fields, &
 	particle_bc_user, shift_domain_user
+	public :: init_turbulent_field
+
+	!public :: evaluate_turbulent_b
 
 !-------------------------------------------------------------------------------
 !	MODULE PROCEDURES AND FUNCTIONS
@@ -190,7 +193,7 @@ subroutine init_EMfields_user()
 	! local variables
 	
 	integer :: i, j, k
-	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real B0x, B0y, B0z, E0x, E0y, E0z
 	real kw, v
 
 ! sqrt(sigma)=omega_c/omega_p = (qe B / gamma0 me c)/sqrt( qe 0.5 ppc0 (1+me/mi)/gamma0)  !4 pi=1, qe/me = 1 
@@ -212,11 +215,6 @@ subroutine init_EMfields_user()
 	E0y=(-beta)*B0z
 	E0z=-(-beta)*B0y
 
-	turbulenceBx = B0z;
-	turbulenceBy = B0y;
-	turbulenceBz = B0z;
-	turbulenceEy = E0y;
-	turbulenceEz = E0z;
 
 	kw = 2*3.1415927/50;
 
@@ -477,7 +475,7 @@ end subroutine inject_particles_user
 subroutine init_turbulent_field
 	implicit none
 	integer :: i, j, k, ki, kj, kk
-	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
+	real B0x, B0y, B0z, E0x, E0y, E0z
 	real kw
 	real kx, ky, kz, kxy
 	real phase1, phase2
@@ -487,65 +485,65 @@ subroutine init_turbulent_field
 	real localB1, localB2
 	integer randomseed;
 
-	call randomseed = 10
-	srand(randomseed)
+	randomseed = 10
+	call srand(randomseed)
 
 
 	do ki = 0, mx0-5
 		do kj = 0, my0-5
 			do kk = 0, mz0-5
 
-			if ki + kj + kk .ne. 0 then
+				if ((ki + kj + kk) .ne. 0) then
 	
-				phase1 = rand();
-				phase2 = rand();
+					phase1 = rand();
+					phase2 = rand();
 
-				kx = ki*2*3.1415927/(mx0-4);
-				ky = kj*2*3.1415927/(my0-4);
-				kz = kk*2*3.1415927/(mz0-4);
-
-				kw = sqrt(kx*kx + ky*ky + kz*kz);
-				kxy = sqrt(kx*kx + ky*ky);
-				cosTheta = kz/kw;
-				sinTheta = kxy/kw;
-				if(ki + kj .ne. 0) then
-					cosPhi = kx/kxy;
-					sinPhi = ky/kxy;
-				else 
-					cosPhi = 1.0
-					sinPhi = 0.0
-				endif
+					kx = ki*2*3.1415927/(mx0-4);
+					ky = kj*2*3.1415927/(my0-4);
+					kz = kk*2*3.1415927/(mz0-4);
 	
-				Bturbulent = evaluate_turbulent_b(ki, kj, kk);
+					kw = sqrt(kx*kx + ky*ky + kz*kz);
+					kxy = sqrt(kx*kx + ky*ky);
+					cosTheta = kz/kw;
+					sinTheta = kxy/kw;
+					if(ki + kj .ne. 0) then
+						cosPhi = kx/kxy;
+						sinPhi = ky/kxy;
+					else 
+						cosPhi = 1.0
+						sinPhi = 0.0
+					endif
+	
+					Bturbulent = evaluate_turbulent_b(ki, kj, kk);
 	
 	
-				do  k=1,mz
-					do  j=1,my
-						do  i=1,mx
-							! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-							kmultr = sinTheta*sin(kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
-							localB1 = Bturbulent*(kmultr + phase1);
-							localB2 = Bturbulent*(kmultr + phase2);
+					do  k=1,mz
+						do  j=1,my
+							do  i=1,mx
+								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+								kmultr = sinTheta*sin(kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
+								localB1 = Bturbulent*(kmultr + phase1);
+								localB2 = Bturbulent*(kmultr + phase2);
 
-							bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
-							by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
-							bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
-
-							ex(i,j,k)=ex(i,j,k);
-							ey(i,j,k)=ey(i,j,k) - beta*( - localB1*cosTheta*sinPhi + localB2*cosPhi);
-							ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*cosPhi - localB2*sinPhi);
+								bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
+								by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
+								bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
+	
+								ex(i,j,k)=ex(i,j,k);
+								ey(i,j,k)=ey(i,j,k) - beta*( - localB1*cosTheta*sinPhi + localB2*cosPhi);
+								ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*cosPhi - localB2*sinPhi);
+							enddo
 						enddo
-					enddo
-				enddo
-			endif
+					enddo	
+				endif
+			enddo
 		enddo
 	enddo
-enddo
 	
 
 	
 end subroutine init_turbulent_field
- 
+
 #ifdef twoD
 end module m_user
 #else

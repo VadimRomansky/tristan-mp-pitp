@@ -113,8 +113,8 @@ module m_fields_3d
 	public :: advance_Efield, advance_Bhalfstep, add_current, allocate_fields, read_input_grid, &
 	read_input_fields, reset_currents
 
-	real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
-
+	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
+	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
@@ -125,6 +125,7 @@ module m_fields_3d
 			  sendbufz, temp, mx0, my0, mz0, mzall, myall, mxall, mxlast, mylast, mzlast, &
 			  mxcum, mycum,	mzcum, ntimes, cleanfld, cleanint, frestartfldlap, mxrest, myrest, mzrest, &						  ! used in outputs module
 			  highorder, corr, x1in, x2in, y1in, y2in, z1in, z2in
+	
        public :: xglob, yglob, zglob, iglob, jglob, kglob, iloc, jloc, kloc
 
 #ifdef filter2
@@ -612,20 +613,6 @@ subroutine advance_b_halfstep(time)
 			i2=mx-1
 		endif
 	endif
-
-#ifdef turbulence
-	if(periodicx.eq.1) then
-		i1=3
-		i2=mx-3
-	else
-		if(modulo(rank,sizex).eq.sizex-1)then
-			i1=3;
-			i2=mx-2;
-		endif
-	endif
-#endif
-
-
 		
 	
 	if(periodicy.eq.1) then
@@ -731,41 +718,7 @@ subroutine advance_b_halfstep(time)
 #endif
 
 #ifdef turbulence
-	if(periodicx.eq.1) then
-	else
-		if(modulo(rank,sizex).eq.sizex-1)then
-#ifndef twoD
-			do k=k1,k2           !3,mz-3 !1,mz-1 !3,mz-3
-				kp1=k+1
-				do j=j1,j2       !3,my-3 !1,my-1 !3,my-3
-					jp1=j+1
-					i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
-					ip1=i+1
-					bx(i,j,k)=bx(i,j,k)
-					by(i,j,k)=B0y + turbulenceBy*sin(kw*(x+v*time))
-					bz(i,j,k)=B0z + turbulenceBz*sin(kw*(x+v*time))
-				enddo
-			enddo
-
-#else
-			k=1
-			do j=j1,j2			!3,my-3 !1,my-1 !3,my-3
-				jp1=j+1
-				i = mx-1		!1,mx-1 !3,mx-3 !1,mx-1
-				ip1=i+1
-
-				bx(i,j,k)=bx(i,j,k)
-				by(i,j,k)=B0y + turbulenceBy*sin(kw*(x+v*time))
-				bz(i,j,k)=B0z + turbulenceBz*sin(kw*(x+v*time))
-
-			enddo
-#endif
-		end if
-	end if
-#endif
-
-#ifdef turbulence
-	call evaluate_turbulence_b_right_boundary()
+	call evaluate_turbulence_b_right_boundary(time)
 #endif
 
 end subroutine advance_b_halfstep
@@ -830,18 +783,6 @@ subroutine advance_e_fullstep(time)
 			i2=mx
 		endif
 	endif
-
-#ifdef turbulence
-	if(periodicx.eq.1) then
-		i1=3
-		i2=mx-3
-	else
-		if(modulo(rank,sizex).eq.sizex-1)then
-			i1=3;
-			i2=mx-1;
-		endif
-	endif
-#endif
 
 	
 	if(periodicy.eq.1) then
@@ -944,41 +885,9 @@ subroutine advance_e_fullstep(time)
 		enddo
 #endif
 
-#ifdef turbulence
-	if(periodicx.eq.1) then
-	else
-		if(modulo(rank,sizex).eq.sizex-1)then
-#ifndef twoD
-			do k=k1,k2		!3,mz-3 !2,mz !3,mz-3
-				km1=k-1
-				do j=j1,j2		!3,my-3 !2,mz !3,my-3
-					jm1=j-1
-					i=mx	!2,mx !3,mx-3 !2,mx
-					im1=i-1
-						!print *, 'i', i
-					ex(i,j,k)=ex(i,j,k)
-					ey(i,j,k)=E0y + turbulenceEy*sin(kw*(x+ v*time));
-					ez(i,j,k)=E0z + turbulenceEz*sin(kw*(x+ v*time));
-				enddo
-			enddo
-#else
-			k=1
-			do j=j1,j2			!3,my-3 !2,mz !3,my-3
-				jm1=j-1
-				i=mx	!2,mx !3,mx-3 !2,mx
-				im1=i-1
-				!print *, 'i', i
-				ex(i,j,k)=ex(i,j,k)
-				ey(i,j,k)=E0y + turbulenceEy*sin(kw*(x+ v*time));
-				ez(i,j,k)=E0z + turbulenceEz*sin(kw*(x+ v*time));
-			enddo
-#endif
-		endif
-	endif
-#endif
 
 #ifdef turbulence
-	call evaluate_turbulence_e_right_boundary()
+	call evaluate_turbulence_e_right_boundary(time)
 #endif
 
 end subroutine advance_e_fullstep
@@ -1757,18 +1666,13 @@ real function lambda(sx,sy,sz)
 end function lambda
 #endif
 
-#ifdef twoD
-end module m_fields
-#else
-end module m_fields_3d
-#endif
 
-
-subroutine evaluate_turbulence_b_right_boundary()
+subroutine evaluate_turbulence_b_right_boundary(time)
 	implicit none
+	real time
 	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
-	real kw, v
+	real kw, v, x
 	real kx, ky, kz, kxy
 	real phase1, phase2
 	real cosTheta, sinTheta, cosPhi, sinPhi
@@ -1866,12 +1770,13 @@ subroutine evaluate_turbulence_b_right_boundary()
 
 end subroutine evaluate_turbulence_b_right_boundary
 
-subroutine evaluate_turbulence_e_right_boundary()
+subroutine evaluate_turbulence_e_right_boundary(time)
 	implicit none
+	real time
 	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
 	real kw, v
-	real kx, ky, kz
+	real kx, ky, kz, kxy
 	real phase1, phase2
 	real cosTheta, sinTheta, cosPhi, sinPhi
 	real Bturbulent
@@ -1894,7 +1799,6 @@ subroutine evaluate_turbulence_e_right_boundary()
 
 	v = beta*c
 	kw = 2*3.1415927/100;
-	x = xglob(mx-1.0)
 
 	do  k=1,mz
 		do  j=1,my
@@ -1917,7 +1821,7 @@ subroutine evaluate_turbulence_e_right_boundary()
 					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 					ex(i,j,k)=E0x;
 					ey(i,j,k)=- beta*ez(i-1,j,k);
-					ez(i,j,k)= bet*ey(i-1,j,k);
+					ez(i,j,k)= beta*ey(i-1,j,k);
 				enddo
 			enddo
 		endif
@@ -1927,15 +1831,22 @@ end subroutine evaluate_turbulence_e_right_boundary
 real function evaluate_turbulent_b(ki, kj, kk)
 	integer ki, kj, kk
 	real turbulentE, Bamplitude, pi
+	real kw, v
+	real kx, ky, kz, kxy
 	pi = 3.1415927;
 	kx = ki*2/(mx0-4);
 	ky = kj*2/(my0-4);
 	kz = kk*2/(mz0-4);
 
 	kw = sqrt(kx*kx + ky*ky + kz*kz);
-	kxy = sqrt(kx*kx + ky*ky);
 
 	turbulentE = 0.1*Binit*Binit/(8*pi)
 
-	evaluate_turbulent_b = 0.1/(mx0*my0*mz0)
+	evaluate_turbulent_b = 0.1/((mx0-4)*(my0-4)*(mz0-4))
 end function evaluate_turbulent_b
+
+#ifdef twoD
+end module m_fields
+#else
+end module m_fields_3d
+#endif
