@@ -487,6 +487,7 @@ subroutine init_turbulent_field
 	real kmultr
 	real localB1, localB2
 	integer randomseed;
+	real pi;
 
 	randomseed = 10
 	call srand(randomseed)
@@ -497,6 +498,8 @@ subroutine init_turbulent_field
 
 	minTurbulentLambda = 10;
 	maxTurbulentLambda = 1000;
+
+	pi = 3.1415927;
 	
 
 	maxKx = maxTurbulentLambda/minTurbulentLambda;
@@ -520,12 +523,13 @@ subroutine init_turbulent_field
 
 				if ((ki + kj + kk) .ne. 0) then
 	
-					phase1 = rand();
-					phase2 = rand();
+					phase1 = 2*pi*rand();
+					phase2 = 2*pi*rand();
 
-					kx = ki*2*3.1415927/maxTurbulentLambda;
-					ky = kj*2*3.1415927/maxTurbulentLambda;
-					kz = kk*2*3.1415927/maxTurbulentLambda;
+
+					kx = ki*2*pi/maxTurbulentLambda;
+					ky = kj*2*pi/maxTurbulentLambda;
+					kz = kk*2*pi/maxTurbulentLambda;
 	
 					kw = sqrt(kx*kx + ky*ky + kz*kz);
 					kxy = sqrt(kx*kx + ky*ky);

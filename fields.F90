@@ -1684,9 +1684,12 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	real kmultr
 	real localB1, localB2
 	integer randomseed;
+	real pi;
 
 	randomseed = 10
 	call srand(randomseed)
+	pi = 3.1415927;
+
 
 	B0x=Binit*cos(btheta)
 	B0y=Binit*sin(btheta)*sin(bphi)
@@ -1741,12 +1744,13 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 
 						if ((ki + kj + kk) .ne. 0) then
 	
-							phase1 = rand();
-							phase2 = rand();
+							phase1 = 2*pi*rand();
+							phase2 = 2*pi*rand();
+
 		
-							kx = ki*2*3.1415927/maxTurbulentLambda;
-							ky = kj*2*3.1415927/maxTurbulentLambda;
-							kz = kk*2*3.1415927/maxTurbulentLambda;
+							kx = ki*2*pi/maxTurbulentLambda;
+							ky = kj*2*pi/maxTurbulentLambda;
+							kz = kk*2*pi/maxTurbulentLambda;
 
 							kw = sqrt(kx*kx + ky*ky + kz*kz);
 							kxy = sqrt(kx*kx + ky*ky);
@@ -1856,8 +1860,8 @@ real function evaluate_turbulent_b(ki, kj, kk)
 	real kw, v
 	real kx, ky, kz, kxy
 	pi = 3.1415927;
-	kx = ki*2*3.1415927/maxTurbulentLambda;
-	ky = kj*2*3.1415927/maxTurbulentLambda;
+	kx = ki*2*pi/maxTurbulentLambda;
+	ky = kj*2*pi/maxTurbulentLambda;
 
 	maxKx = maxTurbulentLambda/minTurbulentLambda;
 	maxKy = maxTurbulentLambda/minTurbulentLambda;
@@ -1866,7 +1870,7 @@ real function evaluate_turbulent_b(ki, kj, kk)
 #ifdef twoD
 	kz = 0
 #else
-	kz = kk*2*3.1415927/maxTurbulentLambda;
+	kz = kk*2*pi/maxTurbulentLambda;
 #endif
 
 	kw = sqrt(kx*kx + ky*ky + kz*kz);
