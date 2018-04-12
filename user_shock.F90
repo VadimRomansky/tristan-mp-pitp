@@ -477,6 +477,7 @@ end subroutine inject_particles_user
 subroutine init_turbulent_field
 	implicit none
 	integer :: i, j, k, ki, kj, kk
+	integer maxKx, maxKy, maxKz
 	real B0x, B0y, B0z, E0x, E0y, E0z
 	real kw
 	real kx, ky, kz, kxy
@@ -493,12 +494,28 @@ subroutine init_turbulent_field
 	print *, 'start initializing turbulence'
 
 	print *, mx0, my0, mz0
-	do ki = 0, mx0-5
-		do kj = 0, my0-5
+
+	minTurbulentLambda = 10;
+	maxTurbulentLambda = 1000;
+	
+
+	maxKx = maxTurbulentLambda/minTurbulentLambda;
+	maxKy = maxTurbulentLambda/minTurbulentLambda;
+	maxKz = maxTurbulentLambda/minTurbulentLambda;
+
+#ifdef twoD
+	maxKz = 1;
+#endif
+	
+	!do ki = 0, mx0-5
+	do ki = 0, maxKx-1
+		!do kj = 0, my0-5
+		do kj = 0, maxKy-1
 #ifdef twoD
 			kk = 0
 #else
-			do kk = 0, mz0-5
+			!do kk = 0, mz0-5
+			do kk = 0, maxKz-1
 #endif
 
 				if ((ki + kj + kk) .ne. 0) then
@@ -506,9 +523,9 @@ subroutine init_turbulent_field
 					phase1 = rand();
 					phase2 = rand();
 
-					kx = ki*2*3.1415927/(mx0-4);
-					ky = kj*2*3.1415927/(my0-4);
-					kz = kk*2*3.1415927/(mz0-4);
+					kx = ki*2*3.1415927/maxTurbulentLambda;
+					ky = kj*2*3.1415927/maxTurbulentLambda;
+					kz = kk*2*3.1415927/maxTurbulentLambda;
 	
 					kw = sqrt(kx*kx + ky*ky + kz*kz);
 					kxy = sqrt(kx*kx + ky*ky);

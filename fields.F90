@@ -72,6 +72,8 @@ module m_fields_3d
 	integer :: mx,my,mz
 	
 	integer, allocatable, dimension(:) :: mxl, myl, mzl
+
+	integer :: minTurbulentLambda, maxTurbulentLambda
 	
 	integer(8) :: mx0,my0,mz0, mzall, myall, mxall, mxlast, mylast, mzlast
 	integer(8) :: mxcum, mycum, mzcum
@@ -116,6 +118,7 @@ module m_fields_3d
 	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 
+	public :: minTurbulentLambda, maxTurbulentLambda
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
@@ -1671,6 +1674,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	implicit none
 	real time
 	integer :: i, j, k, ki, kj, kk
+	integer maxKx, maxKy, maxKz
 	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
 	real kw, v, x
 	real kx, ky, kz, kxy
@@ -1716,18 +1720,33 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	else
 		if(modulo(rank,sizex).eq.sizex-1)then
 
-			do ki = 0, mx0-5
-				do kj = 0, my0-5
-					do kk = 0, mz0-5
+			maxKx = maxTurbulentLambda/minTurbulentLambda;
+			maxKy = maxTurbulentLambda/minTurbulentLambda;
+			maxKz = maxTurbulentLambda/minTurbulentLambda;
+
+#ifdef twoD
+			maxKz = 1;
+#endif
+	
+			!do ki = 0, mx0-5
+			do ki = 0, maxKx-1
+				!do kj = 0, my0-5
+				do kj = 0, maxKy-1
+#ifdef twoD
+					kk = 0
+#else
+					!do kk = 0, mz0-5
+					do kk = 0, maxKz-1
+#endif
 
 						if ((ki + kj + kk) .ne. 0) then
 	
 							phase1 = rand();
 							phase2 = rand();
 		
-							kx = ki*2*3.1415927/(mx0-4);
-							ky = kj*2*3.1415927/(my0-4);
-							kz = kk*2*3.1415927/(mz0-4);
+							kx = ki*2*3.1415927/maxTurbulentLambda;
+							ky = kj*2*3.1415927/maxTurbulentLambda;
+							kz = kk*2*3.1415927/maxTurbulentLambda;
 
 							kw = sqrt(kx*kx + ky*ky + kz*kz);
 							kxy = sqrt(kx*kx + ky*ky);
@@ -1759,7 +1778,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 								enddo
 							enddo
 						endif
+#ifndef twoD
 					enddo
+#endif
 				enddo
 			enddo
 		endif
@@ -1830,25 +1851,31 @@ end subroutine evaluate_turbulence_e_right_boundary
 
 real function evaluate_turbulent_b(ki, kj, kk)
 	integer ki, kj, kk
+	integer maxKx, maxKy, maxKz
 	real turbulentE, Bamplitude, pi
 	real kw, v
 	real kx, ky, kz, kxy
 	pi = 3.1415927;
-	kx = ki*2/(mx0-5);
-	ky = kj*2/(my0-5);
+	kx = ki*2*3.1415927/maxTurbulentLambda;
+	ky = kj*2*3.1415927/maxTurbulentLambda;
+
+	maxKx = maxTurbulentLambda/minTurbulentLambda;
+	maxKy = maxTurbulentLambda/minTurbulentLambda;
+	maxKz = maxTurbulentLambda/minTurbulentLambda;
+					
 #ifdef twoD
 	kz = 0
 #else
-	kz = kk*2/(mz0-5);
+	kz = kk*2*3.1415927/maxTurbulentLambda;
 #endif
 
 	kw = sqrt(kx*kx + ky*ky + kz*kz);
 
 	turbulentE = 0.1*Binit*Binit/(8*pi)
 #ifdef twoD
-	Bamplitude = 0.1*Binit/sqrt(1.0*(mx0-5)*(my0-5))
+	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*kw)
 #else
-	Bamplitude = 0.1*Binit/sqrt(1.0*(mx0-5)*(my0-5)*(mz0-5))
+	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*maxKz*kw*kw)
 #endif
 	!print *, 'Binit', Binit
 	!print *, 'Bamplitude', Bamplitude
