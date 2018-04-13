@@ -20,7 +20,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 10000 		# number of actual grid points in the x direction
+mx0 	= 100000 		# number of actual grid points in the x direction
 my0 	= 1000			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
@@ -43,7 +43,7 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 1        # plot interval
+interval	= 20000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 1 		# downsampling factor for grid output

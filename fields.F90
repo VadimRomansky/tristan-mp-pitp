@@ -74,6 +74,7 @@ module m_fields_3d
 	integer, allocatable, dimension(:) :: mxl, myl, mzl
 
 	integer :: minTurbulentLambda, maxTurbulentLambda
+	real :: turbulenceFieldCorrection
 	
 	integer(8) :: mx0,my0,mz0, mzall, myall, mxall, mxlast, mylast, mzlast
 	integer(8) :: mxcum, mycum, mzcum
@@ -118,7 +119,7 @@ module m_fields_3d
 	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 
-	public :: minTurbulentLambda, maxTurbulentLambda
+	public :: minTurbulentLambda, maxTurbulentLambda, turbulenceFieldCorrection
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
@@ -1764,7 +1765,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 								sinPhi = 0.0
 							endif
 	
-							Bturbulent = evaluate_turbulent_b(ki, kj, kk);
+							Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
 	
 	
 							do  k=1,mz

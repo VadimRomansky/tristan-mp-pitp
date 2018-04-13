@@ -488,6 +488,8 @@ subroutine init_turbulent_field
 	real localB1, localB2
 	integer randomseed;
 	real pi;
+	real turbulenceEnergyFraction
+	real turbulenceEnergy
 
 	randomseed = 10
 	call srand(randomseed)
@@ -498,6 +500,8 @@ subroutine init_turbulent_field
 
 	minTurbulentLambda = 10;
 	maxTurbulentLambda = 1000;
+	turbulenceEnergyFraction = 1.0
+	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
 	
@@ -509,7 +513,7 @@ subroutine init_turbulent_field
 #ifdef twoD
 	maxKz = 1;
 #endif
-	
+
 	!do ki = 0, mx0-5
 	do ki = 0, maxKx-1
 		!do kj = 0, my0-5
@@ -544,6 +548,61 @@ subroutine init_turbulent_field
 					endif
 	
 					Bturbulent = evaluate_turbulent_b(ki, kj, kk);
+
+					turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
+				endif
+#ifndef twoD
+			enddo
+#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*Binit*Binit/turbulenceEnergy);	
+	else 
+		turbulenceFieldCorrection = 1.0;
+	endif
+
+
+
+
+
+	
+	!do ki = 0, mx0-5
+	do ki = 0, maxKx-1
+		!do kj = 0, my0-5
+		do kj = 0, maxKy-1
+#ifdef twoD
+			kk = 0
+#else
+			!do kk = 0, mz0-5
+			do kk = 0, maxKz-1
+#endif
+
+				if ((ki + kj + kk) .ne. 0) then
+	
+					phase1 = 2*pi*rand();
+					phase2 = 2*pi*rand();
+
+
+					kx = ki*2*pi/maxTurbulentLambda;
+					ky = kj*2*pi/maxTurbulentLambda;
+					kz = kk*2*pi/maxTurbulentLambda;
+	
+					kw = sqrt(kx*kx + ky*ky + kz*kz);
+					kxy = sqrt(kx*kx + ky*ky);
+					cosTheta = kz/kw;
+					sinTheta = kxy/kw;
+					if(ki + kj .ne. 0) then
+						cosPhi = kx/kxy;
+						sinPhi = ky/kxy;
+					else 
+						cosPhi = 1.0
+						sinPhi = 0.0
+					endif
+	
+					Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
+
 	
 					!print *, 'Bturbulent', Bturbulent
 					do  k=1,mz
@@ -570,6 +629,9 @@ subroutine init_turbulent_field
 #endif
 		enddo
 	enddo
+
+
+	
 	
 
 	
