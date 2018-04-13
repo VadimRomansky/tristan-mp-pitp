@@ -1877,10 +1877,11 @@ real function evaluate_turbulent_b(ki, kj, kk)
 	kw = sqrt(kx*kx + ky*ky + kz*kz);
 
 	turbulentE = 0.1*Binit*Binit/(8*pi)
+!todo kolmogorov
 #ifdef twoD
-	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*kw)
+	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*(kw**(8.0/3.0)))
 #else
-	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*maxKz*kw*kw)
+	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*maxKz*(kw**(11.0/3.0))
 #endif
 	!print *, 'Binit', Binit
 	!print *, 'Bamplitude', Bamplitude

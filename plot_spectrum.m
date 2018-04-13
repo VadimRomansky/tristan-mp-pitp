@@ -1,7 +1,7 @@
 clear;
-fp = hdf5read('./output1/spect4.004','specp');
-fe = hdf5read('./output1/spect4.004','spece');
-g=hdf5read('./output1/spect4.004','gamma');
+fp = hdf5read('./output/spect.005','specp');
+fe = hdf5read('./output/spect.005','spece');
+g=hdf5read('./output/spect.005','gamma');
 
 Nx = size(fp,1);
 Np = size(fp,2);
