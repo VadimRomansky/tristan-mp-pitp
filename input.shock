@@ -43,7 +43,7 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 20000         # plot interval
+interval	= 10000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 1 		# downsampling factor for grid output
@@ -78,7 +78,7 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.03		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+sigma	= 0.015		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
 maxptl0 = 5e9		# max number of particles in the simulation
 ppc0 	= 8		# number of particles per cell
 

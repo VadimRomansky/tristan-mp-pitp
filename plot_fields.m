@@ -1,10 +1,10 @@
 clear;
-Bx = hdf5read('./output/flds.tot.003','bx');
-By = hdf5read('./output/flds.tot.003','by');
-Bz = hdf5read('./output/flds.tot.003','bz');
-Ex = hdf5read('./output/flds.tot.003','ex');
-Ey = hdf5read('./output/flds.tot.003','ey');
-Ez = hdf5read('./output/flds.tot.003','ez');
+Bx = hdf5read('./output/flds.tot.001','bx');
+By = hdf5read('./output/flds.tot.001','by');
+Bz = hdf5read('./output/flds.tot.001','bz');
+Ex = hdf5read('./output/flds.tot.001','ex');
+Ey = hdf5read('./output/flds.tot.001','ey');
+Ez = hdf5read('./output/flds.tot.001','ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);
@@ -26,6 +26,10 @@ c1=0.45;
 tau = c1*rho/c0;
 
 fieldFactor = me*rho/(q*tau*tau);
+
+samplingFactor = 1;
+
+rho = rho*samplingFactor;
 
 figure(1);
 plot ((1:Nx)*rho,Bx(1:Nx, fix(Ny/2))*fieldFactor, 'red');

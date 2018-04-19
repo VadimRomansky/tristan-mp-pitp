@@ -73,7 +73,8 @@ module m_fields_3d
 	
 	integer, allocatable, dimension(:) :: mxl, myl, mzl
 
-	integer :: minTurbulentLambda, maxTurbulentLambda
+	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
+			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
 	real :: turbulenceFieldCorrection
 	
 	integer(8) :: mx0,my0,mz0, mzall, myall, mxall, mxlast, mylast, mzlast
@@ -119,7 +120,8 @@ module m_fields_3d
 	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 
-	public :: minTurbulentLambda, maxTurbulentLambda, turbulenceFieldCorrection
+	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
+			 minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
@@ -1724,9 +1726,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	else
 		if(modulo(rank,sizex).eq.sizex-1)then
 
-			maxKx = maxTurbulentLambda/minTurbulentLambda;
-			maxKy = maxTurbulentLambda/minTurbulentLambda;
-			maxKz = maxTurbulentLambda/minTurbulentLambda;
+			maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+			maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+			maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
 
 #ifdef twoD
 			maxKz = 1;
@@ -1749,9 +1751,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 							phase2 = 2*pi*rand();
 
 		
-							kx = ki*2*pi/maxTurbulentLambda;
-							ky = kj*2*pi/maxTurbulentLambda;
-							kz = kk*2*pi/maxTurbulentLambda;
+							kx = ki*2*pi/maxTurbulentLambdaX;
+							ky = kj*2*pi/maxTurbulentLambdaY;
+							kz = kk*2*pi/maxTurbulentLambdaZ;
 
 							kw = sqrt(kx*kx + ky*ky + kz*kz);
 							kxy = sqrt(kx*kx + ky*ky);
@@ -1861,17 +1863,17 @@ real function evaluate_turbulent_b(ki, kj, kk)
 	real kw, v
 	real kx, ky, kz, kxy
 	pi = 3.1415927;
-	kx = ki*2*pi/maxTurbulentLambda;
-	ky = kj*2*pi/maxTurbulentLambda;
+	kx = ki*2*pi/maxTurbulentLambdaX;
+	ky = kj*2*pi/maxTurbulentLambdaY;
 
-	maxKx = maxTurbulentLambda/minTurbulentLambda;
-	maxKy = maxTurbulentLambda/minTurbulentLambda;
-	maxKz = maxTurbulentLambda/minTurbulentLambda;
+	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
 					
 #ifdef twoD
 	kz = 0
 #else
-	kz = kk*2*pi/maxTurbulentLambda;
+	kz = kk*2*pi/maxTurbulentLambdaZ;
 #endif
 
 	kw = sqrt(kx*kx + ky*ky + kz*kz);

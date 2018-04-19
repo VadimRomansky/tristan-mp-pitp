@@ -498,17 +498,21 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambda = 10;
-	maxTurbulentLambda = 1000;
+	minTurbulentLambdaX = 10;
+	maxTurbulentLambdaX = 10000;
+	minTurbulentLambdaY = 10;
+	maxTurbulentLambdaY = 1000;
+	minTurbulentLambdaZ = 10;
+	maxTurbulentLambdaZ = 1000;
 	turbulenceEnergyFraction = 1.0
 	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
 	
 
-	maxKx = maxTurbulentLambda/minTurbulentLambda;
-	maxKy = maxTurbulentLambda/minTurbulentLambda;
-	maxKz = maxTurbulentLambda/minTurbulentLambda;
+	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
 
 #ifdef twoD
 	maxKz = 1;
@@ -531,9 +535,9 @@ subroutine init_turbulent_field
 					phase2 = 2*pi*rand();
 
 
-					kx = ki*2*pi/maxTurbulentLambda;
-					ky = kj*2*pi/maxTurbulentLambda;
-					kz = kk*2*pi/maxTurbulentLambda;
+					kx = ki*2*pi/maxTurbulentLambdaX;
+					ky = kj*2*pi/maxTurbulentLambdaY;
+					kz = kk*2*pi/maxTurbulentLambdaZ;
 	
 					kw = sqrt(kx*kx + ky*ky + kz*kz);
 					kxy = sqrt(kx*kx + ky*ky);
@@ -585,9 +589,9 @@ subroutine init_turbulent_field
 					phase2 = 2*pi*rand();
 
 
-					kx = ki*2*pi/maxTurbulentLambda;
-					ky = kj*2*pi/maxTurbulentLambda;
-					kz = kk*2*pi/maxTurbulentLambda;
+					kx = ki*2*pi/maxTurbulentLambdaX;
+					ky = kj*2*pi/maxTurbulentLambdaY;
+					kz = kk*2*pi/maxTurbulentLambdaZ;
 	
 					kw = sqrt(kx*kx + ky*ky + kz*kz);
 					kxy = sqrt(kx*kx + ky*ky);
