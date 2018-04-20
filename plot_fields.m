@@ -1,10 +1,14 @@
 clear;
-Bx = hdf5read('./output/flds.tot.001','bx');
-By = hdf5read('./output/flds.tot.001','by');
-Bz = hdf5read('./output/flds.tot.001','bz');
-Ex = hdf5read('./output/flds.tot.001','ex');
-Ey = hdf5read('./output/flds.tot.001','ey');
-Ez = hdf5read('./output/flds.tot.001','ez');
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.002';
+full_name = strcat(directory_name, file_name, file_number);
+Bx = hdf5read(full_name,'bx');
+By = hdf5read(full_name,'by');
+Bz = hdf5read(full_name,'bz');
+Ex = hdf5read(full_name,'ex');
+Ey = hdf5read(full_name,'ey');
+Ez = hdf5read(full_name,'ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);

@@ -1,6 +1,10 @@
 clear;
-np = hdf5read('./output/flds.tot.010','densi');
-ne = hdf5read('./output/flds.tot.010','dens');
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.002';
+full_name = strcat(directory_name, file_name, file_number);
+np = hdf5read(full_name,'densi');
+ne = hdf5read(full_name,'dens');
 
 Nx = size(np, 1);
 Ny = size(np, 2);
