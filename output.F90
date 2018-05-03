@@ -299,8 +299,10 @@ subroutine Diagnostics()
 #ifdef HDF5
                 call save_param()
                 call output_tot()
+		print *, 'finish output tot'
 !                call output_hug()
                call save_spectrum()
+		print *, 'finish save spectrum'
 !              call save_spectrum_2d()
 !                call save_momentumspec()
 !                call save_velocityspec()
@@ -311,6 +313,7 @@ subroutine Diagnostics()
 
 
 		call do_diagnostics()
+		print *, 'finish diagnostic'
 
 end subroutine Diagnostics
 
