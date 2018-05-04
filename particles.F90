@@ -297,6 +297,8 @@ subroutine allocate_particles()
 	print *, buffsize
 	
 	! allocate particle buffers
+
+	print *, 'maxptl', maxptl, maxhlf
 	
 	allocate(p(maxptl),tempp(maxhlf))
 	print *, "allocate 1"
