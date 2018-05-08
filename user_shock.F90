@@ -504,7 +504,7 @@ subroutine init_turbulent_field
 	maxTurbulentLambdaY = 1000;
 	minTurbulentLambdaZ = 10;
 	maxTurbulentLambdaZ = 1000;
-	turbulenceEnergyFraction = 1.0
+	turbulenceEnergyFraction = 0.2
 	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
@@ -562,7 +562,7 @@ subroutine init_turbulent_field
 	enddo
 
 	if (turbulenceEnergy > 0) then
-		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*Binit*Binit/turbulenceEnergy);	
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*Binit*Binit/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));	
 	else 
 		turbulenceFieldCorrection = 1.0;
 	endif
