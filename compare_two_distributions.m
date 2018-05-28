@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.002';
+file_number = '.004';
 Nd = 2;
 
 full_name = strcat(directory_name, file_name, num2str(0), file_number);

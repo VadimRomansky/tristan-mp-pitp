@@ -36,28 +36,28 @@ samplingFactor = 1;
 rho = rho*samplingFactor;
 
 figure(1);
-plot ((1:Nx)*rho,Bx(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bx(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,By(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,By(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('By');
 xlabel ('x');
 ylabel ('By');
 grid ;
 
 figure(3);
-plot ((1:Nx)*rho,Bz(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bz(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
 grid ;
 
 figure(4);
-plot ((1:Nx)*rho,Ex(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ex(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
@@ -71,7 +71,7 @@ ylabel ('Ey');
 grid ;
 
 figure(6);
-plot ((1:Nx)*rho,Ez(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ez(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');

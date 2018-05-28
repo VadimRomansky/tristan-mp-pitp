@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 140                    # number of cpus in x direction
+sizex	= 280                   # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -21,7 +21,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 <grid>
 
 mx0 	= 100000 		# number of actual grid points in the x direction
-my0 	= 1000			# number of actual grid points in the y direction
+my0 	= 500			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
@@ -37,16 +37,16 @@ ntimes		= 32		# number of passes for smoothing filter (current)
 <restart>
 
 irestart	= 0		# 1 to restart the simulation from saved restart/*.d files.
-intrestart	= 10000		# often to save restart files. They overwrite previous *d files.
+intrestart	= 1000000		# often to save restart files. They overwrite previous *d files.
 laprestart	= 0		# if different from 0, restart from a named restart file, saved at timestep laprestart 
 namedrestartint = 80000000      # interval for saving named restart files, like restart.lap01234.d
 
 <output>
 
-interval	= 10000        # plot interval
+interval	= 20000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
-istep		= 1 		# downsampling factor for grid output
+istep		= 10 		# downsampling factor for grid output
 stride		= 100		# particle stride for particle output?
 
 ###############################################################
@@ -78,16 +78,16 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.015		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
-maxptl0 = 5e9		# max number of particles in the simulation
+sigma	= 0.0021		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+maxptl0 = 9e9		# max number of particles in the simulation
 ppc0 	= 8		# number of particles per cell
 
 
 delgam 	= 9.e-6	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
-me	= 73.44				# electron mass
-mi	= 1836.0			# ion mass (actually mass to charge ratio)
+me	= 1.0				# electron mass
+mi	= 25.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 0.1			# flow drift gamma. If < 1, interpreted as v/c. 
+gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction
 c_omp	= 10			# electron skin depth in cells
 

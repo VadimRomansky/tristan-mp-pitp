@@ -1775,9 +1775,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 									i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
 
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-									kmultr = sinTheta*sin((kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k))
-									localB1 = Bturbulent*(kmultr + phase1);
-									localB2 = Bturbulent*(kmultr + phase2);
+									kmultr = (kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									localB1 = Bturbulent*sin(kmultr + phase1);
+									localB2 = Bturbulent*sin(kmultr + phase2);
 
 									bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
 									by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
