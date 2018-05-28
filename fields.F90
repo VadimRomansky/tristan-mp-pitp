@@ -1779,9 +1779,10 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 
-									bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
-									by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
-									bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
+									bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+									by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+									bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+
 								enddo
 							enddo
 						endif

@@ -498,12 +498,12 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambdaX = 50;
+	minTurbulentLambdaX = 5000;
 	maxTurbulentLambdaX = 10000;
-	minTurbulentLambdaY = 50;
-	maxTurbulentLambdaY = 5000;
-	minTurbulentLambdaZ = 50;
-	maxTurbulentLambdaZ = 5000;
+	minTurbulentLambdaY = 10;
+	maxTurbulentLambdaY = 10;
+	minTurbulentLambdaZ = 10;
+	maxTurbulentLambdaZ = 10;
 	turbulenceEnergyFraction = 0.3
 	turbulenceEnergy = 0.0;
 
@@ -617,13 +617,13 @@ subroutine init_turbulent_field
 								localB1 = Bturbulent*sin(kmultr + phase1);
 								localB2 = Bturbulent*sin(kmultr + phase2);
 
-								bx(i,j,k)=bx(i,j,k) + localB1*sinTheta;
-								by(i,j,k)=by(i,j,k) - localB1*cosTheta*cosPhi - localB2*sinPhi;
-								bz(i,j,k)=bz(i,j,k) - localB1*cosTheta*sinPhi + localB2*cosPhi;
+								bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+								by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+								bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
 	
 								ex(i,j,k)=ex(i,j,k);
-								ey(i,j,k)=ey(i,j,k) - beta*( - localB1*cosTheta*sinPhi + localB2*cosPhi);
-								ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*cosPhi - localB2*sinPhi);
+								ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+								ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
 							enddo
 						enddo
 					enddo	
