@@ -498,12 +498,12 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambdaX = 5000;
+	minTurbulentLambdaX = 50;
 	maxTurbulentLambdaX = 10000;
-	minTurbulentLambdaY = 10;
-	maxTurbulentLambdaY = 10;
-	minTurbulentLambdaZ = 10;
-	maxTurbulentLambdaZ = 10;
+	minTurbulentLambdaY = 50;
+	maxTurbulentLambdaY = 500;
+	minTurbulentLambdaZ = 50;
+	maxTurbulentLambdaZ = 500;
 	turbulenceEnergyFraction = 0.3
 	turbulenceEnergy = 0.0;
 
