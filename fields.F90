@@ -1772,16 +1772,18 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	
 							do  k=1,mz
 								do  j=1,my
-									i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
+									do i = mx-2, mx
+									!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
 
-									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-									kmultr = (kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-									localB1 = Bturbulent*sin(kmultr + phase1);
-									localB2 = Bturbulent*sin(kmultr + phase2);
+										! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+										kmultr = (kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+										localB1 = Bturbulent*sin(kmultr + phase1);
+										localB2 = Bturbulent*sin(kmultr + phase2);
 
-									bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-									by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-									bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+										bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+										by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+										bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+									enddo
 
 								enddo
 							enddo
@@ -1845,12 +1847,14 @@ subroutine evaluate_turbulence_e_right_boundary(time)
 		if(modulo(rank,sizex).eq.sizex-1)then
 			do  k=1,mz
 				do  j=1,my
-					i = mx  !1,mx-1 !3,mx-3 !1,mx-1
+					do i = mx-1, mx
+						!i = mx  !1,mx-1 !3,mx-3 !1,mx-1
 
-					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-					ex(i,j,k)=E0x;
-					ey(i,j,k)=- beta*ez(i-1,j,k);
-					ez(i,j,k)= beta*ey(i-1,j,k);
+						! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+						ex(i,j,k)=E0x;
+						ey(i,j,k)=- beta*ez(i-1,j,k);
+						ez(i,j,k)= beta*ey(i-1,j,k);
+					enddo
 				enddo
 			enddo
 		endif
