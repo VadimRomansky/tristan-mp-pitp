@@ -1711,6 +1711,8 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	kw = 2*3.1415927/100;
 	x = xglob(mx-1.0)
 
+	!print *, 'v = time =',v,time
+
 
 	if(periodicx.eq.1)then
 		!print * , 'periodic'
@@ -1770,15 +1772,13 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 							endif
 	
 							Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
-	
-	
+
 							do  k=1,mz
 								do  j=1,my
-									do i = mx-3, mx-1
+									do i = mx-3, mx-2
 									!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
-
 										! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-										kmultr = (kx*xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+										kmultr = kx*(xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 										localB1 = Bturbulent*sin(kmultr + phase1);
 										localB2 = Bturbulent*sin(kmultr + phase2);
 
@@ -1843,13 +1843,13 @@ subroutine evaluate_turbulence_e_right_boundary(time)
 		if(modulo(rank,sizex).eq.sizex-1)then
 			do  k=1,mz
 				do  j=1,my
-					do i = mx-2, mx
+					do i = mx-2, mx-1
 						!i = mx  !1,mx-1 !3,mx-3 !1,mx-1
 
 						! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 						ex(i,j,k)=E0x;
-						ey(i,j,k)=- beta*bz(i-1,j,k);
-						ez(i,j,k)= beta*by(i-1,j,k);
+						ey(i,j,k)=- beta*bz(i,j,k);
+						ez(i,j,k)= beta*by(i,j,k);
 					enddo
 				enddo
 			enddo

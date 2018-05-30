@@ -570,7 +570,7 @@ subroutine init_turbulent_field
 
 
 
-
+	call srand(randomseed)
 
 	
 	!do ki = 0, mx0-5
