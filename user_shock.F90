@@ -204,6 +204,7 @@ subroutine init_EMfields_user()
 
 	!initialize B field to be set by Binit and the inclination angle 	
         !angles btheta and bphi are read earlier
+	print *, 'periodic x = ', periodicx
 	btheta=btheta/180.*pi
 	bphi=bphi/180.*pi
 
@@ -498,12 +499,12 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambdaX = 50;
-	maxTurbulentLambdaX = 10000;
+	minTurbulentLambdaX = 500;
+	maxTurbulentLambdaX = 1000;
 	minTurbulentLambdaY = 50;
-	maxTurbulentLambdaY = 500;
+	maxTurbulentLambdaY = 50;
 	minTurbulentLambdaZ = 50;
-	maxTurbulentLambdaZ = 500;
+	maxTurbulentLambdaZ = 50;
 	turbulenceEnergyFraction = 0.3
 	turbulenceEnergy = 0.0;
 
