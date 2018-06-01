@@ -478,8 +478,15 @@ end subroutine inject_particles_user
 subroutine init_turbulent_field
 	implicit none
 	integer :: i, j, k, ki, kj, kk
-	integer maxKx, maxKy, maxKz
 	real B0x, B0y, B0z, E0x, E0y, E0z
+    real pi;
+
+#ifdef stripedfield
+    integer globali
+	integer shifti
+	real leftWeight, rightWeight
+#else
+    integer maxKx, maxKy, maxKz
 	real kw
 	real kx, ky, kz, kxy
 	real phase1, phase2
@@ -488,9 +495,77 @@ subroutine init_turbulent_field
 	real kmultr
 	real localB1, localB2
 	integer randomseed;
-	real pi;
 	real turbulenceEnergyFraction
 	real turbulenceEnergy
+#endif
+
+#ifdef stripedfield
+    stripedCount = 1000;
+    upperStripedCount = 600;
+    lowerStripedCount = 300;
+    stripedLayerWidth = (stripedCount - upperStripedCount - lowerStripedCount)/2;
+    if(modulo(stripedCount - upperStripedCount - lowerStripedCount,2).eq.1)then
+        upperStripedCount = upperStripedCount + 1;
+    end if
+    print *, 'start initializing striped'
+
+    B0x=Binit*cos(btheta)
+    B0y=Binit*sin(btheta)*sin(bphi)
+    B0z=Binit*sin(btheta)*cos(bphi)
+
+    E0x=0.
+    E0y=(-beta)*B0z
+    E0z=-(-beta)*B0y
+
+    do  k=1,mz
+        do  j=1,my
+            do  i=1,mx
+                globali = iglob(i);
+                if(modulo(globali, stripedCount) < upperStripedCount)then
+                    bx(i,j,k) = B0x;
+                    by(i,j,k) = B0y;
+                    bz(i,j,k) = B0z;
+
+                    ex(i,j,k) = E0x;
+                    ey(i,j,k) = E0y;
+                    ez(i,j,k) = E0z;
+                else if(modulo(globali, stripedCount)< upperStripedCount + stripedLayerWidth)then
+					shifti = modulo(globali, stripedCount) - upperStripedCount + 1;
+					leftWeight = (stripedLayerWidth - shifti)*1.0/stripedLayerWidth;
+					rightWeight = 1.0 - leftWeight
+
+                    bx(i,j,k) = B0x;
+                    by(i,j,k) = B0y;
+                    bz(i,j,k) = B0z*(leftWeight - rightWeight);
+
+                    ex(i,j,k) = E0x;
+                    ey(i,j,k) = E0y*(leftWeight - rightWeight);
+                    ez(i,j,k) = E0z;
+                else if(modulo(globali, stripedCount) < upperStripedCount + stripedLayerWidth + lowerStripedCount) then
+                    bx(i,j,k) = B0x;
+                    by(i,j,k) = B0y;
+                    bz(i,j,k) = -B0z;
+
+                    ex(i,j,k) = E0x;
+                    ey(i,j,k) = -E0y;
+                    ez(i,j,k) = E0z;
+                else
+					shifti = modulo(globali, stripedCount) - upperStripedCount - stripedLayerWidth - lowerStripedCount + 1;
+					leftWeight = (stripedLayerWidth - shifti)*1.0/stripedLayerWidth;
+					rightWeight = 1.0 - leftWeight
+                    bx(i,j,k) = B0x;
+                    by(i,j,k) = B0y;
+                    bz(i,j,k) = -B0z*(leftWeight - rightWeight);
+
+                    ex(i,j,k) = E0x;
+                    ey(i,j,k) = -E0y*(leftWeight - rightWeight);
+                    ez(i,j,k) = E0z;
+                end if
+            end do
+        end do
+    end do
+
+#else
 
 	randomseed = 10
 	call srand(randomseed)
@@ -634,7 +709,7 @@ subroutine init_turbulent_field
 #endif
 		enddo
 	enddo
-
+#endif
 
 	
 	

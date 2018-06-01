@@ -23,7 +23,7 @@ PERFORMANCE= -O3
 #-xhost -qopt-report -g -ipo
 
 #Precompiler options for enabling different algorithms
-CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD -Dturbulence
+CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD -Dturbulence -Dstripedfield
 
 # -DMPI use MPI 
 # -DHDF5 use HDF5
@@ -31,6 +31,8 @@ CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD -Dturbulence
 #         omitting this option will use parallel IO; performance may vary
 # -DtwoD 2D code (ignorable z coordinate), omitting this defaults to 3D
 # -DDEBUG when enabled produces a lot of debugging information
+# -Dturbulence create turbulence field
+# -Dstripedfield create ctreaped field, use only with turbulence
 
 # undocumented options: do not use
 # -Dfilter2  

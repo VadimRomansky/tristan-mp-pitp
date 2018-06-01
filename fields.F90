@@ -76,6 +76,8 @@ module m_fields_3d
 	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
 			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
 	real :: turbulenceFieldCorrection
+
+	integer :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 	
 	integer(8) :: mx0,my0,mz0, mzall, myall, mxall, mxlast, mylast, mzlast
 	integer(8) :: mxcum, mycum, mzcum
@@ -122,6 +124,8 @@ module m_fields_3d
 
 	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
 			 minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection
+
+	public :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
@@ -1688,10 +1692,69 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	real localB1, localB2
 	integer randomseed;
 	real pi;
+	real shifti, moduloi;
+	real leftWeight, rightWeight
 	!print *, 'b right boundary'
 	randomseed = 10
 	call srand(randomseed)
 	pi = 3.1415927;
+
+
+
+#ifdef stripedfield
+	B0x=Binit*cos(btheta)
+	B0y=Binit*sin(btheta)*sin(bphi)
+	B0z=Binit*sin(btheta)*cos(bphi)
+
+	E0x=0.
+	E0y=(-beta)*B0z
+	E0z=-(-beta)*B0y
+
+	v = beta*c
+
+	if(periodicx.eq.1)then
+		!print * , 'periodic'
+	else
+		do  k=1,mz
+			do  j=1,my
+				do i = mx-3, mx-2
+					!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
+					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+					x = xglob(i*1.0);
+					x = x + v*time;
+
+					moduloi = modulo(x, stripedCount*1.0);
+					if(moduloi < upperStripedCount*1.0)then
+						bx(i,j,k) = B0x;
+						by(i,j,k) = B0y;
+						bz(i,j,k) = B0z;
+					else if(moduloi < (upperStripedCount + stripedLayerWidth)*1.0) then
+						shifti = moduloi - upperStripedCount*1.0 + 1.0;
+						leftWeight = (stripedLayerWidth*1.0 - shifti)/stripedLayerWidth;
+						rightWeight = 1.0 - leftWeight
+
+						bx(i,j,k) = B0x;
+						by(i,j,k) = B0y;
+						bz(i,j,k) = B0z*(leftWeight - rightWeight);
+					else if(moduloi < (upperStripedCount + stripedLayerWidth + lowerStripedCount)*1.0) then
+						bx(i,j,k) = B0x;
+						by(i,j,k) = B0y;
+						bz(i,j,k) = -B0z;
+					else
+						shifti = moduloi - (upperStripedCount + stripedLayerWidth + lowerStripedCount)*1.0 + 1.0;
+						leftWeight = (stripedLayerWidth*1.0 - shifti)/stripedLayerWidth;
+						rightWeight = 1.0 - leftWeight
+
+						bx(i,j,k) = B0x;
+						by(i,j,k) = B0y;
+						bz(i,j,k) = B0z*(leftWeight - rightWeight);
+					end if
+				enddo
+
+			enddo
+		enddo
+	end if
+#else
 
 
 	B0x=Binit*cos(btheta)
@@ -1720,7 +1783,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 		if(modulo(rank,sizex).eq.sizex-1)then
 			do  k=1,mz
 				do  j=1,my
-					do i = mx-3, mx-1
+					do i = mx-3, mx
 						bx(i,j,k)=B0x;
 						by(i,j,k)=B0y;
 						bz(i,j,k)=B0z;
@@ -1797,7 +1860,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 			enddo
 		endif
 	endif
-
+#endif
 	
 
 
@@ -1816,6 +1879,7 @@ subroutine evaluate_turbulence_e_right_boundary(time)
 	real kmultr
 	real localB1, localB2
 	integer randomseed;
+
 
 
 	!print *, 'turbulence right field'
