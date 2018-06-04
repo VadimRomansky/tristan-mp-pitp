@@ -20,8 +20,8 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 10000 		# number of actual grid points in the x direction
-my0 	= 10			# number of actual grid points in the y direction
+mx0 	= 5000 		# number of actual grid points in the x direction
+my0 	= 100			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
@@ -43,7 +43,7 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 100        # plot interval
+interval	= 1000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 10 		# downsampling factor for grid output
@@ -63,7 +63,7 @@ testendion      = 6000000
 
 <boundaries>
 
-periodicx	= 0			# periodic boundaries in the x direction?
+periodicx	= 1			# periodic boundaries in the x direction?
 periodicy	= 1			# periodic boundaries in the y direction?
 periodicz	= 1			# periodic boundaries in the z direction?
 
@@ -78,7 +78,7 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.0021		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+sigma	= 0.003		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
 maxptl0 = 5e6		# max number of particles in the simulation
 ppc0 	= 4		# number of particles per cell
 

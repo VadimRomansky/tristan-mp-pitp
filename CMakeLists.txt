@@ -3,7 +3,7 @@ project(tristan_mp_pitp)
 enable_language (Fortran)
 
 set(SOURCE_FILES
-        aux.F90
+        aux1.F90
         communications.F90
         domain.F90
         dynamic_domain.F90

@@ -48,7 +48,7 @@ FFLAGS= $(CUSTOM) $(PERFORMANCE)
 EXECUTABLE= tristan-mp2d
 
 # Objects
-OBJS= system.o systemf.o par.o inputparser.o inputparserf.o fparser.o globaldata.o aux.o communications.o fields.o fieldboundaries.o particles.o domain.o dynamic_domain.o $(USER).o output.o restart.o particles_movedeposit.o overload.o  initialize.o tristanmainloop.o tristan.o
+OBJS= system.o systemf.o par.o inputparser.o inputparserf.o fparser.o globaldata.o aux1.o communications.o fields.o fieldboundaries.o particles.o domain.o dynamic_domain.o $(USER).o output.o restart.o particles_movedeposit.o overload.o  initialize.o tristanmainloop.o tristan.o
 
 ###########################
 
