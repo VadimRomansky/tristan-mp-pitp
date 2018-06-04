@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.003';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -64,7 +64,7 @@ ylabel ('Ex');
 grid ;
 
 figure(5);
-plot ((1:Nx)*rho,Ey(1:Nx, fix(Ny/2))*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ey(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');

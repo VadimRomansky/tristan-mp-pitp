@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.003';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -35,8 +35,10 @@ norme = 0;
 norm = 1;
 
 for i = 1:Np,
-    Pp(i) = sqrt((g(i)+1)^2 - 1)*mp*c;
-    Pe(i) = sqrt((g(i)+1)^2 - 1)*me*c;
+    %Pp(i) = sqrt((g(i)+1)^2 - 1)*mp*c;
+    %Pe(i) = sqrt((g(i)+1)^2 - 1)*me*c;
+    Pp(i) = sqrt((g(i)+1)^2 - 1);
+    Pe(i) = sqrt((g(i)+1)^2 - 1);
     for j = 1:Nx,
         Fp(i) = Fp(i) + fp(j,i);
         Fe(i) = Fe(i) + fe(j,i);
@@ -73,16 +75,16 @@ for i = 1:Np,
 end;
 
 figure(1);
-%plot (Pp(1:Np)/(mp*c),Fp(1:Np), 'red');
-plot (Pp(1:Np)/(mp*c),Fp(1:Np), 'red',Pp(1:Np)/(mp*c), Fpjuttner(1:Np), 'blue');
+plot (Pp(1:Np),Fp(1:Np), 'red');
+%plot (Pp(1:Np)/(mp*c),Fp(1:Np), 'red',Pp(1:Np)/(mp*c), Fpjuttner(1:Np), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
 grid ;
 
 figure(2);
-%plot (Pe(1:Np)/(me*c),Fe(1:Np), 'red');
-plot (Pe(1:Np)/(me*c),Fe(1:Np), 'red',Pe(1:Np)/(me*c), Fejuttner(1:Np), 'blue');
+plot (Pe(1:Np),Fe(1:Np), 'red');
+%plot (Pe(1:Np)/(me*c),Fe(1:Np), 'red',Pe(1:Np)/(me*c), Fejuttner(1:Np), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');

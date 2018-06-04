@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.003';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
@@ -28,14 +28,14 @@ tau = c1*rho/c0;
 densityFactor = 1.0/(rho*rho*rho);
 
 figure(1);
-plot ((1:Nx)*rho,np(1:Nx, fix(Ny/2))*densityFactor, 'red');
+plot ((1:Nx)*rho,np(1:Nx, fix(Ny/2)+1)*densityFactor, 'red');
 title ('np');
 xlabel ('x');
 ylabel ('np');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,ne(1:Nx, fix(Ny/2))*densityFactor, 'red');
+plot ((1:Nx)*rho,ne(1:Nx, fix(Ny/2)+1)*densityFactor, 'red');
 title ('ne');
 xlabel ('x');
 ylabel ('ne');
