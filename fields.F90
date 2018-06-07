@@ -1712,9 +1712,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 
 	v = beta*c
 
-	if(periodicx.eq.1)then
-		!print * , 'periodic'
-	else
+	!if(periodicx.eq.1)then
+	!	!print * , 'periodic'
+	!else
 		do  k=1,mz
 			do  j=1,my
 				do i = mx-3, mx-2
@@ -1753,7 +1753,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 
 			enddo
 		enddo
-	end if
+	!end if
 #else
 
 
@@ -1777,9 +1777,9 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 	!print *, 'v = time =',v,time
 
 
-	if(periodicx.eq.1)then
-		!print * , 'periodic'
-	else
+	!if(periodicx.eq.1)then
+	!	!print * , 'periodic'
+	!else
 		if(modulo(rank,sizex).eq.sizex-1)then
 			do  k=1,mz
 				do  j=1,my
@@ -1859,7 +1859,7 @@ subroutine evaluate_turbulence_b_right_boundary(time)
 				enddo
 			enddo
 		endif
-	endif
+	!endif
 #endif
 	
 
@@ -1902,8 +1902,8 @@ subroutine evaluate_turbulence_e_right_boundary(time)
 	v = beta*c
 	kw = 2*3.1415927/100;
 
-	if(periodicx.eq.1)then
-	else
+	!if(periodicx.eq.1)then
+	!else
 		if(modulo(rank,sizex).eq.sizex-1)then
 			do  k=1,mz
 				do  j=1,my
@@ -1918,7 +1918,7 @@ subroutine evaluate_turbulence_e_right_boundary(time)
 				enddo
 			enddo
 		endif
-	endif
+	!endif
 end subroutine evaluate_turbulence_e_right_boundary
 
 real function evaluate_turbulent_b(ki, kj, kk)
