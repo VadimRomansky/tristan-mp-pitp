@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 1                   # number of cpus in x direction
+sizex	= 2                   # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -21,7 +21,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 <grid>
 
 mx0 	= 5000 		# number of actual grid points in the x direction
-my0 	= 100			# number of actual grid points in the y direction
+my0 	= 10			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
