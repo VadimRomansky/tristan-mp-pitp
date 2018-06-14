@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.001';
+file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -25,6 +25,7 @@ n = 10^-4;
 omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
+rho = 0.2;
 c1=0.45;
 
 tau = c1*rho/c0;
