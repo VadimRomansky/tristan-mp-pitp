@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 2                   # number of cpus in x direction
+sizex	= 140                    # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -20,7 +20,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 5000 		# number of actual grid points in the x direction
+mx0 	= 200000 		# number of actual grid points in the x direction
 my0 	= 10			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
@@ -37,13 +37,13 @@ ntimes		= 32		# number of passes for smoothing filter (current)
 <restart>
 
 irestart	= 0		# 1 to restart the simulation from saved restart/*.d files.
-intrestart	= 1000000		# often to save restart files. They overwrite previous *d files.
+intrestart	= 10000		# often to save restart files. They overwrite previous *d files.
 laprestart	= 0		# if different from 0, restart from a named restart file, saved at timestep laprestart 
 namedrestartint = 80000000      # interval for saving named restart files, like restart.lap01234.d
 
 <output>
 
-interval	= 1000        # plot interval
+interval	= 200000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 10 		# downsampling factor for grid output
@@ -58,12 +58,12 @@ testendlec      = 6000000
 writetestion    = 0             # write test ions for tracking
 dlapion         = 600           # interval
 teststartion    = 1000000                # starting lap 
-testendion      = 6000000
+testendion      = 16000000
 ###############################################################
 
 <boundaries>
 
-periodicx	= 1			# periodic boundaries in the x direction?
+periodicx	= 0			# periodic boundaries in the x direction?
 periodicy	= 1			# periodic boundaries in the y direction?
 periodicz	= 1			# periodic boundaries in the z direction?
 
@@ -78,16 +78,16 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.003		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
-maxptl0 = 5e6		# max number of particles in the simulation
-ppc0 	= 4		# number of particles per cell
+sigma	= 0.0000005		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+maxptl0 = 9e9		# max number of particles in the simulation
+ppc0 	= 10		# number of particles per cell
 
 
 delgam 	= 9.e-6	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
 me	= 1.0				# electron mass
 mi	= 25.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
+gamma0	= 0.02			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction
 c_omp	= 10			# electron skin depth in cells
 

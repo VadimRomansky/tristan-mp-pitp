@@ -500,9 +500,9 @@ subroutine init_turbulent_field
 #endif
 
 #ifdef stripedfield
-    stripedCount = 1000;
-    upperStripedCount = 600;
-    lowerStripedCount = 300;
+    stripedCount = 6400;
+    upperStripedCount = 3200;
+    lowerStripedCount = 3180;
     stripedLayerWidth = (stripedCount - upperStripedCount - lowerStripedCount)/2;
     if(modulo(stripedCount - upperStripedCount - lowerStripedCount,2).eq.1)then
         upperStripedCount = upperStripedCount + 1;
