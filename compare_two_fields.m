@@ -1,10 +1,11 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.004';
+file_number = '.tot.005';
 Nd = 2;
+start = 2;
 
-full_name = strcat(directory_name, file_name, num2str(0), file_number);
+full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
 By0 = hdf5read(full_name,'by');
 Bz0 = hdf5read(full_name,'bz');
@@ -46,7 +47,7 @@ Ez(1:Nd,1:Nx)=0;
 
 
 for j = 1:Nd,
-    full_name = strcat(directory_name, file_name, num2str(j-1), file_number);
+    full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
     Bx0 = hdf5read(full_name,'bx');
     By0 = hdf5read(full_name,'by');
     Bz0 = hdf5read(full_name,'bz');

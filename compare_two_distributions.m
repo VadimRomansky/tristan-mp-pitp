@@ -1,10 +1,11 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.014';
+file_number = '.005';
 Nd = 2;
+start = 2;
 
-full_name = strcat(directory_name, file_name, num2str(0), file_number);
+full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
@@ -17,7 +18,7 @@ Pe(1:Nd,1:Np)=0;
 
 
 for j = 1:Nd,
-    full_name = strcat(directory_name, file_name, num2str(j-1), file_number);
+    full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
     fp = hdf5read(full_name,'specp');
     fe = hdf5read(full_name,'spece');
     gam=hdf5read(full_name,'gamma');
