@@ -1,9 +1,9 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.005';
+file_number = '.tot.003';
 Nd = 2;
-start = 2;
+start = 4;
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Np0 = hdf5read(full_name,'densi');
@@ -44,8 +44,8 @@ for j = 1:Nd,
     Np0 = hdf5read(full_name,'densi');
     Ne0 = hdf5read(full_name,'dens');
     for i = 1:Nx,
-        Np(j,i)=Np0(i, fix(Ny/2));
-        Ne(j,i)=Ne0(i, fix(Ny/2));
+        Np(j,i)=Np0(i, fix(Ny/2)+1);
+        Ne(j,i)=Ne0(i, fix(Ny/2)+1);
     end;
 end;
 

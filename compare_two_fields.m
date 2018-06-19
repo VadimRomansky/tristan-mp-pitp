@@ -1,9 +1,9 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.005';
+file_number = '.tot.003';
 Nd = 2;
-start = 2;
+start = 4;
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
@@ -55,12 +55,12 @@ for j = 1:Nd,
     Ey0 = hdf5read(full_name,'ey');
     Ez0 = hdf5read(full_name,'ez');
     for i = 1:Nx,
-        Bx(j,i)=Bx0(i, fix(Ny/2));
-        By(j,i)=By0(i, fix(Ny/2));
-        Bz(j,i)=Bz0(i, fix(Ny/2));
-        Ex(j,i)=Ex0(i, fix(Ny/2));
-        Ey(j,i)=Ey0(i, fix(Ny/2));
-        Ez(j,i)=Ez0(i, fix(Ny/2));
+        Bx(j,i)=Bx0(i, fix(Ny/2)+1);
+        By(j,i)=By0(i, fix(Ny/2)+1);
+        Bz(j,i)=Bz0(i, fix(Ny/2)+1);
+        Ex(j,i)=Ex0(i, fix(Ny/2)+1);
+        Ey(j,i)=Ey0(i, fix(Ny/2)+1);
+        Ez(j,i)=Ez0(i, fix(Ny/2)+1);
     end;
 end;
 

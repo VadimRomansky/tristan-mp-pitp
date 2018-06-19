@@ -3,7 +3,7 @@ directory_name = './output1/';
 file_name = 'spect';
 file_number = '.005';
 Nd = 2;
-start = 2;
+start = 0;
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
