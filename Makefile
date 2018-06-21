@@ -23,7 +23,7 @@ PERFORMANCE= -O3
 #-xhost -qopt-report -g -ipo
 
 #Precompiler options for enabling different algorithms
-CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD
+CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD -Dturbulence -Dstripedfield
 # -DMPI use MPI 
 # -DHDF5 use HDF5
 # -DserIO use serial IO, all processors send chunks to rank 0 which saves into file

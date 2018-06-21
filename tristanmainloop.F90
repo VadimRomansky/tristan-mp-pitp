@@ -140,7 +140,7 @@ subroutine mainloop()
 		if(debug) print *,rank,"aft bc_b2", "step=", lap
 		call timer(15,tmstop=tmstop) !hack
 		call timer(16) !hack
-		call field_bc_user()
+		call field_bc_user(lap + 0.5)
 		
 		call timer(16,tmstop=tmstop) !hack
 
@@ -152,7 +152,7 @@ subroutine mainloop()
 			
 		call advance_Efield(lap*1.0)
 							
-		call field_bc_user()
+		call field_bc_user(lap*1.0)
 		
 		call timer(24,tmstop=tmstop) !hack
 		call timer(25) !hack

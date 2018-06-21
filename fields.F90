@@ -72,12 +72,6 @@ module m_fields_3d
 	integer :: mx,my,mz
 	
 	integer, allocatable, dimension(:) :: mxl, myl, mzl
-
-	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
-			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
-	real :: turbulenceFieldCorrection
-
-	integer :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 	
 	integer(8) :: mx0,my0,mz0, mzall, myall, mxall, mxlast, mylast, mzlast
 	integer(8) :: mxcum, mycum, mzcum
@@ -118,14 +112,6 @@ module m_fields_3d
 	
 	public :: advance_Efield, advance_Bhalfstep, add_current, allocate_fields, read_input_grid, &
 	read_input_fields, reset_currents
-
-	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
-	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
-
-	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
-			 minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection
-
-	public :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
 	public :: radiationx, radiationy, radiationz, periodicx, periodicy, periodicz, &
 			  wall, wallgam, bx, by, bz, ex, ey, ez, curx, cury, curz, ix, iy, iz, lot, &
@@ -727,12 +713,6 @@ subroutine advance_b_halfstep(time)
 				enddo
 #endif
 
-#ifdef turbulence
-	if(modulo(rank,sizex).eq.sizex-1)then
-		call evaluate_turbulence_b_right_boundary(time)
-	end if
-#endif
-
 end subroutine advance_b_halfstep
 
 
@@ -897,12 +877,6 @@ subroutine advance_e_fullstep(time)
 		enddo
 #endif
 
-
-#ifdef turbulence
-	if(modulo(rank,sizex).eq.sizex-1)then
-		call evaluate_turbulence_e_right_boundary(time)
-	end if
-#endif
 
 end subroutine advance_e_fullstep
 
@@ -1679,285 +1653,6 @@ real function lambda(sx,sy,sz)
 
 end function lambda
 #endif
-
-
-subroutine evaluate_turbulence_b_right_boundary(time)
-	implicit none
-	real time
-	integer :: i, j, k, ki, kj, kk
-	integer maxKx, maxKy, maxKz
-	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
-	real kw, v, x
-	real kx, ky, kz, kxy
-	real phase1, phase2
-	real cosTheta, sinTheta, cosPhi, sinPhi
-	real Bturbulent
-	real kmultr
-	real localB1, localB2
-	integer randomseed;
-	real pi;
-	real shifti, moduloi;
-	real leftWeight, rightWeight
-	!print *, 'b right boundary'
-	randomseed = 10
-	call srand(randomseed)
-	pi = 3.1415927;
-
-
-
-#ifdef stripedfield
-	B0x=Binit*cos(btheta)
-	B0y=Binit*sin(btheta)*sin(bphi)
-	B0z=Binit*sin(btheta)*cos(bphi)
-
-	E0x=0.
-	E0y=(-beta)*B0z
-	E0z=-(-beta)*B0y
-
-	v = beta*c
-
-	!if(periodicx.eq.1)then
-	!	!print * , 'periodic'
-	!else
-		do  k=1,mz
-			do  j=1,my
-				do i = mx-3, mx
-					!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
-					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-					x = xglob(i*1.0);
-					x = x + v*time;
-
-					moduloi = modulo(x, stripedCount*1.0);
-					if(moduloi < upperStripedCount*1.0)then
-						bx(i,j,k) = B0x;
-						by(i,j,k) = B0y;
-						bz(i,j,k) = B0z;
-					else if(moduloi < (upperStripedCount + stripedLayerWidth)*1.0) then
-						shifti = moduloi - upperStripedCount*1.0 + 1.0;
-						leftWeight = (stripedLayerWidth*1.0 - shifti)/stripedLayerWidth;
-						rightWeight = 1.0 - leftWeight
-
-						bx(i,j,k) = B0x;
-						by(i,j,k) = B0y;
-						bz(i,j,k) = B0z*(leftWeight - rightWeight);
-					else if(moduloi < (upperStripedCount + stripedLayerWidth + lowerStripedCount)*1.0) then
-						bx(i,j,k) = B0x;
-						by(i,j,k) = B0y;
-						bz(i,j,k) = -B0z;
-					else
-						shifti = moduloi - (upperStripedCount + stripedLayerWidth + lowerStripedCount)*1.0 + 1.0;
-						leftWeight = (stripedLayerWidth*1.0 - shifti)/stripedLayerWidth;
-						rightWeight = 1.0 - leftWeight
-
-						bx(i,j,k) = B0x;
-						by(i,j,k) = B0y;
-						bz(i,j,k) = B0z*(leftWeight - rightWeight);
-					end if
-				enddo
-
-			enddo
-		enddo
-	!end if
-#else
-
-
-	B0x=Binit*cos(btheta)
-	B0y=Binit*sin(btheta)*sin(bphi)
-	B0z=Binit*sin(btheta)*cos(bphi)
-
-	E0x=0.
-	E0y=(-beta)*B0z
-	E0z=-(-beta)*B0y
-
-	turbulenceBy = B0y;
-	turbulenceBz = B0z;
-	turbulenceEy = E0y;
-	turbulenceEz = E0z;
-
-	v = beta*c
-	kw = 2*3.1415927/100;
-	x = xglob(mx-1.0)
-
-	!print *, 'v = time =',v,time
-
-
-	!if(periodicx.eq.1)then
-	!	!print * , 'periodic'
-	!else
-		if(modulo(rank,sizex).eq.sizex-1)then
-			do  k=1,mz
-				do  j=1,my
-					do i = mx-3, mx
-						bx(i,j,k)=B0x;
-						by(i,j,k)=B0y;
-						bz(i,j,k)=B0z;
-					end do
-				end do
-			end do
-			maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
-			maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
-			maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
-
-			!print *, 'add modes'
-
-#ifdef twoD
-			maxKz = 1;
-#endif
-	
-			!do ki = 0, mx0-5
-			do ki = 0, maxKx-1
-				!do kj = 0, my0-5
-				do kj = 0, maxKy-1
-#ifdef twoD
-					kk = 0
-#else
-					!do kk = 0, mz0-5
-					do kk = 0, maxKz-1
-#endif
-
-						if ((ki + kj + kk) .ne. 0) then
-	
-							phase1 = 2*pi*rand();
-							phase2 = 2*pi*rand();
-							!print *, 'phase 1 =', phase1
-
-		
-							kx = ki*2*pi/maxTurbulentLambdaX;
-							ky = kj*2*pi/maxTurbulentLambdaY;
-							kz = kk*2*pi/maxTurbulentLambdaZ;
-
-							kw = sqrt(kx*kx + ky*ky + kz*kz);
-							kxy = sqrt(kx*kx + ky*ky);
-							cosTheta = kz/kw;
-							sinTheta = kxy/kw;
-							if((ki + kj) .ne. 0) then
-								cosPhi = kx/kxy;
-								sinPhi = ky/kxy;
-							else 
-								cosPhi = 1.0
-								sinPhi = 0.0
-							endif
-	
-							Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
-
-							do  k=1,mz
-								do  j=1,my
-									do i = mx-3, mx-2
-									!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
-										! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-										kmultr = kx*(xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-										localB1 = Bturbulent*sin(kmultr + phase1);
-										localB2 = Bturbulent*sin(kmultr + phase2);
-
-										bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-										by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-										bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
-									enddo
-
-								enddo
-							enddo
-						endif
-#ifndef twoD
-					enddo
-#endif
-				enddo
-			enddo
-		endif
-	!endif
-#endif
-	
-
-
-end subroutine evaluate_turbulence_b_right_boundary
-
-subroutine evaluate_turbulence_e_right_boundary(time)
-	implicit none
-	real time
-	integer :: i, j, k, ki, kj, kk
-	real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
-	real kw, v
-	real kx, ky, kz, kxy
-	real phase1, phase2
-	real cosTheta, sinTheta, cosPhi, sinPhi
-	real Bturbulent
-	real kmultr
-	real localB1, localB2
-	integer randomseed;
-
-
-
-	!print *, 'turbulence right field'
-
-
-
-	B0x=Binit*cos(btheta)
-	B0y=Binit*sin(btheta)*sin(bphi)
-	B0z=Binit*sin(btheta)*cos(bphi)
-
-	E0x=0.
-	E0y=(-beta)*B0z
-	E0z=-(-beta)*B0y
-
-	turbulenceBy = B0y;
-	turbulenceBz = B0z;
-	turbulenceEy = E0y;
-	turbulenceEz = E0z;
-
-	v = beta*c
-	kw = 2*3.1415927/100;
-
-	!if(periodicx.eq.1)then
-	!else
-		if(modulo(rank,sizex).eq.sizex-1)then
-			do  k=1,mz
-				do  j=1,my
-					do i = mx-3, mx
-						!i = mx  !1,mx-1 !3,mx-3 !1,mx-1
-
-						! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-						ex(i,j,k)=E0x;
-						ey(i,j,k)=- beta*bz(i,j,k);
-						ez(i,j,k)= beta*by(i,j,k);
-					enddo
-				enddo
-			enddo
-		endif
-	!endif
-end subroutine evaluate_turbulence_e_right_boundary
-
-real function evaluate_turbulent_b(ki, kj, kk)
-	integer ki, kj, kk
-	integer maxKx, maxKy, maxKz
-	real turbulentE, Bamplitude, pi
-	real kw, v
-	real kx, ky, kz, kxy
-	pi = 3.1415927;
-	kx = ki*2*pi/maxTurbulentLambdaX;
-	ky = kj*2*pi/maxTurbulentLambdaY;
-
-	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
-	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
-	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
-					
-#ifdef twoD
-	kz = 0
-#else
-	kz = kk*2*pi/maxTurbulentLambdaZ;
-#endif
-
-	kw = sqrt(kx*kx + ky*ky + kz*kz);
-
-	turbulentE = 0.1*Binit*Binit/(8*pi)
-!todo kolmogorov
-#ifdef twoD
-	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*(kw**(8.0/3.0)))
-#else
-	Bamplitude = 0.1*Binit/sqrt(1.0*maxKx*maxKy*maxKz*(kw**(11.0/3.0))
-#endif
-	!print *, 'Binit', Binit
-	!print *, 'Bamplitude', Bamplitude
-	evaluate_turbulent_b = Bamplitude
-end function evaluate_turbulent_b
 
 #ifdef twoD
 end module m_fields
