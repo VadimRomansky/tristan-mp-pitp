@@ -212,9 +212,10 @@ end subroutine shift_domain
 !
 !-------------------------------------------------------------------------------
 
-subroutine field_bc()
-	
+subroutine field_bc(time)
+
 	implicit none
+	real time
 
 !	select case(caseinit)
 !		case(0)
@@ -225,7 +226,7 @@ subroutine field_bc()
 !		   if(rank .eq. 0) print *, "No such caseinit defined in overload:",caseinit
 !	end select
 	
-	call field_bc_user()
+	call field_bc_user(time)
 
 end subroutine field_bc
 

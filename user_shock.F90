@@ -365,7 +365,7 @@ end subroutine inject_particles_user
 subroutine field_bc_user(time)
 	implicit none
 
-		real time
+		real, intent(in) :: time
         real xmin, xmax
         integer i1, i2
  ! impose conductor behind the left reflecting wall
@@ -478,7 +478,7 @@ subroutine field_bc_user(time)
 			enddo
 		enddo
 		!end if
-		#else
+#else
 
 
 		B0x=Binit*cos(btheta)
@@ -794,9 +794,9 @@ subroutine init_turbulent_field
 #endif
 
 #ifdef stripedfield
-    stripedCount = 6400;
-    upperStripedCount = 3200;
-    lowerStripedCount = 3180;
+    stripedCount = 640;
+    upperStripedCount = 320;
+    lowerStripedCount = 310;
     stripedLayerWidth = (stripedCount - upperStripedCount - lowerStripedCount)/2;
     if(modulo(stripedCount - upperStripedCount - lowerStripedCount,2).eq.1)then
         upperStripedCount = upperStripedCount + 1;

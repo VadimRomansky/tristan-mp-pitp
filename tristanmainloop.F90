@@ -22,6 +22,7 @@ module m_tris
 	use m_overload
 	use m_particles_movedeposit
 	use m_dynamic_domain
+	use m_user
 #else
 
 module m_tris_3d
@@ -38,6 +39,7 @@ module m_tris_3d
 	use m_overload_3d
 	use m_particles_movedeposit_3d
 	use m_dynamic_domain_3d
+	use m_user_3d
 #endif
 
 
@@ -160,7 +162,7 @@ subroutine mainloop()
 
 		call post_bc_e()
 
-		call field_bc_user()
+		call field_bc_user(lap*1.0)
 
 		if(debug) print *,rank,": advanced e", "step=", lap,ions,lecs
 		call timer(25,tmstop=tmstop) !hack
@@ -238,7 +240,7 @@ subroutine mainloop()
 
 		call bc_e1() 
 
-		call field_bc_user()
+		call field_bc_user(lap*1.0)
 
 		call timer(9,tmstop=tmstop)
 		

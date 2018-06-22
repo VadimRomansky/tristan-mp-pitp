@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 140                    # number of cpus in x direction
+sizex	= 1                    # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -20,7 +20,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 200000 		# number of actual grid points in the x direction
+mx0 	= 2000 		# number of actual grid points in the x direction
 my0 	= 10			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
@@ -43,10 +43,10 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 200000        # plot interval
+interval	= 1000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
-istep		= 10 		# downsampling factor for grid output
+istep		= 1 		# downsampling factor for grid output
 stride		= 100		# particle stride for particle output?
 
 ###############################################################
@@ -78,16 +78,16 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.0000005		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
-maxptl0 = 9e9		# max number of particles in the simulation
+sigma	= 0.003		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
+maxptl0 = 9e6		# max number of particles in the simulation
 ppc0 	= 10		# number of particles per cell
 
 
 delgam 	= 9.e-6	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
 me	= 1.0				# electron mass
-mi	= 25.0			# ion mass (actually mass to charge ratio)
+mi	= 1.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 0.02			# flow drift gamma. If < 1, interpreted as v/c. 
+gamma0	= 15			# flow drift gamma. If < 1, interpreted as v/c.
 				# the drift of background plasma in the negative x direction
 c_omp	= 10			# electron skin depth in cells
 
