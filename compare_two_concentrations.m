@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.003';
+file_number = '.tot.012';
 Nd = 2;
 start = 4;
 
@@ -45,7 +45,7 @@ for j = 1:Nd,
     Ne0 = hdf5read(full_name,'dens');
     for i = 1:Nx,
         Np(j,i)=Np0(i, fix(Ny/2)+1);
-        Ne(j,i)=Ne0(i, fix(Ny/2)+1);
+        Ne(j,i)=Ne0(i, fix(Ny/2)+1)- Np0(i, fix(Ny/2)+1);
     end;
 end;
 

@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
-file_name = 'flds1.tot';
-file_number = '.005';
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.011';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -29,8 +29,9 @@ rho = 0.2;
 c1=0.45;
 
 tau = c1*rho/c0;
-
+samplingFactor = 5;
 fieldFactor = me*rho/(q*tau*tau);
+rho = rho*samplingFactor;
 
 figure(1);
 colormap Jet;

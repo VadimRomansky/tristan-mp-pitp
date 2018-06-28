@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.003';
+file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -31,8 +31,9 @@ tau = c1*rho/c0;
 
 fieldFactor = me*rho/(q*tau*tau);
 
-samplingFactor = 1;
+samplingFactor = 10;
 
+rho = 0.2;
 rho = rho*samplingFactor;
 
 figure(1);

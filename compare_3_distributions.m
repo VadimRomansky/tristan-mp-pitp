@@ -1,14 +1,17 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.006';
+file_number = '.011';
 Nd = 3;
 start = 0;
+
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
+startx = 1;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -26,7 +29,7 @@ for j = 1:Nd,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = 1:Nx,
+        for k = startx:endx,
             Fp(j,i) = Fp(j,i) + fp(k,i);
             Fe(j,i) = Fe(j,i) + fe(k,i);
         end;
@@ -47,7 +50,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend('turbulent','regular','one mode','Location','southeast');
+legend('30','90','turb','Location','southeast');
 grid ;
 
 figure(2);
@@ -58,5 +61,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend('turbulent','regular','one mode','Location','southeast');
+legend('30','90','turb','Location','southeast');
 grid ;

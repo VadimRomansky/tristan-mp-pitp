@@ -22,9 +22,11 @@ tau = c1*rho/c0;
 
 energyFactor = rho*rho/tau;
 
+tau = c1/Nskinlength;
+
 figure(1);
 %plot (general(1:N2,3)*omega_plasma, general(1:N2,4), 'green', general(1:N2,3)*omega_plasma, general(1:N2,5), 'blue', general(1:N2, 3)*omega_plasma, general(1:N2,6), 'black', general(1:N2, 3)*omega_plasma, general(1:N2,7), 'red', general(1:N2, 3)*omega_plasma, general(1:N2,11), 'yellow');
-plot (energy(1:N2,1)*tau*omega, energy(1:N2,4)*energyFactor, 'green', energy(1:N2,1)*tau*omega, energy(1:N2,2)*energyFactor, 'blue', energy(1:N2,1)*tau*omega, energy(1:N2,3)*energyFactor, 'black', energy(1:N2,1)*tau*omega, energy(1:N2,5)*energyFactor, 'red');
+plot (energy(1:N2,1)*tau, energy(1:N2,4)*energyFactor, 'green', energy(1:N2,1)*tau, energy(1:N2,2)*energyFactor, 'blue', energy(1:N2,1)*tau, energy(1:N2,3)*energyFactor, 'black', energy(1:N2,1)*tau, energy(1:N2,5)*energyFactor, 'red');
 
 xlabel ('{{t {\omega}_p}}');
 ylabel ('E/E_0');
