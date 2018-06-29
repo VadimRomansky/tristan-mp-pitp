@@ -50,7 +50,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend('30','90','turb','Location','southeast');
+legend('90','30','turb','Location','southeast');
 grid ;
 
 figure(2);
@@ -61,5 +61,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend('30','90','turb','Location','southeast');
+legend('90','30','turb','Location','southeast');
 grid ;

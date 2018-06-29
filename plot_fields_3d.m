@@ -1,6 +1,6 @@
 clear;
-directory_name = './output/';
-file_name = 'flds.tot';
+directory_name = './output1/';
+file_name = 'flds2.tot';
 file_number = '.011';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
