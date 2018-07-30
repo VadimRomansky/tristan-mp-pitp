@@ -6,7 +6,7 @@
 
 <node_configuration>
 
-sizex	= 1                    # number of cpus in x direction
+sizex	= 280                    # number of cpus in x direction
 sizey 	= 1			# number of cpus in the y direction
 
 <time>
@@ -20,8 +20,8 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 2000 		# number of actual grid points in the x direction
-my0 	= 10			# number of actual grid points in the y direction
+mx0 	= 50000 		# number of actual grid points in the x direction
+my0 	= 1000			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
@@ -43,10 +43,10 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 1000        # plot interval
+interval	= 10000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
-istep		= 1 		# downsampling factor for grid output
+istep		= 5 		# downsampling factor for grid output
 stride		= 100		# particle stride for particle output?
 
 ###############################################################
@@ -58,12 +58,12 @@ testendlec      = 6000000
 writetestion    = 0             # write test ions for tracking
 dlapion         = 600           # interval
 teststartion    = 1000000                # starting lap 
-testendion      = 16000000
+testendion      = 6000000
 ###############################################################
 
 <boundaries>
 
-periodicx	= 0			# periodic boundaries in the x direction?
+periodicx	= 1			# periodic boundaries in the x direction?
 periodicy	= 1			# periodic boundaries in the y direction?
 periodicz	= 1			# periodic boundaries in the z direction?
 
@@ -78,18 +78,18 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.003		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia
-maxptl0 = 9e6		# max number of particles in the simulation
-ppc0 	= 10		# number of particles per cell
+sigma	= 0.0261		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
+maxptl0 = 9e9		# max number of particles in the simulation
+ppc0 	= 8		# number of particles per cell
 
 
-delgam 	= 9.e-6	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
+delgam 	= 1.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
 me	= 1.0				# electron mass
-mi	= 1.0			# ion mass (actually mass to charge ratio)
+mi	= 25.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 15			# flow drift gamma. If < 1, interpreted as v/c.
+gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction
-c_omp	= 10			# electron skin depth in cells
+c_omp	= 5			# electron skin depth in cells
 
 <problem>
 

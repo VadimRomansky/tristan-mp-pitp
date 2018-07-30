@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
-file_name = 'flds2.tot';
-file_number = '.011';
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.050';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -36,43 +36,45 @@ samplingFactor = 10;
 rho = 0.2;
 rho = rho*samplingFactor;
 
+ypoint = fix(Ny/2) + 1;
+
 figure(1);
-plot ((1:Nx)*rho,Bx(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bx(1:Nx, ypoint)*fieldFactor, 'red');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,By(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,By(1:Nx, ypoint)*fieldFactor, 'red');
 title ('By');
 xlabel ('x');
 ylabel ('By');
 grid ;
 
 figure(3);
-plot ((1:Nx)*rho,Bz(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bz(1:Nx, ypoint)*fieldFactor, 'red');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
 grid ;
 
 figure(4);
-plot ((1:Nx)*rho,Ex(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ex(1:Nx, ypoint)*fieldFactor, 'red');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
 grid ;
 
 figure(5);
-plot ((1:Nx)*rho,Ey(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ey(1:Nx, ypoint)*fieldFactor, 'red');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');
 grid ;
 
 figure(6);
-plot ((1:Nx)*rho,Ez(1:Nx, fix(Ny/2)+1)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Ez(1:Nx, ypoint)*fieldFactor, 'red');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');
