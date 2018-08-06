@@ -35,6 +35,23 @@ for j = 1:Nd,
     end;
 end;
 
+norm = 1;
+
+for j = 1:Nd,
+    normp = (Fp(j,1)/(Pp(j,2)^2))*(Pp(j,2) - Pp(j,1));
+    norme = (Fe(j,1)/(Pe(j,2)^2))*(Pe(j,2) - Pe(j,1));
+
+    for i = 2:Np,
+        normp = normp + (Fp(j,i)/(Pp(j,i)^2))*(Pp(j,i) - Pp(j,i-1));
+        norme = norme + (Fe(j,i)/(Pe(j,i)^2))*(Pe(j,i) - Pe(j,i-1));
+    end;
+
+    for i = 1:Np,
+        Fp(j,i) = Fp(j,i)*norm/normp;
+        Fe(j,i) = Fe(j,i)*norm/norme;
+    end;
+end;
+
 Color = {'red','blue','green','black','yellow',[.5,.5,.5],'cyan',[.3,.7,.3], 'magenta',[1.0,.5,0],[.75,0.0,.7],[.7,.3,.3]};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');

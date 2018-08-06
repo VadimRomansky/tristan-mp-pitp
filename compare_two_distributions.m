@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.011';
+file_number = '.019';
 Nd = 2;
 start = 0;
 
@@ -35,6 +35,23 @@ for j = 1:Nd,
     end;
 end;
 
+norm = 1;
+
+for j = 1:Nd,
+    normp = (Fp(j,1)/(Pp(j,2)^2))*(Pp(j,2) - Pp(j,1));
+    norme = (Fe(j,1)/(Pe(j,2)^2))*(Pe(j,2) - Pe(j,1));
+
+    for i = 2:Np,
+        normp = normp + (Fp(j,i)/(Pp(j,i)^2))*(Pp(j,i) - Pp(j,i-1));
+        norme = norme + (Fe(j,i)/(Pe(j,i)^2))*(Pe(j,i) - Pe(j,i-1));
+    end;
+
+    for i = 1:Np,
+        Fp(j,i) = Fp(j,i)*norm/normp;
+        Fe(j,i) = Fe(j,i)*norm/norme;
+    end;
+end;
+
 Color = {'red','blue'};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
@@ -47,7 +64,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend('regular','turbulent','Location','southeast');
 grid ;
 
 figure(2);
@@ -58,5 +75,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend('regular','turbulent','Location','southeast');
 grid ;
