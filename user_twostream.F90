@@ -332,8 +332,9 @@ end subroutine inject_particles_user
 ! 
 !-------------------------------------------------------------------------------
 
-	subroutine field_bc_user()
+	subroutine field_bc_user(time)
 	implicit none
+	real time
 
 !no special field BCs needed. Periodic conditions are taken care of in fieldboundaries
 
