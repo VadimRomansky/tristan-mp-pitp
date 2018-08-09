@@ -6,8 +6,8 @@
 
 <node_configuration>
 
-sizex	= 280                    # number of cpus in x direction
-sizey 	= 1			# number of cpus in the y direction
+sizex	= 70                    # number of cpus in x direction
+sizey 	= 8			# number of cpus in the y direction
 
 <time>
 
@@ -21,7 +21,7 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 <grid>
 
 mx0 	= 50000 		# number of actual grid points in the x direction
-my0 	= 1000			# number of actual grid points in the y direction
+my0 	= 2500			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
@@ -78,12 +78,12 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.0261		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
+sigma	= 0.003		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
 maxptl0 = 9e9		# max number of particles in the simulation
 ppc0 	= 8		# number of particles per cell
 
 
-delgam 	= 1.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
+delgam 	= 5.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
 me	= 1.0				# electron mass
 mi	= 25.0			# ion mass (actually mass to charge ratio)
 

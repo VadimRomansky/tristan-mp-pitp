@@ -395,10 +395,10 @@ subroutine field_bc_user(time)
         endif
 
 #ifdef turbulence
-		if(modulo(rank,sizex).eq.sizex-1)then
-			call evaluate_turbulence_e_right_boundary(time)
-			call evaluate_turbulence_b_right_boundary(time)
-		end if
+		!if(modulo(rank,sizex).eq.sizex-1)then
+		!	call evaluate_turbulence_e_right_boundary(time)
+		!	call evaluate_turbulence_b_right_boundary(time)
+		!end if
 #endif
 
 	end subroutine field_bc_user
@@ -406,7 +406,7 @@ subroutine field_bc_user(time)
 	subroutine evaluate_turbulence_b_right_boundary(time)
 		implicit none
 		real time
-		integer :: i, j, k, ki, kj, kk, j1, j2, k1, k2
+		integer :: i, j, k, ki, kj, kk
 		integer maxKx, maxKy, maxKz
 		real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
 		real kw, v, x
@@ -425,57 +425,6 @@ subroutine field_bc_user(time)
 		call srand(randomseed)
 		pi = 3.1415927;
 
-		if(periodicy.eq.1) then
-			j1=3
-			j2=my-3
-		else
-			j1=3
-			j2=my-3
-			if(modulo(rank,sizex*sizey)/sizex.eq.0) then
-				j1=1
-				j2=my-3
-			endif
-			if(modulo(rank,sizex*sizey)/sizex.eq.sizey-1)then
-				j1=3
-				j2=my-1
-			endif
-			if(size0.eq.1 .or. sizey.eq.1)then
-				j1=1
-				j2=my-1
-			endif
-		endif
-	
-!	j1=1
-!	j2=my-1
-
-#ifndef twoD
-		if(periodicz.eq.1) then
-			k1=3
-			k2=mz-3
-		else
-			k1=3
-			k2=mz-3
-			if(rank/(sizex*sizey).eq.0) then
-				k1=1
-				k2=mz-3
-			endif
-			if(rank/(sizex*sizey).eq.sizez-1)then
-				k1=3
-				k2=mz-1
-			endif
-			if(size0.eq.1)then
-				k1=1
-				k2=mz-1
-			endif
-		endif
-		
-!		k1=1
-!		k2=mz-1
-#else
-		k1=1
-		k2=1
-#endif
-
 #ifdef stripedfield
 		B0x=Binit*cos(btheta)
 		B0y=Binit*sin(btheta)*sin(bphi)
@@ -487,13 +436,11 @@ subroutine field_bc_user(time)
 
 		v = beta*c
 
-
-
 		!if(periodicx.eq.1)then
 		!	!print * , 'periodic'
 		!else
-		do  k=k1,k2
-			do  j=j1,j2
+		do  k=1,mz
+			do  j=1,my
 				do i = mx-3, mx
 					!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
 					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
@@ -558,9 +505,9 @@ subroutine field_bc_user(time)
 		!	!print * , 'periodic'
 		!else
 		if(modulo(rank,sizex).eq.sizex-1)then
-			do  k=k1,k2
-				do  j=j1,j2
-					do i = mx-2, mx
+			do  k=1,mz
+				do  j=1,my
+					do i = mx-3, mx
 						bx(i,j,k)=B0x;
 						by(i,j,k)=B0y;
 						bz(i,j,k)=B0z;
@@ -612,9 +559,9 @@ subroutine field_bc_user(time)
 
 							Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
 
-							do  k=k1,k2
-								do  j=j1,j2
-									do i = mx-2, mx
+							do  k=1,mz
+								do  j=1,my
+									do i = mx-3, mx-2
 										!i = mx - 1  !1,mx-1 !3,mx-3 !1,mx-1
 										! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 										kmultr = kx*(xglob(1.0*i)+v*time) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
@@ -642,7 +589,7 @@ subroutine field_bc_user(time)
 	subroutine evaluate_turbulence_e_right_boundary(time)
 		implicit none
 		real time
-		integer :: i, j, k, ki, kj, kk, j1, j2, k1, k2
+		integer :: i, j, k, ki, kj, kk
 		real B0x, B0y, B0z, E0x, E0y, E0z, turbulenceBy, turbulenceBz, turbulenceEy, turbulenceEz
 		real kw, v
 		real kx, ky, kz, kxy
@@ -675,73 +622,18 @@ subroutine field_bc_user(time)
 		v = beta*c
 		kw = 2*3.1415927/100;
 
-		if(periodicy.eq.1) then
-			j1=3
-			j2=my-3
-		else
-			j1=3
-			j2=my-3
-			if(modulo(rank,sizex*sizey)/sizex.eq.0) then
-				j1=2
-				j2=my-3
-			endif
-			if(modulo(rank,sizex*sizey)/sizex.eq.sizey-1)then
-				j1=3
-				j2=my
-			endif
-			if(size0.eq.1 .or. sizey.eq.1)then
-				j1=2
-				j2=my
-			endif
-		endif
-	
-
-#ifndef twoD
-		if(periodicz.eq.1) then
-			k1=3
-			k2=mz-3
-		else
-			k1=3
-			k2=mz-3
-			if(rank/(sizex*sizey).eq.0) then
-				k1=2
-				k2=mz-3
-			endif
-			if(rank/(sizex*sizey).eq.sizez-1)then
-				k1=3
-				k2=mz
-			endif
-			if(size0.eq.1)then
-				k1=2
-				k2=mz
-			endif
-		endif
-		
-		k1=2
-		k2=mz
-
-#else
-		k1=1
-		k2=1
-#endif
-
 		!if(periodicx.eq.1)then
 		!else
 		if(modulo(rank,sizex).eq.sizex-1)then
-			do  k=k1,k2
-				do  j=j1,j2
-					do i = mx-2, mx
+			do  k=1,mz
+				do  j=1,my
+					do i = mx-3, mx
 						!i = mx  !1,mx-1 !3,mx-3 !1,mx-1
 
 						! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 						ex(i,j,k)=E0x;
-#ifdef twod
-						ey(i,j,k)=- beta*(bz(i,j,k) + bz(i,j,k-1)+bz(i,j-1,k)+bz(i,j-1,k-1))/4;
-						ez(i,j,k)= beta*(by(i,j,k) + by(i,j,k-1)+by(i,j-1,k)+by(i,j-1,k-1))/4;
-#else
-						ey(i,j,k)=- beta*(bz(i,j,k) + bz(i,j-1,k))/2;
-						ez(i,j,k)= beta*(by(i,j,k) + by(i,j-1,k))/2;
-#endif
+						ey(i,j,k)=- beta*bz(i,j,k);
+						ez(i,j,k)= beta*by(i,j,k);
 					enddo
 				enddo
 			enddo
@@ -879,10 +771,9 @@ subroutine field_bc_user(time)
 
 subroutine init_turbulent_field
 	implicit none
-	integer :: i, j, k, ki, kj, kk, j1, j2, k1, k2
+	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z
     real pi;
-
 
 #ifdef stripedfield
     integer globali
@@ -900,57 +791,6 @@ subroutine init_turbulent_field
 	integer randomseed;
 	real turbulenceEnergyFraction
 	real turbulenceEnergy
-#endif
-
-
-		if(periodicy.eq.1) then
-			j1=3
-			j2=my-3
-		else
-			j1=3
-			j2=my-3
-			if(modulo(rank,sizex*sizey)/sizex.eq.0) then
-				j1=2
-				j2=my-3
-			endif
-			if(modulo(rank,sizex*sizey)/sizex.eq.sizey-1)then
-				j1=3
-				j2=my
-			endif
-			if(size0.eq.1 .or. sizey.eq.1)then
-				j1=2
-				j2=my
-			endif
-		endif
-	
-
-#ifndef twoD
-		if(periodicz.eq.1) then
-			k1=3
-			k2=mz-3
-		else
-			k1=3
-			k2=mz-3
-			if(rank/(sizex*sizey).eq.0) then
-				k1=2
-				k2=mz-3
-			endif
-			if(rank/(sizex*sizey).eq.sizez-1)then
-				k1=3
-				k2=mz
-			endif
-			if(size0.eq.1)then
-				k1=2
-				k2=mz
-			endif
-		endif
-		
-		k1=2
-		k2=mz
-
-#else
-		k1=1
-		k2=1
 #endif
 
 #ifdef stripedfield
@@ -1028,13 +868,13 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambdaX = 100;
-	maxTurbulentLambdaX = 1000;
-	minTurbulentLambdaY = 100;
-	maxTurbulentLambdaY = 1000;
-	minTurbulentLambdaZ = 100;
-	maxTurbulentLambdaZ = 1000;
-	turbulenceEnergyFraction = 0.3
+	minTurbulentLambdaX = 500;
+	maxTurbulentLambdaX = 5000;
+	minTurbulentLambdaY = 500;
+	maxTurbulentLambdaY = 5000;
+	minTurbulentLambdaZ = 500;
+	maxTurbulentLambdaZ = 5000;
+	turbulenceEnergyFraction = 0.9
 	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
@@ -1139,8 +979,8 @@ subroutine init_turbulent_field
 
 	
 					!print *, 'Bturbulent', Bturbulent
-					do  k=k1,k2
-						do  j=j1,j2
+					do  k=1,mz
+						do  j=1,my
 							do  i=1,mx
 								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
