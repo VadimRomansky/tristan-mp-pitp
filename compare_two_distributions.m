@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.019';
+file_number = '.009';
 Nd = 2;
 start = 0;
 
@@ -64,7 +64,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend('regular','turbulent','Location','southeast');
+legend('regular B along z','regular B along y','Location','southeast');
 grid ;
 
 figure(2);
@@ -75,5 +75,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend('regular','turbulent','Location','southeast');
+legend('regular B along z','regular B along y','Location','southeast');
 grid ;

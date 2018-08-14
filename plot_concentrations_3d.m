@@ -1,13 +1,19 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.005';
+file_number = '.025';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
 
 Nx = size(np, 1);
 Ny = size(np, 2);
+
+offsetx = 10;
+offsety = 0;
+
+ne1(1:Nx-2*offsetx,1:Ny-2*offsety)=0;
+np1(1:Nx-2*offsetx,1:Ny-2*offsety)=0;
 
 Nskinlength = 10;
 
@@ -22,15 +28,10 @@ omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;
-rho = 0.2;
 samplingFactor = 5;
-
 tau = c1*rho/c0;
-rho = rho*samplingFactor;
-offsetx = 10;
-offsety = 0;
-ne1(1:Nx-2*offsetx,1:Ny-2*offsety)=0;
-np1(1:Nx-2*offsetx,1:Ny-2*offsety)=0;
+rho =0.1;
+
 
 for i=1:Nx-2*offsetx,
     for j=1:Ny-2*offsety,
