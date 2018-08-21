@@ -53,6 +53,7 @@ for j = 1:Nd,
 end;
 
 Color = {'red','blue','green','black','yellow',[.5,.5,.5],'cyan',[.3,.7,.3], 'magenta',[1.0,.5,0],[.75,0.0,.7],[.7,.3,.3]};
+LegendTitle = {'filter 16','filter 32','filter 16','filter 32','filter 16','filter 32','filter 16','filter 32','filter 16','filter 32'};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 

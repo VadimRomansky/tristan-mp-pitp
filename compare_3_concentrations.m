@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.001';
+file_number = '.tot.025';
 Nd = 3;
 start = 0;
 
@@ -30,9 +30,11 @@ tau = c1*rho/c0;
 fieldFactor = me*rho/(q*tau*tau);
 densityFactor = 1.0/(rho*rho*rho);
 
-samplingFactor = 1;
+samplingFactor = 5;
 
 rho = rho*samplingFactor;
+rho = samplingFactor/Nskinlength;
+
 
 
 Np(1:Nd,1:Nx)=0;
@@ -49,7 +51,10 @@ for j = 1:Nd,
     end;
 end;
 
+N0 = Np(1,fix(Nx/2));
+
 Color = {'red','blue','green'};
+LegendTitle = {'filter 16','filter 32','filter 128'};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
@@ -57,9 +62,9 @@ set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman');
 figure(1);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Np(j, 1:Nx)*densityFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Np(j, 1:Nx)/N0,'color', Color{j});
 end;
-legend('90','30','turbulent','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Np');
 xlabel ('x');
 ylabel ('Np');
@@ -68,9 +73,9 @@ grid ;
 figure(2);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ne(j, 1:Nx)*densityFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Ne(j, 1:Nx)/N0,'color', Color{j});
 end;
-legend('90','30','turbulent','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Ne');
 xlabel ('x');
 ylabel ('Ne');

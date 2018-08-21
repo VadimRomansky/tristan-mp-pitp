@@ -1,9 +1,11 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'flds';
-file_number = '.tot.012';
+file_number = '.tot.006';
 Nd = 2;
-start = 4;
+start = 0;
+Color = {'red','blue'};
+LegendTitle = {'old','new'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Np0 = hdf5read(full_name,'densi');
@@ -49,8 +51,6 @@ for j = 1:Nd,
     end;
 end;
 
-Color = {'red','blue'};
-
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
 
@@ -59,7 +59,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Np(j, 1:Nx)*densityFactor,'color', Color{j});
 end;
-legend('smooth','no smooth','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 title ('Np');
 xlabel ('x');
 ylabel ('Np');
@@ -70,7 +70,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ne(j, 1:Nx)*densityFactor,'color', Color{j});
 end;
-legend('smooth','no smooth','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 title ('Ne');
 xlabel ('x');
 ylabel ('Ne');

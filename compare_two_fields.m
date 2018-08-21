@@ -1,9 +1,11 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'flds';
-file_number = '.tot.011';
+file_number = '.tot.006';
 Nd = 2;
 start = 0;
+Color = {'red','blue'};
+LegendTitle = {'old','new'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
@@ -64,8 +66,6 @@ for j = 1:Nd,
     end;
 end;
 
-Color = {'red','blue'};
-
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
 
@@ -74,7 +74,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Bx(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
@@ -85,7 +85,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, By(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
 title ('By');
 xlabel ('x');
 ylabel ('By');
@@ -96,7 +96,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Bz(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
@@ -107,7 +107,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ex(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
@@ -118,7 +118,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ey(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');
@@ -129,7 +129,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ez(j, 1:Nx)*fieldFactor,'color', Color{j});
 end;
-legend('turbulent','regular','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');
