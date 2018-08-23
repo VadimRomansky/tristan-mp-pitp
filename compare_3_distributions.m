@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.025';
+file_number = '.005';
 Nd = 3;
 start = 0;
 
@@ -56,7 +56,7 @@ for j = 1:Nd,
 end;
 
 Color = {'red','blue','green'};
-LegendTitle = {'filter 16','filter 32','filter 128'};
+LegendTitle = {'0','1','1'};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
