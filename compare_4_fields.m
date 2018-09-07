@@ -1,11 +1,12 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'flds';
-file_number = '.tot.050';
-Nd = 2;
+file_number = '.tot.005';
+Nd = 4;
 start = 0;
-Color = {'red','blue'};
-LegendTitle = {'0','1'};
+
+Color = {'red','blue','green','black'};
+LegendTitle = {'By, l = 6 rg','Bz, l = 6 rg','By, l = 22 rg', 'Bz, l = 22 rg'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
@@ -35,10 +36,10 @@ tau = c1*rho/c0;
 
 fieldFactor = me*rho/(q*tau*tau);
 
-samplingFactor = 1;
+samplingFactor = 5;
 
 rho = rho*samplingFactor;
-
+rho = samplingFactor/Nskinlength;
 
 Bx(1:Nd,1:Nx)=0;
 By(1:Nd,1:Nx)=0;
@@ -46,7 +47,6 @@ Bz(1:Nd,1:Nx)=0;
 Ex(1:Nd,1:Nx)=0;
 Ey(1:Nd,1:Nx)=0;
 Ez(1:Nd,1:Nx)=0;
-
 
 for j = 1:Nd,
     full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
@@ -65,6 +65,12 @@ for j = 1:Nd,
         Ez(j,i)=Ez0(i, fix(Ny/2)+1);
     end;
 end;
+B0x = Bx(1,Nx);
+B0y = By(1,Nx);
+B0z = Bz(1,Nx);
+E0x = Ex(1,Nx);
+E0y = Ey(1,Nx);
+E0z = Ez(1,Nx);
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
@@ -72,9 +78,9 @@ set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman');
 figure(1);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Bx(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Bx(j, 1:Nx)/B0x,'color', Color{j});
 end;
-legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
@@ -83,9 +89,9 @@ grid ;
 figure(2);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, By(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, By(j, 1:Nx)/B0y,'color', Color{j});
 end;
-legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('By');
 xlabel ('x');
 ylabel ('By');
@@ -94,9 +100,9 @@ grid ;
 figure(3);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Bz(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Bz(j, 1:Nx)/B0z,'color', Color{j});
 end;
-legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
@@ -105,9 +111,9 @@ grid ;
 figure(4);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ex(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Ex(j, 1:Nx)/E0x,'color', Color{j});
 end;
-legend(LegendTitle(1), LegendTitle(2),'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
@@ -116,9 +122,9 @@ grid ;
 figure(5);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ey(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Ey(j, 1:Nx)/E0y,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');
@@ -127,9 +133,9 @@ grid ;
 figure(6);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ez(j, 1:Nx)*fieldFactor,'color', Color{j});
+    plot ((1:Nx)*rho, Ez(j, 1:Nx)/E0z,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');

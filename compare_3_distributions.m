@@ -5,6 +5,9 @@ file_number = '.005';
 Nd = 3;
 start = 0;
 
+Color = {'red','blue','green'};
+LegendTitle = {'l = 6rg','l = 22 rg','l = 45 rg'};
+
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -54,9 +57,6 @@ for j = 1:Nd,
         Fe(j,i) = Fe(j,i)*norm/norme;
     end;
 end;
-
-Color = {'red','blue','green'};
-LegendTitle = {'0','1','1'};
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 

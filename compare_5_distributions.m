@@ -1,12 +1,12 @@
 clear;
-directory_name = './output5/';
+directory_name = './output6/';
 file_name = 'spect';
 file_number = '.006';
-Nd = 4;
+Nd = 5;
 start = 0;
 
-Color = {'red','blue','green','black'};
-LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 45 rg'};
+Color = {'red','blue','green','black','magenta'};
+LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -69,7 +69,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5},'Location','southeast');
 grid ;
 
 figure(2);
@@ -80,5 +80,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5},'Location','southeast');
 grid ;

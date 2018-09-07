@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.006';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -19,7 +19,7 @@ Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
 me = 0.91*10^-27;
-mass_ratio = 100;
+mass_ratio = 25;
 mp = me*mass_ratio;
 c = 2.99792458*10^10;
 Te = 9*10^9;

@@ -1,7 +1,7 @@
 clear;
-directory_name = './output2/';
+directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.005';
+file_number = '.tot.050';
 Nd = 3;
 start = 0;
 
@@ -78,7 +78,7 @@ set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman');
 figure(1);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Bx(j, 1:Nx)/B0x,'color', Color{j});
+    plot ((1:Nx)*rho, Bx(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Bx');
@@ -89,7 +89,7 @@ grid ;
 figure(2);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, By(j, 1:Nx)/B0y,'color', Color{j});
+    plot ((1:Nx)*rho, By(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('By');
@@ -100,7 +100,7 @@ grid ;
 figure(3);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Bz(j, 1:Nx)/B0z,'color', Color{j});
+    plot ((1:Nx)*rho, Bz(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Bz');
@@ -111,7 +111,7 @@ grid ;
 figure(4);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ex(j, 1:Nx)/E0x,'color', Color{j});
+    plot ((1:Nx)*rho, Ex(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Ex');
@@ -122,7 +122,7 @@ grid ;
 figure(5);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ey(j, 1:Nx)/E0y,'color', Color{j});
+    plot ((1:Nx)*rho, Ey(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Ey');
@@ -133,7 +133,7 @@ grid ;
 figure(6);
 hold on;
 for j=1:Nd,
-    plot ((1:Nx)*rho, Ez(j, 1:Nx)/E0z,'color', Color{j});
+    plot ((1:Nx)*rho, Ez(j, 1:Nx),'color', Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 title ('Ez');

@@ -4,7 +4,7 @@ load energy
 N1 = 1;
 N2 = size(energy,1);
 
-Nskinlength = 10;
+Nskinlength = 5;
 
 c0 = 2.998*10^10;
 mass_ratio = 20;

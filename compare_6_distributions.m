@@ -1,12 +1,12 @@
 clear;
-directory_name = './output5/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.006';
-Nd = 4;
+file_number = '.002';
+Nd = 6;
 start = 0;
 
-Color = {'red','blue','green','black'};
-LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 45 rg'};
+Color = {'red','blue','green','black','cyan','magenta'};
+LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -69,7 +69,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
 grid ;
 
 figure(2);
@@ -80,5 +80,5 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
 grid ;
