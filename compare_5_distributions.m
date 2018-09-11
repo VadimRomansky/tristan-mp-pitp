@@ -6,15 +6,15 @@ Nd = 5;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
-LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-
+%LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
+LegendTitle = {'lmax = 45 old','lmax = 45 lmin = 0.2 ysize 90','lmax = 45 lmin = 0.2 ysize = 45', 'lmax = 45 lmin = 2 ysize = 45','lmax = 22'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = Nx/2;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

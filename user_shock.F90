@@ -868,13 +868,13 @@ subroutine init_turbulent_field
 
 	print *, mx0, my0, mz0
 
-	minTurbulentLambdaX = 500;
 	maxTurbulentLambdaX = 5000;
-	minTurbulentLambdaY = 500;
-	maxTurbulentLambdaY = 2500;
-	minTurbulentLambdaZ = 500;
+	minTurbulentLambdaX = 100;
+	maxTurbulentLambdaY = 5000;
+	minTurbulentLambdaY = 100;
 	maxTurbulentLambdaZ = 5000;
-	turbulenceEnergyFraction = 0.3
+	minTurbulentLambdaZ = 100;
+	turbulenceEnergyFraction = 0.9
 	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
@@ -884,12 +884,14 @@ subroutine init_turbulent_field
 	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
 	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
 
+	print *, maxKx, maxKy, maxKz
+
 #ifdef twoD
 	maxKz = 1;
 #endif
 
 	!do ki = 0, mx0-5
-	do ki = 1, maxKx-1
+	do ki = 0, maxKx-1
 		!do kj = 0, my0-5
 		do kj = 0, maxKy-1
 #ifdef twoD
@@ -937,13 +939,13 @@ subroutine init_turbulent_field
 		turbulenceFieldCorrection = 1.0;
 	endif
 
-
+	print *, 'field corection updated', turbulenceFieldCorrection
 
 	call srand(randomseed)
 
 	
 	!do ki = 0, mx0-5
-	do ki = 1, maxKx-1
+	do ki = 0, maxKx-1
 		!do kj = 0, my0-5
 		do kj = 0, maxKy-1
 #ifdef twoD
@@ -952,6 +954,7 @@ subroutine init_turbulent_field
 			!do kk = 0, mz0-5
 			do kk = 0, maxKz-1
 #endif
+				!print *, ki, kj, kk
 
 				if ((ki + kj + kk) .ne. 0) then
 	
@@ -1005,7 +1008,7 @@ subroutine init_turbulent_field
 	enddo
 #endif
 
-	
+print *, 'finish initializing turbulence' 	
 	
 
 	
