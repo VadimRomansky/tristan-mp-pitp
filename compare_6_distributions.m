@@ -1,12 +1,13 @@
 clear;
-directory_name = './output3/';
+directory_name = './output7/';
 file_name = 'spect';
-file_number = '.002';
+file_number = '.006';
 Nd = 6;
 start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta'};
-LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
+%LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
+LegendTitle = {'l = 0.2', 'l=6', 'l=11', 'l=22','l=45','l=45 old'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +15,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx;
+endx = 12500;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

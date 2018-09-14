@@ -869,11 +869,11 @@ subroutine init_turbulent_field
 	print *, mx0, my0, mz0
 
 	maxTurbulentLambdaX = 5000;
-	minTurbulentLambdaX = 100;
+	minTurbulentLambdaX = 5000;
 	maxTurbulentLambdaY = 5000;
-	minTurbulentLambdaY = 100;
+	minTurbulentLambdaY = 5000;
 	maxTurbulentLambdaZ = 5000;
-	minTurbulentLambdaZ = 100;
+	minTurbulentLambdaZ = 5000;
 	turbulenceEnergyFraction = 0.9
 	turbulenceEnergy = 0.0;
 
@@ -891,14 +891,14 @@ subroutine init_turbulent_field
 #endif
 
 	!do ki = 0, mx0-5
-	do ki = 0, maxKx-1
+	do ki = 0, maxKx
 		!do kj = 0, my0-5
-		do kj = 0, maxKy-1
+		do kj = 0, maxKy
 #ifdef twoD
 			kk = 0
 #else
 			!do kk = 0, mz0-5
-			do kk = 0, maxKz-1
+			do kk = 0, maxKz
 #endif
 
 				if ((ki + kj + kk) .ne. 0) then
@@ -945,14 +945,14 @@ subroutine init_turbulent_field
 
 	
 	!do ki = 0, mx0-5
-	do ki = 0, maxKx-1
+	do ki = 0, maxKx
 		!do kj = 0, my0-5
-		do kj = 0, maxKy-1
+		do kj = 0, maxKy
 #ifdef twoD
 			kk = 0
 #else
 			!do kk = 0, mz0-5
-			do kk = 0, maxKz-1
+			do kk = 0, maxKz
 #endif
 				!print *, ki, kj, kk
 
