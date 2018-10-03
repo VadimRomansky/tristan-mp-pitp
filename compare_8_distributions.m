@@ -1,13 +1,13 @@
 clear;
-directory_name = './output1/';
+directory_name = './output8/';
 file_name = 'spect';
 file_number = '.020';
 Nd = 8;
-start = 2;
+start = 0;
 
-Color = {'red','blue','green','black','cyan','magenta',[.5,.5,.5],[.3,.7,.3],[.75,0.0,.7],[.7,.3,.3]};
+Color = {'red','blue','green','black','cyan','magenta',[.5,.5,.5],[.7,.7,.3],[.75,0.0,.7],[.9,.3,.3]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'Bz l 500 per 0', 'Bz l 500 per 1', 'By l 1000 per 0', 'By l 1000 per 1','Bz l 1000 per 0', 'Bz l 1000 per 1'};
+LegendTitle = {'By l 500 per 0', 'By l 500 per 1','Bz l 500 per 0', 'Bz l 500 per 1', 'By l 1000 per 0', 'By l 1000 per 1','Bz l 1000 per 0', 'Bz l 1000 per 1'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

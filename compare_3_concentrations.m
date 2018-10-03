@@ -1,12 +1,12 @@
 clear;
-directory_name = './output1/';
+directory_name = './output3/';
 file_name = 'flds';
-file_number = '.tot.050';
+file_number = '.tot.018';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'0','1','1'};
+LegendTitle = {'no turb','By','Bz'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Np0 = hdf5read(full_name,'densi');

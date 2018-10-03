@@ -1,12 +1,12 @@
 clear;
-directory_name = './output6/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.005';
+file_number = '.018';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'90%','50%','20%'};
+LegendTitle = {'no turb','By','Bz'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = Nx;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

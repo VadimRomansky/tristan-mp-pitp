@@ -6,9 +6,9 @@
 
 <node_configuration>
 
-sizex	= 1                    # number of cpus in x direction
-sizey 	= 28			# number of cpus in the y direction
-sizez = 20
+sizex	= 28                    # number of cpus in x direction
+sizey 	= 5			# number of cpus in the y direction
+sizez = 1
 
 <time>
 
@@ -21,10 +21,10 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 2000 		# number of actual grid points in the x direction
-my0 	= 250			# number of actual grid points in the y direction
+mx0 	= 10000 		# number of actual grid points in the x direction
+my0 	= 300			# number of actual grid points in the y direction
 
-mz0 	= 250 			# ... (ignored for 2D simulations)
+mz0 	= 1 			# ... (ignored for 2D simulations)
 
 
 <algorithm>
@@ -44,7 +44,7 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 10        # plot interval
+interval	= 1000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 5 		# downsampling factor for grid output
@@ -79,8 +79,8 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 0.1		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
-maxptl0 = 2e10		# max number of particles in the simulation
+sigma	= 0.5		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
+maxptl0 = 2e9		# max number of particles in the simulation
 ppc0 	= 10		# number of particles per cell
 
 
