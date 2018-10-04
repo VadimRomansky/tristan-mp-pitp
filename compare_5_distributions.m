@@ -1,13 +1,13 @@
 clear;
-directory_name = './output6/';
+directory_name = './output4/';
 file_name = 'spect';
-file_number = '.006';
+file_number = '.020';
 Nd = 5;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
 %LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-LegendTitle = {'lmax = 45 old','lmax = 45 lmin = 0.2 ysize 90','lmax = 45 lmin = 0.2 ysize = 45', 'lmax = 45 lmin = 2 ysize = 45','lmax = 22'};
+LegendTitle = {'noturb','By l=300', 'Bz l=300', 'By l=600', 'Bz l=600'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');

@@ -410,7 +410,7 @@ subroutine energy()
 	endif
 
 	!print*, 'write energy'
-	write(fnamen,"(a6)") "./output/energy"
+	write(fnamen,"(a15)") './output/energy'
 	if(rank.eq.0 .and. lap .lt. lapst+elap) then !first time
 		!print*, 'write energy 2'
 
