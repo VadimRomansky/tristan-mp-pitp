@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/2;
+endx = Nx;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
