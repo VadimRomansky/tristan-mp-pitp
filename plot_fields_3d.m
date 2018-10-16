@@ -1,17 +1,25 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.013';
+file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
 Bz = hdf5read(full_name,'bz');
-Ex = hdf5read(full_name,'ex');
-Ey = hdf5read(full_name,'ey');
-Ez = hdf5read(full_name,'ez');
+%Ex = hdf5read(full_name,'ex');
+%Ey = hdf5read(full_name,'ey');
+%Ez = hdf5read(full_name,'ez');
 
 Nx = size(Bx, 1);
 Ny = size(By, 2);
+
+Bnorm(1:Nx, 1:Ny) = 0;
+
+for i=1:Nx,
+    for j = 1:Ny,
+        Bnorm(i,j) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
+    end;
+end;
 
 Nskinlength = 10;
 
@@ -66,35 +74,46 @@ ylabel ('x');
 zlabel ('Bz');
 grid ;
 
-figure(4);
-colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-surf(X, Y, Ex*fieldFactor);
-shading interp;
-title ('Ex');
-xlabel ('y');
-ylabel ('x');
-zlabel ('Ex');
-grid ;
+%figure(4);
+%colormap Jet;
+%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+%surf(X, Y, Ex*fieldFactor);
+%shading interp;
+%title ('Ex');
+%xlabel ('y');
+%ylabel ('x');
+%zlabel ('Ex');
+%grid ;
 
-figure(5);
-colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-surf(X, Y, Ey*fieldFactor);
-shading interp;
-title ('Ey');
-xlabel ('y');
-ylabel ('x');
-zlabel ('Ey');
-grid ;
+%figure(5);
+%colormap Jet;
+%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+%surf(X, Y, Ey*fieldFactor);
+%shading interp;
+%title ('Ey');
+%xlabel ('y');
+%ylabel ('x');
+%zlabel ('Ey');
+%grid ;
 
-figure(6);
+%figure(6);
+%colormap Jet;
+%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+%surf(X, Y, Ez*fieldFactor);
+%shading interp;
+%title ('Ez');
+%xlabel ('y');
+%ylabel ('x');
+%zlabel ('Ez');
+%grid ;
+
+figure(7);
 colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-surf(X, Y, Ez*fieldFactor);
+surf(X, Y, Bnorm*fieldFactor);
 shading interp;
-title ('Ez');
+title ('B');
 xlabel ('y');
 ylabel ('x');
-zlabel ('Ez');
+zlabel ('B');
 grid ;

@@ -1,13 +1,13 @@
 clear;
-directory_name = './output/';
-file_name = 'spect';
-file_number = '.006';
+directory_name = './output2/';
+file_name = 'spect0';
+file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
 g=hdf5read(full_name,'gamma');
 
-Nx = size(fp,1);
+Nx = size(fp,1)/4;
 Np = size(fp,2);
 
 Fp(1:Np)=0;
@@ -46,7 +46,8 @@ for i = 1:Np,
     Fp(i)=Fp(i)*(Pp(i)^3)/(1+g(i));
     Fe(i)=Fe(i)*(Pe(i)^3)/(1+g(i));
     
-    exp1 = exp(-sqrt(1+Pe(i)*Pe(i)/(me*me*c*c))/thetae);
+    %exp1 = exp(-sqrt(1+Pe(i)*Pe(i)/(me*me*c*c))/thetae);
+    exp1 = exp(-sqrt(1+Pe(i)*Pe(i))/thetae);
     bes = besselk(2, 1/thetae);
     p = Pe(i);
     p3 = (p/(me*c))^3;
@@ -54,10 +55,11 @@ for i = 1:Np,
     
     
     
-    exp1 = exp(-sqrt(1+Pp(i)*Pp(i)/(mp*mp*c*c))/thetap);
+    %exp1 = exp(-sqrt(1+Pp(i)*Pp(i)/(mp*mp*c*c))/thetap);
+    exp1 = exp(-sqrt(1+Pp(i)*Pp(i))/thetap);
     bes = besselk(2, 1/thetap);
     p = Pp(i);
-    p3 = (p/(mp*c))^3;
+    p3 = (p)^3;
     Fpjuttner(i) = fractionp*(1.0/(thetap*bes))*exp1*p3*Pp(i);
 end;
 
@@ -75,16 +77,17 @@ for i = 1:Np,
 end;
 
 figure(1);
-plot (Pp(1:Np),Fp(1:Np), 'red');
-%plot (Pp(1:Np)/(mp*c),Fp(1:Np), 'red',Pp(1:Np)/(mp*c), Fpjuttner(1:Np), 'blue');
+%plot (Pp(1:Np),Fp(1:Np), 'red');
+plot (Pp(1:Np),Fp(1:Np), 'red',Pp(1:Np), Fpjuttner(1:Np), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
+legend('Fp', 'Juttner','Location','southeast');
 grid ;
 
 figure(2);
 plot (Pe(1:Np),Fe(1:Np), 'red');
-%plot (Pe(1:Np)/(me*c),Fe(1:Np), 'red',Pe(1:Np)/(me*c), Fejuttner(1:Np), 'blue');
+%plot (Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
