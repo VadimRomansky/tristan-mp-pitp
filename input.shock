@@ -6,9 +6,8 @@
 
 <node_configuration>
 
-sizex	= 28                    # number of cpus in x direction
-sizey 	= 5			# number of cpus in the y direction
-sizez = 1
+sizex	= 40                    # number of cpus in x direction
+sizey 	= 7			# number of cpus in the y direction
 
 <time>
 
@@ -21,8 +20,8 @@ timespan= 60000000 		# time, in seconds, available to run the problem,
 
 <grid>
 
-mx0 	= 10000 		# number of actual grid points in the x direction
-my0 	= 300			# number of actual grid points in the y direction
+mx0 	= 50000 		# number of actual grid points in the x direction
+my0 	= 2500			# number of actual grid points in the y direction
 
 mz0 	= 1 			# ... (ignored for 2D simulations)
 
@@ -33,7 +32,7 @@ highorder	= 0	       # 0 -- 2nd order FDTD field integrateion; 1 -- 4th order;
                                # don't use 1 for non-relativistic flows 
 
 Corr		= 1.025	       # correction for the speed of light
-ntimes		= 8		# number of passes for smoothing filter (current)
+ntimes		= 32		# number of passes for smoothing filter (current)
 
 <restart>
 
@@ -44,7 +43,7 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 1000        # plot interval
+interval	= 10000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
 istep		= 5 		# downsampling factor for grid output
@@ -75,13 +74,13 @@ enlarge		= 0 			# if 1, enlarge box in the x direction if injector is close to r
 <fields>
 
 btheta	= 90			# bfield angle bx=B*cos(btheta)  by=B*sin(btheta)*sin(bphi) bz=B*sin(btheta)*cos(bphi)
-bphi	= 0 			#
+bphi	= 30 			#
 
 <particles>
 
-sigma	= 0.5		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
-maxptl0 = 2e9		# max number of particles in the simulation
-ppc0 	= 10		# number of particles per cell
+sigma	= 0.1		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
+maxptl0 = 1e10		# max number of particles in the simulation
+ppc0 	= 8		# number of particles per cell
 
 
 delgam 	= 5.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)

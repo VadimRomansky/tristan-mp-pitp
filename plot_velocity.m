@@ -1,14 +1,14 @@
 clear;
-directory_name = './output/';
-file_name = 'flds.tot';
-file_number = '.006';
+directory_name = './output1/';
+file_name = 'flds1.tot';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = hdf5info(full_name);
-np = hdf5read(full_name,'densi');
-ne = hdf5read(full_name,'dens');
+Vp = hdf5read(full_name,'v4xi');
+Ve = hdf5read(full_name,'v4x');
 
-Nx = size(np, 1);
-Ny = size(np, 2);
+Nx = size(Vp, 1);
+Ny = size(Vp, 2);
 
 Nskinlength = 10;
 
@@ -29,18 +29,17 @@ rho =0.1;
 
 %densityFactor = 1.0/(rho*rho*rho);
 rho = rho*samplingFactor;
-densityFactor = 1/8;
 
 figure(1);
-plot ((1:Nx)*rho,np(1:Nx, fix(Ny/2)+1)*densityFactor, 'red');
-title ('np');
+plot ((1:Nx)*rho,Vp(1:Nx, fix(Ny/2)+1), 'red');
+title ('Vp');
 xlabel ('x');
-ylabel ('np');
+ylabel ('Vp');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,(ne(1:Nx, fix(Ny/2)+1)-np(1:Nx, fix(Ny/2)+1))*densityFactor, 'red');
-title ('ne');
+plot ((1:Nx)*rho,Ve(1:Nx, fix(Ny/2)+1), 'red');
+title ('Ve');
 xlabel ('x');
-ylabel ('ne');
+ylabel ('Ve');
 grid ;

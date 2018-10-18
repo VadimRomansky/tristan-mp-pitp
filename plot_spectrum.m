@@ -1,6 +1,6 @@
 clear;
-directory_name = './output2/';
-file_name = 'spect0';
+directory_name = './output/';
+file_name = 'spect';
 file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
@@ -50,7 +50,7 @@ for i = 1:Np,
     exp1 = exp(-sqrt(1+Pe(i)*Pe(i))/thetae);
     bes = besselk(2, 1/thetae);
     p = Pe(i);
-    p3 = (p/(me*c))^3;
+    p3 = (p)^3;
     Fejuttner(i) = fractione*(1.0/(thetae*bes))*exp1*p3*Pe(i);
     
     
