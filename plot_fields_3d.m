@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.005';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -117,3 +117,5 @@ xlabel ('y');
 ylabel ('x');
 zlabel ('B');
 grid ;
+
+dlmwrite('B.dat',Bnorm);
