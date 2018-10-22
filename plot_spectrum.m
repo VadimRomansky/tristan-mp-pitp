@@ -1,13 +1,13 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.006';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
 g=hdf5read(full_name,'gamma');
 
-Nx = size(fp,1);
+Nx = size(fp,1)/12;
 Np = size(fp,2);
 
 Fp(1:Np)=0;
