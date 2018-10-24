@@ -1,12 +1,12 @@
 clear;
-directory_name = './output4/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.005';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'noturb','By l=300', 'Bz l=300', 'By l=600'};
+LegendTitle = {'0','15', '30', '90'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -61,6 +61,7 @@ end;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
+set(0, 'DefaultLineLineWidth', 1);
 figure(1);
 hold on;
 title ('F_p');

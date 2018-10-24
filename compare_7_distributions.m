@@ -1,11 +1,15 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.004';
+file_number = '.005';
 Nd = 7;
 start = 0;
 
-Color = {'red','blue','green','black','cyan','magenta',[0.5,0.5,0.5]};
+me=0.9*10^-27;
+mp=25*me;
+c=3*10^10;
+
+Color = {'magenta','cyan','green','black','red','blue','yellow'};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
 LegendTitle = {'90', '75', '60', '45','30','15','0'};
 
@@ -15,7 +19,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -62,6 +66,7 @@ end;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
+set(0, 'DefaultLineLineWidth', 1);
 figure(1);
 hold on;
 title ('F_p');
