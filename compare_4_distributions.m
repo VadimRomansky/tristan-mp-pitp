@@ -1,12 +1,12 @@
 clear;
-directory_name = './output3/';
+directory_name = './output1/';
 file_name = 'spect';
-file_number = '.005';
+file_number = '.010';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'0','15', '30', '90'};
+LegendTitle = {'theta 90 Bz','theta 90 By', 'theta 80 Bz', 'theta 80 By'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = Nx/8;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

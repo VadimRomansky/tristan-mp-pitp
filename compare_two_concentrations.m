@@ -1,7 +1,7 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.005';
+file_number = '.tot.003';
 Nd = 2;
 start = 0;
 Color = {'red','blue'};

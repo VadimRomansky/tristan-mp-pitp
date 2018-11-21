@@ -1,13 +1,14 @@
 clear;
-directory_name = './output1/';
+directory_name = './output4/';
 file_name = 'spect';
-file_number = '.003';
+file_number = '.026';
 Nd = 6;
 start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta'};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'90', '75', '60', '45','30','15'};
+%LegendTitle = {'90', '75', '60', '45','30','15'};
+LegendTitle = {'1', '6', '11', '16','21','26'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

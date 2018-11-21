@@ -869,12 +869,12 @@ subroutine init_turbulent_field
 	print *, mx0, my0, mz0
 
 	maxTurbulentLambdaX = 2500;
-	minTurbulentLambdaX = 25;
+	minTurbulentLambdaX = 2500;
 	maxTurbulentLambdaY = 2500;
-	minTurbulentLambdaY = 25;
+	minTurbulentLambdaY = 2500;
 	maxTurbulentLambdaZ = 2500;
-	minTurbulentLambdaZ = 25;
-	turbulenceEnergyFraction = 0.9
+	minTurbulentLambdaZ = 2500;
+	turbulenceEnergyFraction = 0.5
 	turbulenceEnergy = 0.0;
 
 	pi = 3.1415927;
@@ -900,33 +900,32 @@ subroutine init_turbulent_field
 			!do kk = 0, mz0-5
 			do kk = 0, maxKz
 #endif
-
 				if ((ki + kj + kk) .ne. 0) then
-	
-					phase1 = 2*pi*rand();
-					phase2 = 2*pi*rand();
+						phase1 = 2*pi*rand();
+						phase2 = 2*pi*rand();
 
 
-					kx = ki*2*pi/maxTurbulentLambdaX;
-					ky = kj*2*pi/maxTurbulentLambdaY;
-					kz = kk*2*pi/maxTurbulentLambdaZ;
+						kx = ki*2*pi/maxTurbulentLambdaX;
+						ky = kj*2*pi/maxTurbulentLambdaY;
+						kz = kk*2*pi/maxTurbulentLambdaZ;
 	
-					kw = sqrt(kx*kx + ky*ky + kz*kz);
-					kxy = sqrt(kx*kx + ky*ky);
-					cosTheta = kz/kw;
-					sinTheta = kxy/kw;
-					if(ki + kj .ne. 0) then
-						cosPhi = kx/kxy;
-						sinPhi = ky/kxy;
-					else 
-						cosPhi = 1.0
-						sinPhi = 0.0
+						kw = sqrt(kx*kx + ky*ky + kz*kz);
+						kxy = sqrt(kx*kx + ky*ky);
+						cosTheta = kz/kw;
+						sinTheta = kxy/kw;
+						if(ki + kj .ne. 0) then
+							cosPhi = kx/kxy;
+							sinPhi = ky/kxy;
+						else 
+							cosPhi = 1.0
+							sinPhi = 0.0
+						endif
+	
+						!Bturbulent = evaluate_turbulent_b(ki, kj, kk);
+						Bturbulent = 1.0;
+	
+						turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
 					endif
-	
-					Bturbulent = evaluate_turbulent_b(ki, kj, kk);
-
-					turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
-				endif
 #ifndef twoD
 			enddo
 #endif
@@ -957,49 +956,49 @@ subroutine init_turbulent_field
 				!print *, ki, kj, kk
 
 				if ((ki + kj + kk) .ne. 0) then
-	
-					phase1 = 2*pi*rand();
-					phase2 = 2*pi*rand();
+						phase1 = 2*pi*rand();
+						phase2 = 2*pi*rand();
 
 
-					kx = ki*2*pi/maxTurbulentLambdaX;
-					ky = kj*2*pi/maxTurbulentLambdaY;
-					kz = kk*2*pi/maxTurbulentLambdaZ;
+						kx = ki*2*pi/maxTurbulentLambdaX;
+						ky = kj*2*pi/maxTurbulentLambdaY;
+						kz = kk*2*pi/maxTurbulentLambdaZ;
 	
-					kw = sqrt(kx*kx + ky*ky + kz*kz);
-					kxy = sqrt(kx*kx + ky*ky);
-					cosTheta = kz/kw;
-					sinTheta = kxy/kw;
-					if(ki + kj .ne. 0) then
-						cosPhi = kx/kxy;
-						sinPhi = ky/kxy;
-					else 
-						cosPhi = 1.0
-						sinPhi = 0.0
-					endif
+						kw = sqrt(kx*kx + ky*ky + kz*kz);
+						kxy = sqrt(kx*kx + ky*ky);
+						cosTheta = kz/kw;
+						sinTheta = kxy/kw;
+						if(ki + kj .ne. 0) then
+							cosPhi = kx/kxy;
+							sinPhi = ky/kxy;
+						else 
+							cosPhi = 1.0
+							sinPhi = 0.0
+						endif
 	
-					Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
+						!Bturbulent = evaluate_turbulent_b(ki, kj, kk)*turbulenceFieldCorrection;
+						Bturbulent = turbulenceFieldCorrection;
 
 	
-					!print *, 'Bturbulent', Bturbulent
-					do  k=1,mz
-						do  j=1,my
-							do  i=1,mx
-								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-								localB1 = Bturbulent*sin(kmultr + phase1);
-								localB2 = Bturbulent*sin(kmultr + phase2);
+						!print *, 'Bturbulent', Bturbulent
+						do  k=1,mz
+							do  j=1,my
+								do  i=1,mx
+									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									localB1 = Bturbulent*sin(kmultr + phase1);
+									localB2 = Bturbulent*sin(kmultr + phase2);
 
-								bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-								by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-								bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+									bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+									by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+									bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
 	
-								ex(i,j,k)=ex(i,j,k);
-								ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
-								ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+									ex(i,j,k)=ex(i,j,k);
+									ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+									ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+								enddo
 							enddo
-						enddo
-					enddo	
+						enddo	
 				endif
 #ifndef twoD
 			enddo

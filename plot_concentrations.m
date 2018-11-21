@@ -1,13 +1,13 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.001';
+file_number = '.004';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = hdf5info(full_name);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
 
-Nx = size(np, 1);
+Nx = size(np, 1)/4;
 Ny = size(np, 2);
 
 Nskinlength = 10;
