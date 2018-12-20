@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.011';
+file_number = '.003';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
@@ -33,11 +33,13 @@ omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;
-
+samplingFactor = 10;
 tau = c1*rho/c0;
-rho =0.2;
+rho =0.1;
 
-densityFactor = 1.0/(rho*rho*rho);
+%densityFactor = 1.0/(rho*rho*rho);
+rho = rho*samplingFactor;
+densityFactor = 1/8;
 
 figure(1);
 plot ((1:Nx)*rho,npa(1:Nx)*densityFactor, 'red');

@@ -1,14 +1,17 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.009';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
 g=hdf5read(full_name,'gamma');
 
-Nx = size(fp,1)/4;
+Nx = size(fp,1);
 Np = size(fp,2);
+
+startx = 1;
+endx = Nx/4;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
@@ -39,7 +42,7 @@ for i = 1:Np,
     %Pe(i) = sqrt((g(i)+1)^2 - 1)*me*c;
     Pp(i) = sqrt((g(i)+1)^2 - 1);
     Pe(i) = sqrt((g(i)+1)^2 - 1);
-    for j = 1:Nx,
+    for j = startx:endx,
         Fp(i) = Fp(i) + fp(j,i);
         Fe(i) = Fe(i) + fe(j,i);
     end;

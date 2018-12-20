@@ -1,19 +1,22 @@
 clear;
-load energy
+load ./output/energy
 
 N1 = 1;
 N2 = size(energy,1);
 
-Nskinlength = 5;
+Nskinlength = 10;
 
 c0 = 2.998*10^10;
-mass_ratio = 20;
-mp = 1.67262*10^-24;
-me = mp/mass_ratio;
+mass_ratio = 64;
+%mp = 1.67262*10^-24;
+%me = mp/mass_ratio;
+me = 9.1*10^-28;
+mp = me*mass_ratio;
 q = 4.80320427*10^-10;
 n = 10^-4;
+gamma = 1.5;
 
-omega = sqrt(4*pi*n*q*q/me);
+omega = sqrt(4*pi*n*q*q/(me*gamma));
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;

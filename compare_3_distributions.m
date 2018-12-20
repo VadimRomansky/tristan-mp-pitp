@@ -1,12 +1,12 @@
 clear;
-directory_name = './output8/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.004';
+file_number = '.010';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'spectrum from 1 to 20 rg','6 and 60 rg','noturb'};
+LegendTitle = {'noturb','1000','2000'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/8;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

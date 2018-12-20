@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.007';
 Nd = 4;
 start = 0;
 
@@ -14,7 +14,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/8;
+endx = Nx/2;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
