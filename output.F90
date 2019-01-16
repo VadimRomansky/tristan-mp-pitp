@@ -416,8 +416,9 @@ subroutine save_spectrum()
 	real, allocatable :: speceprime(:,:), specpprime(:,:)
 	real, allocatable :: umean(:), vmean(:), wmean(:), numdens(:)	! mean flow speed, mean number density
 
-	if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
-		
+	!if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
+	if((modulo((lap-pltstart),interval) .eq.0) .or. (lap .eq. (pltstart + 1)))then
+
 		gammin=1
 		gammax=1
 		gambins=100*2	! number of energy bins
@@ -2324,7 +2325,8 @@ subroutine save_param()
 !  integer(HID_T) :: memspace ! Dataspace identifier in memory
 !  integer(HID_T) :: plist_id ! Property list identifier
   
-  if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0) then
+  !if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0) then
+  if((modulo((lap-pltstart),interval) .eq.0) .or.(lap .eq. (pltstart + 1))) then
 
      ind=(lap-pltstart)/interval
      write(indchar,"(i3.3)")ind
@@ -2534,7 +2536,11 @@ subroutine output_tot()
   logical :: writecurr
  
 
-  if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
+  !if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
+  print * , 'modulo', modulo((lap-pltstart),interval)
+  print *, 'lap', lap
+  print *, 'pltstart', pltstart
+  if((modulo((lap-pltstart),interval) .eq.0).or.(lap .eq. (pltstart+1)))then
 
      !timestamp of the saved output
      ind=(lap-pltstart)/interval	    
