@@ -28,9 +28,13 @@ omega = sqrt(4*pi*n*q*q/me);
 
 rho = c0/(omega*Nskinlength);
 c1=0.45;
-samplingFactor = 5;
+samplingFactor = 10;
 tau = c1*rho/c0;
 rho =0.1;
+
+%densityFactor = 1.0/(rho*rho*rho);
+rho = rho*samplingFactor;
+densityFactor = 1/8;
 
 
 for i=1:Nx-2*offsetx,
