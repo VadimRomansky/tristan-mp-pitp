@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.001';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -14,10 +14,12 @@ Nx = size(Bx, 1);
 Ny = size(By, 2);
 
 Bnorm(1:Nx, 1:Ny) = 0;
+Bperp(1:Nx, 1:Ny) = 0;
 
 for i=1:Nx,
     for j = 1:Ny,
         Bnorm(i,j) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
+        Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
     end;
 end;
 
@@ -119,3 +121,14 @@ zlabel ('B');
 grid ;
 
 dlmwrite('B.dat',Bnorm);
+
+figure(8);
+colormap Jet;
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+surf(X, Y, Bperp*fieldFactor);
+shading interp;
+title ('Bperp');
+xlabel ('y');
+ylabel ('x');
+zlabel ('B');
+grid ;

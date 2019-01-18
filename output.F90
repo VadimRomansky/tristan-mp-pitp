@@ -2537,9 +2537,9 @@ subroutine output_tot()
  
 
   !if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
-  print * , 'modulo', modulo((lap-pltstart),interval)
-  print *, 'lap', lap
-  print *, 'pltstart', pltstart
+  !print * , 'modulo', modulo((lap-pltstart),interval)
+  !print *, 'lap', lap
+  !print *, 'pltstart', pltstart
   if((modulo((lap-pltstart),interval) .eq.0).or.(lap .eq. (pltstart+1)))then
 
      !timestamp of the saved output
