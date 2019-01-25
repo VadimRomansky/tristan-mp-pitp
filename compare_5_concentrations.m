@@ -1,13 +1,13 @@
 clear;
-directory_name = './output7/';
+directory_name = './output2/';
 file_name = 'flds';
-file_number = '.tot.020';
+file_number = '.tot.007';
 Nd = 5;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
 %LegendTitle = {'2','16','32','128'};
-LegendTitle = {'no turb Bz','l 1000 Bz', 'l 1000 By', 'l 500 Bz', 'l 500 By'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'isotropic turbulence','anisotropic turbulence by'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

@@ -1,20 +1,20 @@
 clear;
-directory_name = './output4/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.009';
 Nd = 5;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
 %LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-LegendTitle = {'noturb','By l=300', 'Bz l=300', 'By l=600', 'Bz l=600'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'isotropic turbulence','anisotropic turbulence by'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;

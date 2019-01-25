@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.002';
+file_number = '.009';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -13,6 +13,12 @@ Np = size(fp,2);
 startx = 1;
 endx = Nx/4;
 
+startPowerP = 150;
+endPowerP = 170;
+
+startPowerE = 180;
+endPowerE = 190;
+
 Fp(1:Np)=0;
 Fe(1:Np)=0;
 
@@ -20,6 +26,13 @@ Pp(1:Np)=0;
 Pe(1:Np)=0;
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
+
+Fpa(1:Np)=0;
+Fea(1:Np)=0;
+gammap = 1;
+gammae = 1;
+ap = 1;
+ae = 1;
 
 me = 0.91*10^-27;
 mass_ratio = 16;
@@ -79,19 +92,42 @@ for i = 1:Np,
     Fe(i) = Fe(i)*norm/norme;
 end;
 
+Fpa(startPowerP) = Fp(startPowerP);
+Fpa(endPowerP) = Fp(endPowerP);
+
+Fea(startPowerE) = Fe(startPowerE);
+Fea(endPowerE) = Fe(endPowerE);
+
+gammap = log(Fpa(startPowerP)/Fpa(endPowerP))/log(Pp(startPowerP)/Pp(endPowerP));
+gammae = log(Fea(startPowerE)/Fea(endPowerE))/log(Pe(startPowerE)/Pe(endPowerE));
+
+ap = exp(log(Fpa(startPowerP)) - gammap*log(Pp(startPowerP)));
+ae = exp(log(Fea(startPowerE)) - gammae*log(Pe(startPowerE)));
+
+for i = startPowerP:endPowerP,
+    Fpa(i) = ap*(Pp(i)^gammap);
+end;
+
+for i = startPowerE:endPowerE,
+    Fea(i) = ae*(Pe(i)^gammae);
+end;
+
 figure(1);
 %plot (Pp(1:Np),Fp(1:Np), 'red');
-plot (Pp(1:Np),Fp(1:Np), 'red',Pp(1:Np), Fpjuttner(1:Np), 'blue');
+plot (Pp(1:Np),Fp(1:Np), 'red',Pp(startPowerP:endPowerP), Fpa(startPowerP:endPowerP), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
-legend('Fp', 'Juttner','Location','southeast');
+name = strcat('approximation gamma = ',num2str(gammap));
+legend('Fp', name,'Location','southeast');
 grid ;
 
 figure(2);
-plot (Pe(1:Np),Fe(1:Np), 'red');
+plot (Pe(1:Np),Fe(1:Np), 'red',Pe(startPowerE:endPowerE), Fea(startPowerE:endPowerE),'blue');
 %plot (Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
+name = strcat('approximation gamma = ',num2str(gammae));
+legend('Fe', name,'Location','southeast');
 grid ;

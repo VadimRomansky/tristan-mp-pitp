@@ -1,12 +1,12 @@
 clear;
 directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.010';
+file_number = '.tot.004';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'2','16','32','128'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence', 'isotropic turbulence'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Np0 = hdf5read(full_name,'densi');

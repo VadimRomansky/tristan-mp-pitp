@@ -1,12 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output1/';
 file_name = 'flds';
-file_number = '.tot.010';
+file_number = '.tot.004';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'By, l = 6 rg','Bz, l = 6 rg','By, l = 22 rg', 'Bz, l = 22 rg'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence', 'isotropic turbulence'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
