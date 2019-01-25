@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.009';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -11,7 +11,7 @@ Nx = size(fp,1);
 Np = size(fp,2);
 
 startx = 1;
-endx = Nx/4;
+endx = fix(Nx/4);
 
 startPowerP = 150;
 endPowerP = 170;
@@ -31,6 +31,8 @@ Fpa(1:Np)=0;
 Fea(1:Np)=0;
 gammap = 1;
 gammae = 1;
+gp(1:Np) = 0;
+ge(1:Np) = 0;
 ap = 1;
 ae = 1;
 
@@ -112,13 +114,18 @@ for i = startPowerE:endPowerE,
     Fea(i) = ae*(Pe(i)^gammae);
 end;
 
+for i = 2:Np,
+    gp(i) = log(Fp(i)/Fp(i-1))/log(Pp(i)/Pp(i-1)) - 4;
+    ge(i) = log(Fe(i)/Fe(i-1))/log(Pe(i)/Pe(i-1)) - 4;
+end;
+
 figure(1);
 %plot (Pp(1:Np),Fp(1:Np), 'red');
 plot (Pp(1:Np),Fp(1:Np), 'red',Pp(startPowerP:endPowerP), Fpa(startPowerP:endPowerP), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
-name = strcat('approximation gamma = ',num2str(gammap));
+name = strcat('approximation gamma = ',num2str(gammap - 4));
 legend('Fp', name,'Location','southeast');
 grid ;
 
@@ -128,6 +135,29 @@ plot (Pe(1:Np),Fe(1:Np), 'red',Pe(startPowerE:endPowerE), Fea(startPowerE:endPow
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
-name = strcat('approximation gamma = ',num2str(gammae));
+name = strcat('approximation gamma = ',num2str(gammae - 4));
 legend('Fe', name,'Location','southeast');
 grid ;
+
+figure(3);
+plot (Pp(1:Np),gp(1:Np), 'red');
+title ('{\gamma}_p');
+xlabel ('p/{m_p c}');
+ylabel ('{\gamma}');
+grid ;
+
+figure(4);
+plot (Pe(1:Np),ge(1:Np), 'red');
+title ('{\gamma}_e');
+xlabel ('p/{m_e c}');
+ylabel ('{\gamma}');
+grid ;
+
+outputArray(1:Np, 1:2) = 0;
+
+for i = 1:Np,
+    outputArray(i, 1) = Pe(i);
+    outputArray(i, 2) = Fe(i)/(Pe(i)^2);
+end;
+
+dlmwrite('Fe_isotropic_turbulence.dat',outputArray, 'delimiter', ' ');
