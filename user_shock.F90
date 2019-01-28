@@ -69,7 +69,7 @@ module m_user_3d
 
 	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
 			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
-	real :: turbulenceFieldCorrection
+	real :: turbulenceFieldCorrection, slabFieldCorrection
 
 	integer :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
@@ -90,7 +90,7 @@ module m_user_3d
 	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 
 	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
-			minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection
+			minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection, slabFieldCorrection
 
 	public :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
@@ -884,20 +884,20 @@ subroutine init_turbulent_field
 	print *, maxKx, maxKy, maxKz
 
 
-!#ifdef twoD
+#ifdef twoD
 !	maxKz = 1;
-!#endif
+#endif
 !
 !	!do ki = 0, mx0-5
 !	do ki = 0, maxKx
 !		!do kj = 0, my0-5
 !		do kj = 0, maxKy
-!#ifdef twoD
+#ifdef twoD
 !			kk = 0
-!#else
+#else
 !			!do kk = 0, mz0-5
 !			do kk = 0, maxKz
-!#endif
+#endif
 !
 !				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
 !
@@ -911,9 +911,9 @@ subroutine init_turbulent_field
 !
 !					turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
 !				endif
-!#ifndef twoD
+#ifndef twoD
 !			enddo
-!#endif
+#endif
 !		enddo
 !	enddo
 
@@ -970,7 +970,7 @@ subroutine init_turbulent_field
 	enddo
 
 	if(slabEnergy > 0) then 
-		slabFieldCorrestion = sqrt(slabFraction*restEnergy/((1.0 - slabFraction)*slabEnergy))
+		slabFieldCorrection = sqrt(slabFraction*restEnergy/((1.0 - slabFraction)*slabEnergy))
 	else
 		slabFieldCorrection = 1.0;
 	endif
@@ -991,86 +991,86 @@ subroutine init_turbulent_field
 
 	
 	!do ki = 0, mx0-5
-	do ki = 0, maxKx
-		!do kj = 0, my0-5
-		do kj = 0, maxKy
+!	do ki = 0, maxKx
+!		!do kj = 0, my0-5
+!		do kj = 0, maxKy
 #ifdef twoD
-			kk = 0
+!			kk = 0
 #else
-			!do kk = 0, mz0-5
-			do kk = 0, maxKz
+!			!do kk = 0, mz0-5
+!			do kk = 0, maxKz
 #endif
-				!print *, ki, kj, kk
-
-				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
-	
-					phase1 = 2*pi*rand();
-					phase2 = 2*pi*rand();
-
-
-					kx = ki*2*pi/maxTurbulentLambdaX;
-					ky = kj*2*pi/maxTurbulentLambdaY;
-					kz = kk*2*pi/maxTurbulentLambdaZ;
-
-					!print *,'k', kx, ky, kz
-
-	
-					kw = sqrt(kx*kx + ky*ky + kz*kz);
-					kyz = sqrt(ky*ky + kz*kz);
-					cosTheta = kx/kw;
-					sinTheta = kyz/kw;
-					if(kj + kk .ne. 0) then
-						cosPhi = ky/kyz;
-						sinPhi = kz/kyz;
-					else 
-						cosPhi = 1.0
-						sinPhi = 0.0
-					endif
-	
-					Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
-
-	
-					!print *, 'Bturbulent', Bturbulent
-					do  k=1,mz
-						do  j=1,my
-							do  i=1,mx
-								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-								!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
-
-								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-								localB1 = Bturbulent*sin(kmultr + phase1);
-								localB2 = Bturbulent*sin(kmultr + phase2);
-								!localB2 = 0
-
-								bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-								by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-								bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
-
-								ex(i,j,k)=ex(i,j,k)
-								ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-								ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
-
-
-
-								!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-								!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-								!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
-	
-								!ex(i,j,k)=ex(i,j,k);
-								!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
-								!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
-							enddo
-						enddo
-					enddo	
-				endif
+!				!print *, ki, kj, kk
+!
+!				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
+!	
+!					phase1 = 2*pi*rand();
+!					phase2 = 2*pi*rand();
+!
+!
+!					kx = ki*2*pi/maxTurbulentLambdaX;
+!					ky = kj*2*pi/maxTurbulentLambdaY;
+!					kz = kk*2*pi/maxTurbulentLambdaZ;
+!
+!					!print *,'k', kx, ky, kz
+!
+!	
+!					kw = sqrt(kx*kx + ky*ky + kz*kz);
+!					kyz = sqrt(ky*ky + kz*kz);
+!					cosTheta = kx/kw;
+!					sinTheta = kyz/kw;
+!					if(kj + kk .ne. 0) then
+!						cosPhi = ky/kyz;
+!						sinPhi = kz/kyz;
+!					else 
+!						cosPhi = 1.0
+!						sinPhi = 0.0
+!					endif
+!	
+!					Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
+!
+!	
+!					!print *, 'Bturbulent', Bturbulent
+!					do  k=1,mz
+!						do  j=1,my
+!							do  i=1,mx
+!								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+!								!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+!
+!								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+!								localB1 = Bturbulent*sin(kmultr + phase1);
+!								localB2 = Bturbulent*sin(kmultr + phase2);
+!								!localB2 = 0
+!
+!								bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
+!								by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
+!								bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+!
+!								ex(i,j,k)=ex(i,j,k)
+!								ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+!								ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+!
+!
+!
+!								!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+!								!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+!								!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+!	
+!								!ex(i,j,k)=ex(i,j,k);
+!								!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+!								!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+!							enddo
+!						enddo
+!					enddo	
+!				endif
 #ifndef twoD
-			enddo
+!			enddo
 #endif
-		enddo
-	enddo
+!		enddo
+!	enddo
 #endif
 
-print *, 'finish initializing turbulence' 
+!print *, 'finish initializing turbulence' 
 
 
 !slab
