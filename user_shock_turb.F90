@@ -88,7 +88,7 @@ module m_user_3d
 
 	public :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
 	public :: evaluate_turbulent_b_slab, evaluate_turbulent_b_2d
-	!real :: evaluate_turbulence_e_right_boundary, evaluate_turbulence_b_right_boundary, evaluate_turbulent_b
+
 
 	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
 			minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection, slabFieldCorrection
@@ -807,14 +807,9 @@ subroutine init_turbulent_field
 	implicit none
 	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z
-    real pi;
+    	real pi;
 
-#ifdef stripedfield
-    integer globali
-	integer shifti
-	real leftWeight, rightWeight
-#else
-    integer maxKx, maxKy, maxKz
+   	integer maxKx, maxKy, maxKz
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -828,75 +823,15 @@ subroutine init_turbulent_field
 	real slabFraction
 	real slabEnergy
 	real restEnergy
-#endif
 
-#ifdef stripedfield
-    stripedCount = 640;
-    upperStripedCount = 320;
-    lowerStripedCount = 310;
-    stripedLayerWidth = (stripedCount - upperStripedCount - lowerStripedCount)/2;
-    if(modulo(stripedCount - upperStripedCount - lowerStripedCount,2).eq.1)then
-        upperStripedCount = upperStripedCount + 1;
-    end if
-    print *, 'start initializing striped'
+	real maltAngleSlab;
+	real maltAngle2d;
+	real maltAngle;
 
-    B0x=Binit*cos(btheta)
-    B0y=Binit*sin(btheta)*sin(bphi)
-    B0z=Binit*sin(btheta)*cos(bphi)
 
-    E0x=0.
-    E0y=(-beta)*B0z
-    E0z=-(-beta)*B0y
-
-    do  k=1,mz
-        do  j=1,my
-            do  i=1,mx
-                globali = iglob(i);
-                if(modulo(globali, stripedCount) < upperStripedCount)then
-                    bx(i,j,k) = B0x;
-                    by(i,j,k) = B0y;
-                    bz(i,j,k) = B0z;
-
-                    ex(i,j,k) = E0x;
-                    ey(i,j,k) = E0y;
-                    ez(i,j,k) = E0z;
-                else if(modulo(globali, stripedCount)< upperStripedCount + stripedLayerWidth)then
-					shifti = modulo(globali, stripedCount) - upperStripedCount + 1;
-					leftWeight = (stripedLayerWidth - shifti)*1.0/stripedLayerWidth;
-					rightWeight = 1.0 - leftWeight
-
-                    bx(i,j,k) = B0x;
-                    by(i,j,k) = B0y;
-                    bz(i,j,k) = B0z*(leftWeight - rightWeight);
-
-                    ex(i,j,k) = E0x;
-                    ey(i,j,k) = E0y*(leftWeight - rightWeight);
-                    ez(i,j,k) = E0z;
-                else if(modulo(globali, stripedCount) < upperStripedCount + stripedLayerWidth + lowerStripedCount) then
-                    bx(i,j,k) = B0x;
-                    by(i,j,k) = B0y;
-                    bz(i,j,k) = -B0z;
-
-                    ex(i,j,k) = E0x;
-                    ey(i,j,k) = -E0y;
-                    ez(i,j,k) = E0z;
-                else
-					shifti = modulo(globali, stripedCount) - upperStripedCount - stripedLayerWidth - lowerStripedCount + 1;
-					leftWeight = (stripedLayerWidth - shifti)*1.0/stripedLayerWidth;
-					rightWeight = 1.0 - leftWeight
-                    bx(i,j,k) = B0x;
-                    by(i,j,k) = B0y;
-                    bz(i,j,k) = -B0z*(leftWeight - rightWeight);
-
-                    ex(i,j,k) = E0x;
-                    ey(i,j,k) = -E0y*(leftWeight - rightWeight);
-                    ez(i,j,k) = E0z;
-                end if
-            end do
-        end do
-    end do
-
-#else
+	maltAngleSlab = pi/10;
+	maltAngle2d = pi/10;
+	
 
 	randomseed = 10
 	call srand(randomseed)
@@ -930,63 +865,11 @@ subroutine init_turbulent_field
 
 
 #ifdef twoD
-!	maxKz = 1;
-#endif
-!
-!	!do ki = 0, mx0-5
-!	do ki = 0, maxKx
-!		!do kj = 0, my0-5
-!		do kj = 0, maxKy
-#ifdef twoD
-!			kk = 0
-#else
-!			!do kk = 0, mz0-5
-!			do kk = 0, maxKz
-#endif
-!
-!				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
-!
-!
-!					kx = ki*2*pi/maxTurbulentLambdaX;
-!					ky = kj*2*pi/maxTurbulentLambdaY;
-!					kz = kk*2*pi/maxTurbulentLambdaZ;
-!	
-!	
-!					Bturbulent = evaluate_turbulent_b(kx, ky, kz);
-!
-!					turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
-!				endif
-#ifndef twoD
-!			enddo
-#endif
-!		enddo
-!	enddo
-
-
-
-!slab
-
-#ifdef twoD
 	maxKz = 1;
 #endif
 
 	!do ki = 0, mx0-5
-	do kj = 1, maxKy
-		ky = kj*2*pi/maxTurbulentLambdaY;
-
-		Bturbulent = evaluate_turbulent_b_slab(0.0, ky, 0.0); !todo 2 spectrums
-
-		slabEnergy = slabEnergy + Bturbulent*Bturbulent;
-	enddo
-
-!rest turbulnce
-
-#ifdef twoD
-	maxKz = 1;
-#endif
-
-	!do ki = 0, mx0-5
-	do ki = 0, maxKx !todo mayby kx always 0
+	do ki = 0, maxKx
 		!do kj = 0, my0-5
 		do kj = 0, maxKy
 #ifdef twoD
@@ -996,17 +879,24 @@ subroutine init_turbulent_field
 			do kk = 0, maxKz
 #endif
 
-				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
+				if (((ki + kj + kk) .ne. 0)) then
 
 
 					kx = ki*2*pi/maxTurbulentLambdaX;
 					ky = kj*2*pi/maxTurbulentLambdaY;
 					kz = kk*2*pi/maxTurbulentLambdaZ;
-	
-	
-					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
 
-					restEnergy = restEnergy + Bturbulent*Bturbulent;
+					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+					if(maltAngle < maltAngleSlab) then	
+						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
+
+						slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+					else if((pi/2.0) - maltAngle < maltAngle2d) then
+						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
+
+						restEnergy = restEnergy + Bturbulent*Bturbulent; 
+					end if
+
 				endif
 #ifndef twoD
 			enddo
@@ -1035,151 +925,26 @@ subroutine init_turbulent_field
 	call srand(randomseed)
 
 	
-	!do ki = 0, mx0-5
-!	do ki = 0, maxKx
-!		!do kj = 0, my0-5
-!		do kj = 0, maxKy
-#ifdef twoD
-!			kk = 0
-#else
-!			!do kk = 0, mz0-5
-!			do kk = 0, maxKz
-#endif
-!				!print *, ki, kj, kk
-!
-!				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
-!	
-!					phase1 = 2*pi*rand();
-!					phase2 = 2*pi*rand();
-!
-!
-!					kx = ki*2*pi/maxTurbulentLambdaX;
-!					ky = kj*2*pi/maxTurbulentLambdaY;
-!					kz = kk*2*pi/maxTurbulentLambdaZ;
-!
-!					!print *,'k', kx, ky, kz
-!
-!	
-!					kw = sqrt(kx*kx + ky*ky + kz*kz);
-!					kyz = sqrt(ky*ky + kz*kz);
-!					cosTheta = kx/kw;
-!					sinTheta = kyz/kw;
-!					if(kj + kk .ne. 0) then
-!						cosPhi = ky/kyz;
-!						sinPhi = kz/kyz;
-!					else 
-!						cosPhi = 1.0
-!						sinPhi = 0.0
-!					endif
-!	
-!					Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
-!
-!	
-!					!print *, 'Bturbulent', Bturbulent
-!					do  k=1,mz
-!						do  j=1,my
-!							do  i=1,mx
-!								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-!								!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
-!
-!								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-!								localB1 = Bturbulent*sin(kmultr + phase1);
-!								localB2 = Bturbulent*sin(kmultr + phase2);
-!								!localB2 = 0
-!
-!								bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-!								by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-!								bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
-!
-!								ex(i,j,k)=ex(i,j,k)
-!								ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-!								ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
-!
-!
-!
-!								!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-!								!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-!								!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
-!	
-!								!ex(i,j,k)=ex(i,j,k);
-!								!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
-!								!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
-!							enddo
-!						enddo
-!					enddo	
-!				endif
-#ifndef twoD
-!			enddo
-#endif
-!		enddo
-!	enddo
-
-!print *, 'finish initializing turbulence' 
-
-
-!slab
-
-#ifdef twoD
-	maxKz = 1;
-#endif
-
-	!do ki = 0, mx0-5
-	do kj = 1, maxKy
-		ky = kj*2*pi/maxTurbulentLambdaY;
-
-		Bturbulent = evaluate_turbulent_b_slab(0.0, ky, 0.0)*slabFieldCorrection*turbulenceFieldCorrection; !todo 2 spectrums
-
-		!print *, 'Bturbulent', Bturbulent
-		do  k=1,mz
-			do  j=1,my
-				do  i=1,mx
-					! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-					!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
-
-					kmultr = ky*yglob(1.0*j)
-					localB1 = Bturbulent*sin(kmultr + phase1);
-					localB2 = Bturbulent*sin(kmultr + phase2);
-					!localB2 = 0
-
-					bx(i,j,k)=bx(i,j,k) + localB1
-					by(i,j,k)=by(i,j,k) 
-					bz(i,j,k)=bz(i,j,k) + localB2
-
-					ex(i,j,k)=ex(i,j,k)
-					ey(i,j,k)=ey(i,j,k) - beta*localB2
-					ez(i,j,k)=ez(i,j,k) 	
-				enddo
-			enddo
-		enddo	
-	enddo
-
-!rest turbulnce
-
-#ifdef twoD
-	maxKz = 1;
-#endif
-
-	!do ki = 0, mx0-5
-	do ki = 0, maxKx !todo mayby kx always 0
-		!do kj = 0, my0-5
+	do ki = 0, maxKx
 		do kj = 0, maxKy
 #ifdef twoD
 			kk = 0
 #else
-			!do kk = 0, mz0-5
+
 			do kk = 0, maxKz
 #endif
+				!print *, ki, kj, kk
 
-				if (((ki + kj + kk) .ne. 0).and.((kj + kk) .gt. 0)) then
+				if (((ki + kj + kk) .ne. 0)) then
+
+					phase1 = 2*pi*rand();
+					phase2 = 2*pi*rand();
 
 
 					kx = ki*2*pi/maxTurbulentLambdaX;
 					ky = kj*2*pi/maxTurbulentLambdaY;
 					kz = kk*2*pi/maxTurbulentLambdaZ;
 
-					!print *,'k', kx, ky, kz
-
-	
 					kw = sqrt(kx*kx + ky*ky + kz*kz);
 					kyz = sqrt(ky*ky + kz*kz);
 					cosTheta = kx/kw;
@@ -1191,9 +956,17 @@ subroutine init_turbulent_field
 						cosPhi = 1.0
 						sinPhi = 0.0
 					endif
-	
-	
-					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
+
+					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+					if(maltAngle < maltAngleSlab) then	
+						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
+
+						slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+					else if((pi/2.0) - maltAngle < maltAngle2d) then
+						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
+
+						restEnergy = restEnergy + Bturbulent*Bturbulent; 
+					end if
 
 					do  k=1,mz
 						do  j=1,my
@@ -1226,16 +999,19 @@ subroutine init_turbulent_field
 							enddo
 						enddo
 					enddo	
-	
-					
+
+
 				endif
 #ifndef twoD
 			enddo
 #endif
 		enddo
-	enddo	
-	
-#endif
+	enddo
+
+print *, 'finish initializing turbulence' 
+
+
+
 	
 end subroutine init_turbulent_field
 
