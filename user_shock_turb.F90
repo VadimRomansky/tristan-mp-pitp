@@ -569,7 +569,7 @@ subroutine init_turbulent_field
 	implicit none
 	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z
-    	real pi;
+	real pi;
 
    	integer maxKx, maxKy, maxKz
 	real kw
@@ -591,9 +591,11 @@ subroutine init_turbulent_field
 	integer, dimension(8) :: values
 	integer ierr
 
+	pi = 2.0*acos(0.0)
 
-	maltAngleSlab = pi/10;
-	maltAngle2d = pi/10;
+
+	maltAngleSlab = pi/10.0;
+	maltAngle2d = pi/10.0;
 
 
 	call date_and_time(VALUES=values)
@@ -649,17 +651,20 @@ subroutine init_turbulent_field
 
 				if (((ki + kj + kk) .ne. 0)) then
 
-
 					kx = ki*2*pi/maxTurbulentLambdaX;
 					ky = kj*2*pi/maxTurbulentLambdaY;
 					kz = kk*2*pi/maxTurbulentLambdaZ;
 
 					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
-					if(maltAngle < maltAngleSlab) then	
+					!print *,maltAngle
+					!print *, maltAngleSlab
+					if(maltAngle < maltAngleSlab) then
+						!print *, '2'
 						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
 
 						slabEnergy = slabEnergy + Bturbulent*Bturbulent;
 					else if((pi/2.0) - maltAngle < maltAngle2d) then
+						!print *, '3'
 						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
 
 						restEnergy = restEnergy + Bturbulent*Bturbulent; 
@@ -671,6 +676,8 @@ subroutine init_turbulent_field
 #endif
 		enddo
 	enddo
+
+	print *,'energies', slabEnergy, restEnergy
 
 	if(slabEnergy > 0) then 
 		slabFieldCorrection = sqrt(slabFraction*restEnergy/((1.0 - slabFraction)*slabEnergy))
