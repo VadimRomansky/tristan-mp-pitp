@@ -70,8 +70,8 @@ module m_user_3d
 	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
 			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
 	real :: turbulenceFieldCorrection, slabFieldCorrection
+	integer :: turbulenceSeed
 
-	integer :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
 !-------------------------------------------------------------------------------
 !	INTERFACE DECLARATIONS
@@ -93,7 +93,6 @@ module m_user_3d
 	public :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, maxTurbulentLambdaY,&
 			minTurbulentLambdaZ, maxTurbulentLambdaZ, turbulenceFieldCorrection, slabFieldCorrection
 
-	public :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
 
 	!public :: evaluate_turbulent_b
@@ -817,7 +816,6 @@ subroutine init_turbulent_field
 	real Bturbulent
 	real kmultr
 	real localB1, localB2
-	integer randomseed;
 	real turbulenceEnergyFraction
 	real turbulenceEnergy
 	real slabFraction
@@ -831,10 +829,13 @@ subroutine init_turbulent_field
 
 	maltAngleSlab = pi/10;
 	maltAngle2d = pi/10;
+
+	print *, rand()
 	
 
-	randomseed = 10
-	call srand(randomseed)
+	turbulenceSeed = floor(1024.0*rand())
+	print *, 'seed', turbulenceSeed
+	call srand(turbulenceSeed)
 
 	print *, 'start initializing turbulence'
 
@@ -922,7 +923,7 @@ subroutine init_turbulent_field
 
 	print *, 'field corection updated', turbulenceFieldCorrection, slabFieldCorrection
 
-	call srand(randomseed)
+	call srand(turbulenceSeed)
 
 	
 	do ki = 0, maxKx

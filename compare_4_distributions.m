@@ -1,12 +1,12 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.004';
+file_number = '.020';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence', 'isotropic turbulence'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'anisotropic turbulence by'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

@@ -70,6 +70,7 @@ module m_user_3d
 	integer :: minTurbulentLambdaX, maxTurbulentLambdaX, minTurbulentLambdaY, &
 			maxTurbulentLambdaY, minTurbulentLambdaZ, maxTurbulentLambdaZ
 	real :: turbulenceFieldCorrection, slabFieldCorrection
+	integer :: turbulenceSeed
 
 	integer :: stripedCount, upperStripedCount, lowerStripedCount, stripedLayerWidth
 
@@ -898,8 +899,9 @@ subroutine init_turbulent_field
 
 #else
 
-	randomseed = 10
-	call srand(randomseed)
+	turbulenceSeed = 1024*rand()
+	print *, 'seed', turbulenceSeed
+	call srand(turbulenceSeed)
 
 	print *, 'start initializing turbulence'
 
@@ -1032,7 +1034,7 @@ subroutine init_turbulent_field
 
 	print *, 'field corection updated', turbulenceFieldCorrection, slabFieldCorrection
 
-	call srand(randomseed)
+	call srand(turbulenceSeed)
 
 	
 	!do ki = 0, mx0-5
