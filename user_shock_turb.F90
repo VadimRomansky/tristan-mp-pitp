@@ -600,6 +600,7 @@ subroutine init_turbulent_field
 	turbulenceSeed = values(8) + values(7)*1000
 	print *, 'seed', turbulenceSeed
 	call MPI_Bcast(turbulenceSeed, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+	print *, 'seed common', turbulenceSeed
 	call srand(turbulenceSeed)
 	!print *, rand(), rand(), rand()
 
