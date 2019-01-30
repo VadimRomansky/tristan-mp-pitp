@@ -225,7 +225,14 @@ subroutine initialize_random_seed()
 
 	implicit none
 
-	dseed=123457.D0        
+	!integer, dimension(8) :: values
+	!call date_and_time(VALUES=values)
+
+	!print*, 'values',values
+
+	dseed=123457.D0
+	!dseed = values(8) + values(7)*1000
+	print*, 'dseed', dseed
 	dseed=dseed+rank
 
 end subroutine initialize_random_seed

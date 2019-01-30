@@ -1486,7 +1486,9 @@ subroutine maxwell_dist(gamma0, cd, dseed, u,v,w,gamma_table,pdf_table,pdf_sz)
 	real pcosth, pphi, psinth, v0t, ut1, vt1, wt1, ptx, pty, ptz
 	real px0, px1, py0, py1, pz0, pz1, gam1, ek 
 	
-	
+
+	!print *, 'dseed', dseed
+
 	v0=cd*sqrt(1.-1./gamma0**2)
 	
 	rannum=random(dseed)
