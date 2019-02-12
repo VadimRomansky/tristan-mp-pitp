@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.008';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = hdf5info(full_name);
 np = hdf5read(full_name,'densi');

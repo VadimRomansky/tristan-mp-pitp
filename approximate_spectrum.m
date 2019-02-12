@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.032';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -153,11 +153,15 @@ xlabel ('p/{m_e c}');
 ylabel ('{\gamma}');
 grid ;
 
-outputArray(1:Np, 1:2) = 0;
+outputArrayE(1:Np, 1:2) = 0;
+outputArrayP(1:Np, 1:2) = 0;
 
 for i = 1:Np,
-    outputArray(i, 1) = Pe(i);
-    outputArray(i, 2) = Fe(i)/(Pe(i)^2);
+    outputArrayE(i, 1) = Pe(i);
+    outputArrayE(i, 2) = Fe(i)/(Pe(i)^2);
+    outputArrayP(i, 1) = Pp(i);
+    outputArrayP(i, 2) = Fp(i)/(Pp(i)^2);
 end;
 
-dlmwrite('Fe_isotropic_turbulence.dat',outputArray, 'delimiter', ' ');
+dlmwrite('Fe_perpendisular.dat',outputArrayE, 'delimiter', ' ');
+dlmwrite('Fp_perpendicular.dat',outputArrayP, 'delimiter', ' ');

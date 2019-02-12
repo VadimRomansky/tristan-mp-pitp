@@ -616,8 +616,8 @@ subroutine init_turbulent_field
 	minTurbulentLambdaY = 500;
 	maxTurbulentLambdaZ = 2000;
 	minTurbulentLambdaZ = 500;
-	turbulenceEnergyFraction = 0.5
-	slabFraction = 0.2
+	turbulenceEnergyFraction = 0.9
+	slabFraction = 0.5
 	turbulenceEnergy = 0.0;
 	slabEnergy = 0.0
 	restEnergy = 0.0
@@ -655,15 +655,16 @@ subroutine init_turbulent_field
 					ky = kj*2*pi/maxTurbulentLambdaY;
 					kz = kk*2*pi/maxTurbulentLambdaZ;
 
-					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+					!maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
 					!print *,maltAngle
 					!print *, maltAngleSlab
-					if(maltAngle < maltAngleSlab) then
+
+					if(kk + ki .eq. 0) then
 						!print *, '2'
 						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
 
 						slabEnergy = slabEnergy + Bturbulent*Bturbulent;
-					else if((pi/2.0) - maltAngle < maltAngle2d) then
+					else if(kk + kj .eq. 0) then
 						!print *, '3'
 						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
 
@@ -734,12 +735,12 @@ subroutine init_turbulent_field
 
 					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
 					Bturbulent = 0
-					if(maltAngle < maltAngleSlab) then	
+					if(kk + ki .eq. 0) then
 						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
 
-					else if((pi/2.0) - maltAngle < maltAngle2d) then
+					else if(kk + kj .eq. 0) then
 						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
- 
+
 					end if
 
 					do  k=1,mz

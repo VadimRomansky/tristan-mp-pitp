@@ -1,5 +1,5 @@
 clear;
-directory_name = './output5/';
+directory_name = './output2/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 7;
@@ -11,7 +11,7 @@ c=3*10^10;
 
 Color = {'magenta','cyan','green','black','red','blue','yellow'};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'Bz noturb', 'Bz turb 1000', 'Bz turb 2000', 'Binplane noturb', 'Binplane turb 1000', 'Binplane turb 2000', 'Binplane turb 4000'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'isotropic turbulence','anisotropic turbulence by','maltese cross','anisotropic 50%'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
