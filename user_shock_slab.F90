@@ -414,12 +414,11 @@ subroutine field_bc_user(time)
 #endif
 		kw = sqrt(kx*kx + ky*ky + kz*kz);
 
-		turbulentE = 0.1*Binit*Binit/(8*pi)
-		!todo kolmogorov
+
 #ifdef twoD
-		Bamplitude = 0.1*Binit/sqrt((kw**(8.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(8.0/3.0)))
 #else
-		Bamplitude = 0.1*Binit/sqrt((kw**(11.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(11.0/3.0)))
 #endif
 		!print *, 'Binit', Binit
 		!print *, 'Bamplitude', Bamplitude
@@ -436,12 +435,10 @@ subroutine field_bc_user(time)
 #endif
 		kw = sqrt(kx*kx + ky*ky + kz*kz);
 
-		turbulentE = 0.1*Binit*Binit/(8*pi)
-		!todo kolmogorov
 #ifdef twoD
-		Bamplitude = 0.1*Binit/sqrt((kw**(8.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(8.0/3.0)))
 #else
-		Bamplitude = 0.1*Binit/sqrt((kw**(11.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(11.0/3.0)))
 #endif
 		!print *, 'Binit', Binit
 		!print *, 'Bamplitude', Bamplitude
@@ -458,12 +455,10 @@ subroutine field_bc_user(time)
 #endif
 		kw = sqrt(kx*kx + ky*ky + kz*kz);
 
-		turbulentE = 0.1*Binit*Binit/(8*pi)
-		!todo kolmogorov
 #ifdef twoD
-		Bamplitude = 0.1*Binit/sqrt((kw**(8.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(8.0/3.0)))
 #else
-		Bamplitude = 0.1*Binit/sqrt((kw**(11.0/3.0)))
+		Bamplitude = 1.0/sqrt((kw**(11.0/3.0)))
 #endif
 		!print *, 'Binit', Binit
 		!print *, 'Bamplitude', Bamplitude
@@ -571,31 +566,12 @@ subroutine init_turbulent_field
 	real B0x, B0y, B0z, E0x, E0y, E0z
 	real pi;
 
-   	integer maxKx, maxKy, maxKz
-	real kw
-	real kx, ky, kz, kyz
-	real phase1, phase2
-	real cosTheta, sinTheta, cosPhi, sinPhi
-	real Bturbulent
-	real kmultr
-	real localB1, localB2
-	real turbulenceEnergyFraction
-	real turbulenceEnergy
-	real slabFraction
-	real slabEnergy
-	real restEnergy
 
-	real maltAngleSlab;
-	real maltAngle2d;
-	real maltAngle;
+	real turbulenceEnergyFraction
+
 	integer, dimension(8) :: values
 	integer ierr
 
-	pi = 2.0*acos(0.0)
-
-
-	maltAngleSlab = pi/10.0;
-	maltAngle2d = pi/10.0;
 
 
 	call date_and_time(VALUES=values)
@@ -616,14 +592,52 @@ subroutine init_turbulent_field
 	minTurbulentLambdaY = 500;
 	maxTurbulentLambdaZ = 2000;
 	minTurbulentLambdaZ = 500;
-	turbulenceEnergyFraction = 0.9
-	slabFraction = 0.5
-	turbulenceEnergy = 0.0;
-	slabEnergy = 0.0
-	restEnergy = 0.0
+	turbulenceEnergyFraction = 0.5
 
-	pi = 3.1415927;
+	!call init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
+	call init_turbulent_field_isotropic(turbulenceEnergyFraction)
+
+	print *, 'finish initializing turbulence'
+
+
+
 	
+end subroutine init_turbulent_field
+
+subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
+	real turbulenceEnergyFraction
+
+	integer maxKx, maxKy, maxKz
+	real kw
+	real kx, ky, kz, kyz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	real turbulenceEnergy
+	real slabFraction
+	real slabEnergy
+	real restEnergy
+
+	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+	real Btheta0;
+	real pi;
+
+	!print *,maltAngle
+	!print *, maltAngleSlab
+
+	pi = 2.0*acos(0.0);
+
+	tempB = 1.0;
+	tempBx = tempB*cos(Btheta)
+	tempBn = tempB*sin(Btheta);
+	tempB0x = tempBx;
+	tempB0n = tempBn/gamma0;
+	Btheta0 = atan2(tempB0n, tempB0x);
+	tempB0 = sqrt(tempB0x*tempB0x + tempB0n*tempB0n);
+	print *,'theta0', Btheta0*180.0/pi;
+
 
 	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
 	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
@@ -633,54 +647,58 @@ subroutine init_turbulent_field
 
 	print *, maxKx, maxKy, maxKz
 
+	!turulence energy fraction correction in plasma frame
 
-#ifdef twoD
+	maltAngleSlab = 10.0*pi/180.0
+	slabFraction = 0.2;
+	turbulenceEnergy = 0;
+	slabEnergy = 0;
+	restEnergy = 0;
+
+	#ifdef twoD
 	maxKz = 1;
-#endif
+	#endif
 
-	!do ki = 0, mx0-5
+
 	do ki = 0, maxKx
-		!do kj = 0, my0-5
+
 		do kj = 0, maxKy
-#ifdef twoD
+			#ifdef twoD
 			kk = 0
-#else
+		#else
 			!do kk = 0, mz0-5
-			do kk = 0, maxKz
-#endif
+		do kk = 0, maxKz
+			#endif
 
-				if (((ki + kj + kk) .ne. 0)) then
+			if ((ki + kj + kk) .ne. 0) then
 
-					kx = ki*2*pi/maxTurbulentLambdaX;
-					ky = kj*2*pi/maxTurbulentLambdaY;
-					kz = kk*2*pi/maxTurbulentLambdaZ;
 
-					!maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
-					!print *,maltAngle
-					!print *, maltAngleSlab
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
 
-					if(kk + ki .eq. 0) then
-						!print *, '2'
-						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
+				maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+				if(maltAngle < maltAngleSlab) then
+					!print *, '2'
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
 
-						slabEnergy = slabEnergy + Bturbulent*Bturbulent;
-					else if(kk + kj .eq. 0) then
-						!print *, '3'
-						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
+					slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+				else if((pi/2.0) - maltAngle < maltAngle2d) then
+					!print *, '3'
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
 
-						restEnergy = restEnergy + Bturbulent*Bturbulent; 
-					end if
-
-				endif
-#ifndef twoD
+					restEnergy = restEnergy + Bturbulent*Bturbulent;
+				end if
+			endif
+			#ifndef twoD
 			enddo
-#endif
+			#endif
 		enddo
 	enddo
 
 	print *,'energies', slabEnergy, restEnergy
 
-	if(slabEnergy > 0) then 
+	if(slabEnergy > 0) then
 		slabFieldCorrection = sqrt(slabFraction*restEnergy/((1.0 - slabFraction)*slabEnergy))
 	else
 		slabFieldCorrection = 1.0;
@@ -691,8 +709,8 @@ subroutine init_turbulent_field
 
 
 	if (turbulenceEnergy > 0) then
-		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*Binit*Binit/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));	
-	else 
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*tempB0*tempB0/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));
+	else
 		turbulenceFieldCorrection = 1.0;
 	endif
 
@@ -700,95 +718,954 @@ subroutine init_turbulent_field
 
 	call srand(turbulenceSeed)
 
-	
+	!turbulence total energy correction in lab frame
+
+	turbulenceEnergy = tempB*tempB;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
 	do ki = 0, maxKx
+
 		do kj = 0, maxKy
-#ifdef twoD
+			#ifdef twoD
 			kk = 0
-#else
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
 
-			do kk = 0, maxKz
-#endif
-				!print *, ki, kj, kk
-
-				if (((ki + kj + kk) .ne. 0)) then
-
-					phase1 = 2*pi*rand();
-					phase2 = 2*pi*rand();
+			if ((ki + kj + kk) .ne. 0) then
 
 
-					kx = ki*2*pi/maxTurbulentLambdaX;
-					ky = kj*2*pi/maxTurbulentLambdaY;
-					kz = kk*2*pi/maxTurbulentLambdaZ;
-
-					kw = sqrt(kx*kx + ky*ky + kz*kz);
-					kyz = sqrt(ky*ky + kz*kz);
-					cosTheta = kx/kw;
-					sinTheta = kyz/kw;
-					if(kj + kk .ne. 0) then
-						cosPhi = ky/kyz;
-						sinPhi = kz/kyz;
-					else 
-						cosPhi = 1.0
-						sinPhi = 0.0
-					endif
-
-					maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
-					Bturbulent = 0
-					if(kk + ki .eq. 0) then
-						Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
-
-					else if(kk + kj .eq. 0) then
-						Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
-
-					end if
-
-					do  k=1,mz
-						do  j=1,my
-							do  i=1,mx
-								! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-								!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
-
-								kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-								localB1 = Bturbulent*sin(kmultr + phase1);
-								localB2 = Bturbulent*sin(kmultr + phase2);
-								!localB2 = 0
-
-								bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-								by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-								bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
-
-								ex(i,j,k)=ex(i,j,k)
-								ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-								ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
 
 
-
-								!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-								!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-								!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
-	
-								!ex(i,j,k)=ex(i,j,k);
-								!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
-								!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
-							enddo
-						enddo
-					enddo	
-
-
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
 				endif
-#ifndef twoD
+
+				maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+				Bturbulent = 0
+				if(maltAngle < maltAngleSlab) then
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
+
+				else if((pi/2.0) - maltAngle < maltAngle2d) then
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
+
+				end if
+
+				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+			endif
+			#ifndef twoD
 			enddo
-#endif
+			#endif
 		enddo
 	enddo
 
-print *, 'finish initializing turbulence' 
+	if (turbulenceEnergy > 0) then
+		tempB = Binit/sqrt(turbulenceEnergy);
+	else
+		tempB = Binit;
+	endif
+
+	Binit = tempB
+
+	!init fields
+
+	Bx = tempB*cos(Btheta);
+	By = tempB*sin(Btheta)*sin(Bphi);
+	Bz = tempB*sin(Btheta)*cos(Bphi);
+
+	Ex = 0;
+	Ey = -beta*Bz;
+	Ez = beta*By;
+
+	do  k=1,mz
+		do  j=1,my
+			do  i=1,mx
+				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+				bx(i,j,k)=Bx
+				by(i,j,k)=By
+				bz(i,j,k)=Bz
+
+				ex(i,j,k)=Ex
+				ey(i,j,k)=Ey
+				ez(i,j,k)=Ez
+			enddo
+		enddo
+	enddo
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+				do kk = 0, maxKz
+			#endif
+				!print *, ki, kj, kk
+
+			if ((ki + kj + kk) .ne. 0) then
+
+				phase1 = 2*pi*rand();
+				phase2 = 2*pi*rand();
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+				!print *,'k', kx, ky, kz
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+				Bturbulent = 0
+				if(maltAngle < maltAngleSlab) then
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection*tempB;
+
+				else if((pi/2.0) - maltAngle < maltAngle2d) then
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection*tempB;
+
+				end if
+
+
+				!print *, 'Bturbulent', Bturbulent
+				do  k=1,mz
+					do  j=1,my
+						do  i=1,mx
+							! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+							!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+							kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+							localB1 = Bturbulent*sin(kmultr + phase1);
+							localB2 = Bturbulent*sin(kmultr + phase2);
+							!localB2 = 0
+
+							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
+							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
+							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+
+							ex(i,j,k)=ex(i,j,k)
+							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
-	
-end subroutine init_turbulent_field
+							!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+							!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+							!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+
+							!ex(i,j,k)=ex(i,j,k);
+							!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+							!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+						enddo
+					enddo
+				enddo
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+end subroutine init_turbulent_field_maltese_slab
+
+subroutine init_turbulent_field_slab(turbulenceFraction)
+	real turbulenceEnergyFraction
+
+	integer maxKx, maxKy, maxKz
+	real kw
+	real kx, ky, kz, kyz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	real turbulenceEnergy
+	real slabFraction
+	real slabEnergy
+	real restEnergy
+
+	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+	real Btheta0;
+	real pi;
+
+	pi = 2.0*acos(0.0);
+
+	tempB = 1.0;
+	tempBx = tempB*cos(Btheta)
+	tempBn = tempB*sin(Btheta);
+	tempB0x = tempBx;
+	tempB0n = tempBn/gamma0;
+	Btheta0 = atan2(tempB0n, tempB0x);
+	tempB0 = sqrt(tempB0x*tempB0x + tempB0n*tempB0n);
+	print *,'theta0', Btheta0*180.0/pi;
+
+
+	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
+
+	!maxKy = 0
+
+	print *, maxKx, maxKy, maxKz
+
+	!turulence energy fraction correction in plasma frame
+
+	maltAngleSlab = 10.0*pi/180.0
+	slabFraction = 0.2;
+	turbulenceEnergy = 0;
+	slabEnergy = 0;
+	restEnergy = 0;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+	do ki = 0, maxKx
+
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
+
+			if ((ki + kj + kk) .ne. 0) then
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+				if(kk + ki .eq. 0) then
+					!print *, '2'
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
+
+					slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+				else if(kk + kj .eq. 0) then
+					!print *, '3'
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
+
+					restEnergy = restEnergy + Bturbulent*Bturbulent;
+				end if
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+
+	print *,'energies', slabEnergy, restEnergy
+
+	if(slabEnergy > 0) then
+		slabFieldCorrection = sqrt(slabFraction*restEnergy/((1.0 - slabFraction)*slabEnergy))
+	else
+		slabFieldCorrection = 1.0;
+	endif
+
+	turbulenceEnergy = restEnergy + slabFieldCorrection*slabFieldCorrection*slabEnergy;
+
+
+
+	if (turbulenceEnergy > 0) then
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*tempB0*tempB0/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));
+	else
+		turbulenceFieldCorrection = 1.0;
+	endif
+
+	print *, 'field corection updated', turbulenceFieldCorrection, slabFieldCorrection
+
+	call srand(turbulenceSeed)
+
+	!turbulence total energy correction in lab frame
+
+	turbulenceEnergy = tempB*tempB;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+	do ki = 0, maxKx
+
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
+
+			if ((ki + kj + kk) .ne. 0) then
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
+				Bturbulent = 0
+				if(maltAngle < maltAngleSlab) then
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
+
+				else if((pi/2.0) - maltAngle < maltAngle2d) then
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
+
+				end if
+
+				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		tempB = Binit/sqrt(turbulenceEnergy);
+	else
+		tempB = Binit;
+	endif
+
+	Binit = tempB
+
+	!init fields
+
+	Bx = tempB*cos(Btheta);
+	By = tempB*sin(Btheta)*sin(Bphi);
+	Bz = tempB*sin(Btheta)*cos(Bphi);
+
+	Ex = 0;
+	Ey = -beta*Bz;
+	Ez = beta*By;
+
+	do  k=1,mz
+		do  j=1,my
+			do  i=1,mx
+				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+				bx(i,j,k)=Bx
+				by(i,j,k)=By
+				bz(i,j,k)=Bz
+
+				ex(i,j,k)=Ex
+				ey(i,j,k)=Ey
+				ez(i,j,k)=Ez
+			enddo
+		enddo
+	enddo
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+				do kk = 0, maxKz
+			#endif
+				!print *, ki, kj, kk
+
+			if ((ki + kj + kk) .ne. 0) then
+
+				phase1 = 2*pi*rand();
+				phase2 = 2*pi*rand();
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+				!print *,'k', kx, ky, kz
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				Bturbulent = 0
+				if(kk + ki .eq. 0) then
+					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection*tempB;
+
+				else if(kk + kj .eq. 0) then
+					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection*tempB;
+
+				end if
+
+
+				!print *, 'Bturbulent', Bturbulent
+				do  k=1,mz
+					do  j=1,my
+						do  i=1,mx
+							! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+							!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+							kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+							localB1 = Bturbulent*sin(kmultr + phase1);
+							localB2 = Bturbulent*sin(kmultr + phase2);
+							!localB2 = 0
+
+							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
+							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
+							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+
+							ex(i,j,k)=ex(i,j,k)
+							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+
+
+
+							!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+							!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+							!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+
+							!ex(i,j,k)=ex(i,j,k);
+							!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+							!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+						enddo
+					enddo
+				enddo
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+end subroutine init_turbulent_field_slab
+
+subroutine init_turbulent_field_isotropic(turbulenceFraction)
+	real turbulenceEnergyFraction
+
+	integer maxKx, maxKy, maxKz
+	real kw
+	real kx, ky, kz, kyz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	real turbulenceEnergy
+	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+	real Btheta0;
+	real pi;
+
+	pi = 2.0*acos(0.0);
+
+	tempB = 1.0;
+	tempBx = tempB*cos(Btheta)
+	tempBn = tempB*sin(Btheta);
+	tempB0x = tempBx;
+	tempB0n = tempBn/gamma0;
+	Btheta0 = atan2(tempB0n, tempB0x);
+	tempB0 = sqrt(tempB0x*tempB0x + tempB0n*tempB0n);
+	print *,'theta0', Btheta0*180.0/pi;
+
+
+	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
+
+	!maxKy = 0
+
+	print *, maxKx, maxKy, maxKz
+
+	!turulence energy fraction correction in plasma frame
+
+	turbulenceEnergy = 0;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+		do ki = 0, maxKx
+
+			do kj = 0, maxKy
+	#ifdef twoD
+			kk = 0
+	#else
+			!do kk = 0, mz0-5
+				do kk = 0, maxKz
+	#endif
+
+					if ((ki + kj + kk) .ne. 0) then
+
+
+						kx = ki*2*pi/maxTurbulentLambdaX;
+						ky = kj*2*pi/maxTurbulentLambdaY;
+						kz = kk*2*pi/maxTurbulentLambdaZ;
+
+
+						Bturbulent = evaluate_turbulent_b(kx, ky, kz);
+
+						turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
+					endif
+	#ifndef twoD
+			enddo
+	#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*tempB0*tempB0/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));
+	else
+		turbulenceFieldCorrection = 1.0;
+	endif
+
+	!turbulence total energy correction in lab frame
+
+	turbulenceEnergy = tempB*tempB;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+	do ki = 0, maxKx
+
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
+
+			if ((ki + kj + kk) .ne. 0) then
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
+
+				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		tempB = Binit/sqrt(turbulenceEnergy);
+	else
+		tempB = Binit;
+	endif
+
+	Binit = tempB
+
+	!init fields
+
+	Bx = tempB*cos(Btheta);
+	By = tempB*sin(Btheta)*sin(Bphi);
+	Bz = tempB*sin(Btheta)*cos(Bphi);
+
+	Ex = 0;
+	Ey = -beta*Bz;
+	Ez = beta*By;
+
+	do  k=1,mz
+		do  j=1,my
+			do  i=1,mx
+				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+				bx(i,j,k)=Bx
+				by(i,j,k)=By
+				bz(i,j,k)=Bz
+
+				ex(i,j,k)=Ex
+				ey(i,j,k)=Ey
+				ez(i,j,k)=Ez
+			enddo
+		enddo
+	enddo
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+	#ifdef twoD
+			kk = 0
+	#else
+				do kk = 0, maxKz
+	#endif
+				!print *, ki, kj, kk
+
+					if ((ki + kj + kk) .ne. 0) then
+
+						phase1 = 2*pi*rand();
+						phase2 = 2*pi*rand();
+
+
+						kx = ki*2*pi/maxTurbulentLambdaX;
+						ky = kj*2*pi/maxTurbulentLambdaY;
+						kz = kk*2*pi/maxTurbulentLambdaZ;
+
+						!print *,'k', kx, ky, kz
+
+
+						kw = sqrt(kx*kx + ky*ky + kz*kz);
+						kyz = sqrt(ky*ky + kz*kz);
+						cosTheta = kx/kw;
+						sinTheta = kyz/kw;
+						if(kj + kk .ne. 0) then
+							cosPhi = ky/kyz;
+							sinPhi = kz/kyz;
+						else
+							cosPhi = 1.0
+							sinPhi = 0.0
+						endif
+
+						Bturbulent = evaluate_turbulent_b(kx, ky, kz)*tempB*turbulenceFieldCorrection;
+
+
+						!print *, 'Bturbulent', Bturbulent
+						do  k=1,mz
+							do  j=1,my
+								do  i=1,mx
+									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									localB1 = Bturbulent*sin(kmultr + phase1);
+									localB2 = Bturbulent*sin(kmultr + phase2);
+									!localB2 = 0
+
+									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
+									by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
+									bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+
+									ex(i,j,k)=ex(i,j,k)
+									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+
+
+
+									!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+									!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+									!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+
+									!ex(i,j,k)=ex(i,j,k);
+									!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+									!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+								enddo
+							enddo
+						enddo
+					endif
+	#ifndef twoD
+			enddo
+	#endif
+		enddo
+	enddo
+
+end subroutine init_turbulent_field_isotropic
+
+subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
+	real turbulenceEnergyFraction
+
+	integer maxKx, maxKy, maxKz
+	real kw
+	real kx, ky, kz, kyz
+	real phase1, phase2
+	real cosTheta, sinTheta, cosPhi, sinPhi
+	real Bturbulent
+	real kmultr
+	real localB1, localB2
+	real turbulenceEnergy
+	real slabFraction
+	real slabEnergy
+	real restEnergy
+
+	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+	real Btheta0;
+	real pi;
+
+	pi = 2.0*acos(0.0);
+
+	tempB = 1.0;
+	tempBx = tempB*cos(Btheta)
+	tempBn = tempB*sin(Btheta);
+	tempB0x = tempBx;
+	tempB0n = tempBn/gamma0;
+	Btheta0 = atan2(tempB0n, tempB0x);
+	tempB0 = sqrt(tempB0x*tempB0x + tempB0n*tempB0n);
+	print *,'theta0', Btheta0*180.0/pi;
+
+
+	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
+	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
+	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
+
+	!maxKy = 0
+
+	print *, maxKx, maxKy, maxKz
+
+	!turulence energy fraction correction in plasma frame
+
+	turbulenceEnergy = 0;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+	do ki = 0, maxKx
+
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
+
+			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+
+				Bturbulent = evaluate_turbulent_b(kx, ky, kz);
+
+				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*tempB0*tempB0/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));
+	else
+		turbulenceFieldCorrection = 1.0;
+	endif
+
+	!turbulence total energy correction in lab frame
+
+	turbulenceEnergy = tempB*tempB;
+
+	#ifdef twoD
+	maxKz = 1;
+	#endif
+
+
+	do ki = 0, maxKx
+
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+			!do kk = 0, mz0-5
+		do kk = 0, maxKz
+			#endif
+
+			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
+
+				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+
+	if (turbulenceEnergy > 0) then
+		tempB = Binit/sqrt(turbulenceEnergy);
+	else
+		tempB = Binit;
+	endif
+
+	Binit = tempB
+
+	!init fields
+
+	Bx = tempB*cos(Btheta);
+	By = tempB*sin(Btheta)*sin(Bphi);
+	Bz = tempB*sin(Btheta)*cos(Bphi);
+
+	Ex = 0;
+	Ey = -beta*Bz;
+	Ez = beta*By;
+
+	do  k=1,mz
+		do  j=1,my
+			do  i=1,mx
+				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+				bx(i,j,k)=Bx
+				by(i,j,k)=By
+				bz(i,j,k)=Bz
+
+				ex(i,j,k)=Ex
+				ey(i,j,k)=Ey
+				ez(i,j,k)=Ez
+			enddo
+		enddo
+	enddo
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+			#ifdef twoD
+			kk = 0
+		#else
+				do kk = 0, maxKz
+			#endif
+				!print *, ki, kj, kk
+
+			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
+
+				phase1 = 2*pi*rand();
+				phase2 = 2*pi*rand();
+
+
+				kx = ki*2*pi/maxTurbulentLambdaX;
+				ky = kj*2*pi/maxTurbulentLambdaY;
+				kz = kk*2*pi/maxTurbulentLambdaZ;
+
+				!print *,'k', kx, ky, kz
+
+
+				kw = sqrt(kx*kx + ky*ky + kz*kz);
+				kyz = sqrt(ky*ky + kz*kz);
+				cosTheta = kx/kw;
+				sinTheta = kyz/kw;
+				if(kj + kk .ne. 0) then
+					cosPhi = ky/kyz;
+					sinPhi = kz/kyz;
+				else
+					cosPhi = 1.0
+					sinPhi = 0.0
+				endif
+
+				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*tempB*turbulenceFieldCorrection;
+
+
+				!print *, 'Bturbulent', Bturbulent
+				do  k=1,mz
+					do  j=1,my
+						do  i=1,mx
+							! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
+							!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+
+							kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+							localB1 = Bturbulent*sin(kmultr + phase1);
+							localB2 = Bturbulent*sin(kmultr + phase2);
+							!localB2 = 0
+
+							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
+							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
+							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+
+							ex(i,j,k)=ex(i,j,k)
+							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+
+
+
+							!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
+							!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
+							!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
+
+							!ex(i,j,k)=ex(i,j,k);
+							!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
+							!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
+						enddo
+					enddo
+				enddo
+			endif
+			#ifndef twoD
+			enddo
+			#endif
+		enddo
+	enddo
+end subroutine init_turbulent_field_simple_anisotropic
+
 
 #ifdef twoD
 end module m_user

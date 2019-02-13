@@ -562,7 +562,6 @@ subroutine field_bc_user(time)
 
 subroutine init_turbulent_field
 	implicit none
-	integer :: i, j, k, ki, kj, kk
 	real B0x, B0y, B0z, E0x, E0y, E0z
 	real pi;
 
@@ -608,6 +607,7 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 	real turbulenceEnergyFraction
 
 	integer maxKx, maxKy, maxKz
+	integer :: i, j, k, ki, kj, kk
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -619,8 +619,12 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 	real slabFraction
 	real slabEnergy
 	real restEnergy
+real maltAngle
+real maltAngleSlab
+real maltAngle2d
 
 	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 	real Btheta0;
 	real pi;
 
@@ -650,25 +654,27 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 	!turulence energy fraction correction in plasma frame
 
 	maltAngleSlab = 10.0*pi/180.0
+	maltAngle2d = 10.0*pi/180.0
+
 	slabFraction = 0.2;
 	turbulenceEnergy = 0;
 	slabEnergy = 0;
 	restEnergy = 0;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if ((ki + kj + kk) .ne. 0) then
 
@@ -690,9 +696,9 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 					restEnergy = restEnergy + Bturbulent*Bturbulent;
 				end if
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -722,20 +728,20 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 
 	turbulenceEnergy = tempB*tempB;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if ((ki + kj + kk) .ne. 0) then
 
@@ -767,11 +773,12 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 
 				end if
 
-				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				turbulenceEnergy = turbulenceEnergy + &
+	Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -785,13 +792,13 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 
 	!init fields
 
-	Bx = tempB*cos(Btheta);
-	By = tempB*sin(Btheta)*sin(Bphi);
-	Bz = tempB*sin(Btheta)*cos(Bphi);
+	Bxreg = tempB*cos(Btheta);
+	Byreg = tempB*sin(Btheta)*sin(Bphi);
+	Bzreg = tempB*sin(Btheta)*cos(Bphi);
 
-	Ex = 0;
-	Ey = -beta*Bz;
-	Ez = beta*By;
+	Exreg = 0;
+	Eyreg = -beta*Bzreg;
+	Ezreg = beta*Byreg;
 
 	do  k=1,mz
 		do  j=1,my
@@ -799,24 +806,24 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-				bx(i,j,k)=Bx
-				by(i,j,k)=By
-				bz(i,j,k)=Bz
+				bx(i,j,k)=Bxreg
+				by(i,j,k)=Byreg
+				bz(i,j,k)=Bzreg
 
-				ex(i,j,k)=Ex
-				ey(i,j,k)=Ey
-				ez(i,j,k)=Ez
+				ex(i,j,k)=Exreg
+				ey(i,j,k)=Eyreg
+				ez(i,j,k)=Ezreg
 			enddo
 		enddo
 	enddo
 
 	do ki = 0, maxKx
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 				do kk = 0, maxKz
-			#endif
+#endif
 				!print *, ki, kj, kk
 
 			if ((ki + kj + kk) .ne. 0) then
@@ -888,17 +895,18 @@ subroutine init_turbulent_field_maltese_slab(turbulenceEnergyFraction)
 					enddo
 				enddo
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 end subroutine init_turbulent_field_maltese_slab
 
-subroutine init_turbulent_field_slab(turbulenceFraction)
+subroutine init_turbulent_field_slab(turbulenceEnergyFraction)
 	real turbulenceEnergyFraction
 
 	integer maxKx, maxKy, maxKz
+	integer :: i, j, k, ki, kj, kk
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -912,6 +920,7 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 	real restEnergy
 
 	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+	real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 	real Btheta0;
 	real pi;
 
@@ -937,26 +946,25 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 
 	!turulence energy fraction correction in plasma frame
 
-	maltAngleSlab = 10.0*pi/180.0
 	slabFraction = 0.2;
 	turbulenceEnergy = 0;
 	slabEnergy = 0;
 	restEnergy = 0;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if ((ki + kj + kk) .ne. 0) then
 
@@ -970,16 +978,16 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz);
 
 					slabEnergy = slabEnergy + Bturbulent*Bturbulent;
-				else if(kk + kj .eq. 0) then
+				else if(kj .eq. 0) then
 					!print *, '3'
 					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz);
 
 					restEnergy = restEnergy + Bturbulent*Bturbulent;
 				end if
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -1009,20 +1017,20 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 
 	turbulenceEnergy = tempB*tempB;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if ((ki + kj + kk) .ne. 0) then
 
@@ -1044,21 +1052,25 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 					sinPhi = 0.0
 				endif
 
-				maltAngle = acos(ky/sqrt(kx*kx + ky*ky + kz*kz))
 				Bturbulent = 0
-				if(maltAngle < maltAngleSlab) then
+				if(kk + ki .eq. 0) then
+					!print *, '2'
 					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection;
 
-				else if((pi/2.0) - maltAngle < maltAngle2d) then
+					slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+				else if(kj .eq. 0) then
+					!print *, '3'
 					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection;
 
+					restEnergy = restEnergy + Bturbulent*Bturbulent;
 				end if
 
-				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				turbulenceEnergy = turbulenceEnergy + &
+				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -1072,13 +1084,13 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 
 	!init fields
 
-	Bx = tempB*cos(Btheta);
-	By = tempB*sin(Btheta)*sin(Bphi);
-	Bz = tempB*sin(Btheta)*cos(Bphi);
+	Bxreg = tempB*cos(Btheta);
+	Byreg = tempB*sin(Btheta)*sin(Bphi);
+	Bzreg = tempB*sin(Btheta)*cos(Bphi);
 
-	Ex = 0;
-	Ey = -beta*Bz;
-	Ez = beta*By;
+	Exreg = 0;
+	Eyreg = -beta*Bzreg;
+	Ezreg = beta*Byreg;
 
 	do  k=1,mz
 		do  j=1,my
@@ -1086,24 +1098,24 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-				bx(i,j,k)=Bx
-				by(i,j,k)=By
-				bz(i,j,k)=Bz
+				bx(i,j,k)=Bxreg
+				by(i,j,k)=Byreg
+				bz(i,j,k)=Bzreg
 
-				ex(i,j,k)=Ex
-				ey(i,j,k)=Ey
-				ez(i,j,k)=Ez
+				ex(i,j,k)=Exreg
+				ey(i,j,k)=Eyreg
+				ez(i,j,k)=Ezreg
 			enddo
 		enddo
 	enddo
 
 	do ki = 0, maxKx
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 				do kk = 0, maxKz
-			#endif
+#endif
 				!print *, ki, kj, kk
 
 			if ((ki + kj + kk) .ne. 0) then
@@ -1133,11 +1145,15 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 
 				Bturbulent = 0
 				if(kk + ki .eq. 0) then
+					!print *, '2'
 					Bturbulent = evaluate_turbulent_b_slab(kx, ky, kz)*slabFieldCorrection*turbulenceFieldCorrection*tempB;
 
-				else if(kk + kj .eq. 0) then
+					slabEnergy = slabEnergy + Bturbulent*Bturbulent;
+				else if(kj .eq. 0) then
+					!print *, '3'
 					Bturbulent = evaluate_turbulent_b_2d(kx, ky, kz)*turbulenceFieldCorrection*tempB;
 
+					restEnergy = restEnergy + Bturbulent*Bturbulent;
 				end if
 
 
@@ -1174,17 +1190,18 @@ subroutine init_turbulent_field_slab(turbulenceFraction)
 					enddo
 				enddo
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 end subroutine init_turbulent_field_slab
 
-subroutine init_turbulent_field_isotropic(turbulenceFraction)
+subroutine init_turbulent_field_isotropic(turbulenceEnergyFraction)
 	real turbulenceEnergyFraction
 
 	integer maxKx, maxKy, maxKz
+	integer :: i, j, k, ki, kj, kk
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -1194,6 +1211,7 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 	real localB1, localB2
 	real turbulenceEnergy
 	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 	real Btheta0;
 	real pi;
 
@@ -1221,20 +1239,20 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 
 	turbulenceEnergy = 0;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 		do ki = 0, maxKx
 
 			do kj = 0, maxKy
-	#ifdef twoD
+#ifdef twoD
 			kk = 0
-	#else
+#else
 			!do kk = 0, mz0-5
 				do kk = 0, maxKz
-	#endif
+#endif
 
 					if ((ki + kj + kk) .ne. 0) then
 
@@ -1248,9 +1266,9 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 
 						turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
 					endif
-	#ifndef twoD
+#ifndef twoD
 			enddo
-	#endif
+#endif
 		enddo
 	enddo
 
@@ -1264,20 +1282,20 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 
 	turbulenceEnergy = tempB*tempB;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if ((ki + kj + kk) .ne. 0) then
 
@@ -1301,11 +1319,12 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 
 				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
 
-				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				turbulenceEnergy = turbulenceEnergy + &
+				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -1319,13 +1338,13 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 
 	!init fields
 
-	Bx = tempB*cos(Btheta);
-	By = tempB*sin(Btheta)*sin(Bphi);
-	Bz = tempB*sin(Btheta)*cos(Bphi);
+	Bxreg = tempB*cos(Btheta);
+	Byreg = tempB*sin(Btheta)*sin(Bphi);
+	Bzreg = tempB*sin(Btheta)*cos(Bphi);
 
-	Ex = 0;
-	Ey = -beta*Bz;
-	Ez = beta*By;
+	Exreg = 0;
+	Eyreg = -beta*Bzreg;
+	Ezreg = beta*Byreg;
 
 	do  k=1,mz
 		do  j=1,my
@@ -1333,24 +1352,24 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-				bx(i,j,k)=Bx
-				by(i,j,k)=By
-				bz(i,j,k)=Bz
+				bx(i,j,k)=Bxreg
+				by(i,j,k)=Byreg
+				bz(i,j,k)=Bzreg
 
-				ex(i,j,k)=Ex
-				ey(i,j,k)=Ey
-				ez(i,j,k)=Ez
+				ex(i,j,k)=Exreg
+				ey(i,j,k)=Eyreg
+				ez(i,j,k)=Ezreg
 			enddo
 		enddo
 	enddo
 
 	do ki = 0, maxKx
 		do kj = 0, maxKy
-	#ifdef twoD
+#ifdef twoD
 			kk = 0
-	#else
+#else
 				do kk = 0, maxKz
-	#endif
+#endif
 				!print *, ki, kj, kk
 
 					if ((ki + kj + kk) .ne. 0) then
@@ -1414,18 +1433,19 @@ subroutine init_turbulent_field_isotropic(turbulenceFraction)
 							enddo
 						enddo
 					endif
-	#ifndef twoD
+#ifndef twoD
 			enddo
-	#endif
+#endif
 		enddo
 	enddo
 
 end subroutine init_turbulent_field_isotropic
 
-subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
+subroutine init_turbulent_field_simple_anisotropic(turbulenceEnergyFraction)
 	real turbulenceEnergyFraction
 
 	integer maxKx, maxKy, maxKz
+	integer :: i, j, k, ki, kj, kk
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -1439,6 +1459,7 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 	real restEnergy
 
 	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
+real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 	real Btheta0;
 	real pi;
 
@@ -1466,20 +1487,20 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 
 	turbulenceEnergy = 0;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
 
@@ -1493,9 +1514,9 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 
 				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -1509,20 +1530,20 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 
 	turbulenceEnergy = tempB*tempB;
 
-	#ifdef twoD
+#ifdef twoD
 	maxKz = 1;
-	#endif
+#endif
 
 
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 			!do kk = 0, mz0-5
 		do kk = 0, maxKz
-			#endif
+#endif
 
 			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
 
@@ -1546,11 +1567,12 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 
 				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
 
-				turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				turbulenceEnergy = turbulenceEnergy + &
+				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 
@@ -1564,13 +1586,13 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 
 	!init fields
 
-	Bx = tempB*cos(Btheta);
-	By = tempB*sin(Btheta)*sin(Bphi);
-	Bz = tempB*sin(Btheta)*cos(Bphi);
+	Bxreg = tempB*cos(Btheta);
+	Byreg = tempB*sin(Btheta)*sin(Bphi);
+	Bzreg = tempB*sin(Btheta)*cos(Bphi);
 
-	Ex = 0;
-	Ey = -beta*Bz;
-	Ez = beta*By;
+	Exreg = 0;
+	Eyreg = -beta*Bzreg;
+	Ezreg = beta*Byreg;
 
 	do  k=1,mz
 		do  j=1,my
@@ -1578,24 +1600,24 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-				bx(i,j,k)=Bx
-				by(i,j,k)=By
-				bz(i,j,k)=Bz
+				bx(i,j,k)=Bxreg
+				by(i,j,k)=Byreg
+				bz(i,j,k)=Bzreg
 
-				ex(i,j,k)=Ex
-				ey(i,j,k)=Ey
-				ez(i,j,k)=Ez
+				ex(i,j,k)=Exreg
+				ey(i,j,k)=Eyreg
+				ez(i,j,k)=Ezreg
 			enddo
 		enddo
 	enddo
 
 	do ki = 0, maxKx
 		do kj = 0, maxKy
-			#ifdef twoD
+#ifdef twoD
 			kk = 0
-		#else
+#else
 				do kk = 0, maxKz
-			#endif
+#endif
 				!print *, ki, kj, kk
 
 			if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
@@ -1659,9 +1681,9 @@ subroutine init_turbulent_field_simple_anisotropic(turbulenceFraction)
 					enddo
 				enddo
 			endif
-			#ifndef twoD
+#ifndef twoD
 			enddo
-			#endif
+#endif
 		enddo
 	enddo
 end subroutine init_turbulent_field_simple_anisotropic
