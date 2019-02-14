@@ -875,12 +875,12 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 							!localB2 = 0
 
 							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+							by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+							bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 							ex(i,j,k)=ex(i,j,k)
-							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+							ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -1170,12 +1170,12 @@ subroutine init_turbulent_field_slab(turbulenceEnergyFraction)
 							!localB2 = 0
 
 							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+							by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+							bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 							ex(i,j,k)=ex(i,j,k)
-							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+							ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -1413,12 +1413,12 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-									bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+							bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
-									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+							ex(i,j,k)=ex(i,j,k)
+							ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -1661,12 +1661,12 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 							!localB2 = 0
 
 							bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-							by(i,j,k)=by(i,j,k) + localB1*cosTheta*cosPhi - localB2*sinPhi
-							bz(i,j,k)=bz(i,j,k) + localB1*cosTheta*sinPhi + localB2*cosPhi
+							by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+							bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 							ex(i,j,k)=ex(i,j,k)
-							ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-							ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+							ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+							ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
