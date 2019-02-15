@@ -1,12 +1,12 @@
 clear;
 directory_name = './output3/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.003';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'noturb','1000','2000'};
+LegendTitle = {'isotropic','simple anisotropic','slab + 2d'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

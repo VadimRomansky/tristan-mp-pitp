@@ -75,7 +75,7 @@ enlarge		= 0 			# if 1, enlarge box in the x direction if injector is close to r
 <fields>
 
 btheta	= 90			# bfield angle bx=B*cos(btheta)  by=B*sin(btheta)*sin(bphi) bz=B*sin(btheta)*cos(bphi)
-bphi	= 0 			#
+bphi	= 90 			#
 
 <particles>
 
@@ -88,7 +88,7 @@ delgam 	= 1.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i 
 me	= 1.0				# electron mass
 mi	= 25.0			# ion mass (actually mass to charge ratio)
 
-gamma0	= 1.1			# flow drift gamma. If < 1, interpreted as v/c. 
+gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction
 c_omp	= 10			# electron skin depth in cells
 
