@@ -773,7 +773,7 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 				end if
 
 				turbulenceEnergy = turbulenceEnergy + &
-	Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+	0.5*Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
 #ifndef twoD
 			enddo
@@ -1195,6 +1195,7 @@ subroutine init_turbulent_field_slab_plasma_frame(turbulenceEnergyFraction)
 #endif
 
 
+
 	do ki = 0, maxKx
 
 		do kj = 0, maxKy
@@ -1305,7 +1306,7 @@ subroutine init_turbulent_field_slab_plasma_frame(turbulenceEnergyFraction)
 				end if
 
 				turbulenceEnergy = turbulenceEnergy + &
-				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				0.5*Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
 #ifndef twoD
 			enddo
@@ -1792,7 +1793,7 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
 
 				turbulenceEnergy = turbulenceEnergy + &
-				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				0.5*Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
 #ifndef twoD
 			enddo
@@ -1886,11 +1887,11 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
 									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
-							bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
-							ex(i,j,k)=ex(i,j,k)
-							ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-							ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ex(i,j,k)=ex(i,j,k)
+									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -2033,7 +2034,7 @@ end subroutine init_turbulent_field_isotropic_plasma_frame
 			kk = 0
 #else
 				do kk = 0, maxKz
-					#endif
+#endif
 				!print *, ki, kj, kk
 
 					if ((ki + kj + kk) .ne. 0) then
@@ -2233,7 +2234,7 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
 
 				turbulenceEnergy = turbulenceEnergy + &
-				Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
+				0.5*Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
 			endif
 #ifndef twoD
 			enddo

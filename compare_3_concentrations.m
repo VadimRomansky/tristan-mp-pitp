@@ -1,7 +1,7 @@
 clear;
 directory_name = './output3/';
 file_name = 'flds';
-file_number = '.tot.018';
+file_number = '.tot.010';
 Nd = 3;
 start = 0;
 
