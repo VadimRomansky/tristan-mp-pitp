@@ -1,12 +1,14 @@
 clear;
-directory_name = './output3/';
+directory_name = './output10/';
 file_name = 'flds';
-file_number = '.tot.003';
-Nd = 4;
+file_number = '.tot.010';
+Nd = 6;
 start = 0;
 
-Color = {'red','blue','green','black'};
-LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence', 'isotropic turbulence'};
+Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
+%LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
+LegendTitle = {'noturb B in plane', 'noturb B out plane','turb 0.5 iso B in plane', 'turb 0.5 iso B out plane', 'turb 0.5 aniso B in plane', 'turb 0.5 aniso B out plane','turb 0.9 iso B in plane', 'turb 0.9 iso B out plane', 'turb 0.9 aniso B in plane', 'turb 0.9 aniso B out plane'};
+
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Np0 = hdf5read(full_name,'densi');
@@ -43,18 +45,18 @@ rho = samplingFactor/Nskinlength;
 Np(1:Nd,1:Nx)=0;
 Ne(1:Nd,1:Nx)=0;
 
-
+ypoint = fix(Ny/4);
 for j = 1:Nd,
     full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
     Np0 = hdf5read(full_name,'densi');
     Ne0 = hdf5read(full_name,'dens');
     for i = 1:Nx,
-        Np(j,i)=Np0(i, fix(Ny/2)+1);
-        Ne(j,i)=Ne0(i, fix(Ny/2)+1)- Np0(i, fix(Ny/2)+1);
+        Np(j,i)=Np0(i, ypoint);
+        Ne(j,i)=Ne0(i, ypoint)- Np0(i, ypoint);
     end;
 end;
 
-N0 = Np(1,fix(Nx/2));
+N0 = Np(1,fix(Nx-1));
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
@@ -64,7 +66,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Np(j, 1:Nx)/N0,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Np');
 xlabel ('x');
 ylabel ('Np');
@@ -75,7 +77,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ne(j, 1:Nx)/N0,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Ne');
 xlabel ('x');
 ylabel ('Ne');

@@ -1,12 +1,14 @@
 clear;
-directory_name = './output3/';
+directory_name = './output2/';
 file_name = 'flds';
-file_number = '.tot.003';
-Nd = 4;
+file_number = '.tot.005';
+Nd = 6;
 start = 0;
 
-Color = {'red','blue','green','black'};
-LegendTitle = {'isotropic','simple anisotropic','slab + 2d','noturb'};
+Color = {'red','blue','green','black','cyan','magenta'};
+%LegendTitle = {'By, l = 6 rg','Bz, l = 6 rg','By, l = 22 rg', 'Bz, l = 22 rg'};
+LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'isotropic turbulence','anisotropic turbulence by','maltese cross'};
+
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');
@@ -48,6 +50,8 @@ Ex(1:Nd,1:Nx)=0;
 Ey(1:Nd,1:Nx)=0;
 Ez(1:Nd,1:Nx)=0;
 
+ypoint = fix(Ny/2) + 1;
+
 for j = 1:Nd,
     full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
     Bx0 = hdf5read(full_name,'bx');
@@ -57,20 +61,20 @@ for j = 1:Nd,
     Ey0 = hdf5read(full_name,'ey');
     Ez0 = hdf5read(full_name,'ez');
     for i = 1:Nx,
-        Bx(j,i)=Bx0(i, fix(Ny/2)+1);
-        By(j,i)=By0(i, fix(Ny/2)+1);
-        Bz(j,i)=Bz0(i, fix(Ny/2)+1);
-        Ex(j,i)=Ex0(i, fix(Ny/2)+1);
-        Ey(j,i)=Ey0(i, fix(Ny/2)+1);
-        Ez(j,i)=Ez0(i, fix(Ny/2)+1);
+        Bx(j,i)=Bx0(i, ypoint);
+        By(j,i)=By0(i, ypoint);
+        Bz(j,i)=Bz0(i, ypoint);
+        Ex(j,i)=Ex0(i, ypoint);
+        Ey(j,i)=Ey0(i, ypoint);
+        Ez(j,i)=Ez0(i, ypoint);
     end;
 end;
-B0x = Bx(1,Nx);
-B0y = By(1,Nx);
-B0z = Bz(1,Nx);
-E0x = Ex(1,Nx);
-E0y = Ey(1,Nx);
-E0z = Ez(1,Nx);
+B0x = sqrt(Bx(1,Nx)*Bx(1,Nx) + By(1,Nx)*By(1,Nx) + Bz(1,Nx)*Bz(1,Nx));
+B0y = B0x;
+B0z = B0x;
+E0x = B0x;
+E0y = B0x;
+E0z = B0x;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
@@ -80,7 +84,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Bx(j, 1:Nx)/B0x,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
@@ -91,7 +95,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, By(j, 1:Nx)/B0y,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('By');
 xlabel ('x');
 ylabel ('By');
@@ -102,7 +106,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Bz(j, 1:Nx)/B0z,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
@@ -113,7 +117,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ex(j, 1:Nx)/E0x,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
@@ -124,7 +128,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ey(j, 1:Nx)/E0y,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');
@@ -135,7 +139,7 @@ hold on;
 for j=1:Nd,
     plot ((1:Nx)*rho, Ez(j, 1:Nx)/E0z,'color', Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},LegendTitle{5},LegendTitle{6},'Location','southeast');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');

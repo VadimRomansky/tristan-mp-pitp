@@ -1,13 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.008';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'anisotropic turbulence by'};
-
+LegendTitle = {'isotropic','simple anisotropic','slab + 2d', 'no turb'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');

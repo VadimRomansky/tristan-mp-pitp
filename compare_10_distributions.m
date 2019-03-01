@@ -1,13 +1,13 @@
 clear;
-directory_name = './output8/';
+directory_name = './output10/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.010';
 Nd = 10;
 start = 0;
 
-Color = {'red','blue','green','black','cyan','magenta',[.5,.5,.5],[.7,.7,.3],[.6,0.0,.2],[.7,.3,.3]};
+Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'By l 500 per 0', 'By l 500 per 1','Bz l 500 per 0', 'Bz l 500 per 1', 'By l 1000 per 0', 'By l 1000 per 1','Bz l 1000 per 0', 'Bz l 1000 per 1','Bz noturb per 0', 'Bz noturb per 1'};
+LegendTitle = {'noturb B in plane', 'noturb B out plane','turb 0.5 iso B in plane', 'turb 0.5 iso B out plane', 'turb 0.5 aniso B in plane', 'turb 0.5 aniso B out plane','turb 0.9 iso B in plane', 'turb 0.9 iso B out plane', 'turb 0.9 aniso B in plane', 'turb 0.9 aniso B out plane'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -62,7 +62,7 @@ end;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
-set(0, 'DefaultLineLineWidth', 2);
+set(0, 'DefaultLineLineWidth', 1.5);
 figure(1);
 hold on;
 title ('F_p');
