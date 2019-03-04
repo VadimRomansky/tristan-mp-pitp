@@ -1636,18 +1636,18 @@ subroutine init_turbulent_field_slab_lab_frame(turbulenceEnergyFraction)
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -1914,7 +1914,7 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 
 end subroutine init_turbulent_field_isotropic_plasma_frame
 
-		subroutine init_turbulent_field_isotropic_lab_frame(turbulenceEnergyFraction)
+subroutine init_turbulent_field_isotropic_lab_frame(turbulenceEnergyFraction)
 			real turbulenceEnergyFraction
 
 			integer maxKx, maxKy, maxKz
@@ -2072,18 +2072,18 @@ end subroutine init_turbulent_field_isotropic_plasma_frame
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -2515,18 +2515,18 @@ subroutine init_turbulent_field_simple_anisotropic_lab_frame(turbulenceEnergyFra
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
