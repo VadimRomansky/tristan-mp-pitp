@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.010';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -36,55 +36,79 @@ samplingFactor = 10;
 rho = 0.2;
 rho = rho*samplingFactor;
 
-ypoint = fix(Ny/2) + 1;
-
 Bnorm(1:Nx) = 0;
 Bperp(1:Nx) = 0;
 theta(1:Nx) = 0;
+Bxa(1:Nx) = 0;
+Bya(1:Nx) = 0;
+Bza(1:Nx) = 0;
+Exa(1:Nx) = 0;
+Eya(1:Nx) = 0;
+Eza(1:Nx) = 0;
 
 for i=1:Nx,
-        Bnorm(i) = sqrt(Bx(i,ypoint)*Bx(i,ypoint) + By(i,ypoint)*By(i,ypoint) + Bz(i,ypoint)*Bz(i,ypoint));
-        Bperp(i) = sqrt(By(i,ypoint)*By(i,ypoint) + Bz(i,ypoint)*Bz(i,ypoint));
-        theta(i) = acos(Bx(i,ypoint)/Bnorm(i))*180/pi;
+    for j=1:Ny,
+        Bxa(i) = Bxa(i) + Bx(i,j);
+        Bya(i) = Bya(i) + By(i,j);
+        Bza(i) = Bza(i) + Bz(i,j);
+        Exa(i) = Exa(i) + Ex(i,j);
+        Eya(i) = Eya(i) + Ey(i,j);
+        Eza(i) = Eza(i) + Ez(i,j);
+        
+        Bnorm(i) = Bnorm(i) + Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j);
+        Bperp(i) = Bperp(i) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j);
+        theta(i) = theta(i) + acos(Bx(i,j)/sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j)))*180/pi;
+    end;
+    Bxa(i) = Bxa(i)/Ny;
+    Bya(i) = Bya(i)/Ny;
+    Bza(i) = Bza(i)/Ny;
+    Exa(i) = Exa(i)/Ny;
+    Eya(i) = Eya(i)/Ny;
+    Eza(i) = Eza(i)/Ny;
+    
+    Bnorm(i) = sqrt(Bnorm(i)/Ny);
+    Bperp(i) = sqrt(Bperp(i)/Ny);
+    theta(i) = theta(i)/Ny;
+    
 end;
 
 figure(1);
-plot ((1:Nx)*rho,Bx(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bxa(1:Nx)*fieldFactor, 'red');
 title ('Bx');
 xlabel ('x');
 ylabel ('Bx');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,By(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bya(1:Nx)*fieldFactor, 'red');
 title ('By');
 xlabel ('x');
 ylabel ('By');
 grid ;
 
 figure(3);
-plot ((1:Nx)*rho,Bz(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Bza(1:Nx)*fieldFactor, 'red');
 title ('Bz');
 xlabel ('x');
 ylabel ('Bz');
 grid ;
 
 figure(4);
-plot ((1:Nx)*rho,Ex(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Exa(1:Nx)*fieldFactor, 'red');
 title ('Ex');
 xlabel ('x');
 ylabel ('Ex');
 grid ;
 
 figure(5);
-plot ((1:Nx)*rho,Ey(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Eya(1:Nx)*fieldFactor, 'red');
 title ('Ey');
 xlabel ('x');
 ylabel ('Ey');
 grid ;
 
 figure(6);
-plot ((1:Nx)*rho,Ez(1:Nx, ypoint)*fieldFactor, 'red');
+plot ((1:Nx)*rho,Eza(1:Nx)*fieldFactor, 'red');
 title ('Ez');
 xlabel ('x');
 ylabel ('Ez');
