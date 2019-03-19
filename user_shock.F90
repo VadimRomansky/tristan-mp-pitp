@@ -282,6 +282,8 @@ subroutine init_particle_distribution_user()
 	             ! temperature is initialized in 2D (z temperature = 0), 1 for 3D distribution (z temp nonzero). 
                      ! 1 is default
 
+	print *,'init_particle_distribution_user'
+
 	!set initial injection points 
  
         leftwall=20.

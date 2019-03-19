@@ -144,7 +144,9 @@ subroutine init_particle_distribution()
 !		case default
 !		   if(rank .eq. 0) print *, "No such caseinit defined in overload:",caseinit
 !	end select
-	
+
+	print *,'overload'
+	!call init_particle_distribution_user()
 	call init_particle_distribution_user()
 
 end subroutine init_particle_distribution
