@@ -789,7 +789,137 @@ end subroutine inject_plasma_region_turb
 
 subroutine init_turbulent_density(turbulent_density)
 	real, allocatable, dimension(:,:,:) :: turbulent_density
+	integer i, j, k
+	integer ki, kj, kk
+	real pi
+	real kx, ky, kz, kmultr
+	real phase
+	integer maxKx, maxKy, maxKz
+	integer maxDensityLambdaX, minDensityLambdaX, &
+			maxDensityLambdaY, minDensityLambdaY, maxDensityLambdaZ, minDensityLambdaZ
+	real turbulentDensityFraction
+	real tempDensity
+	real densityCorrection
+	real maxDensity
+
+
+	call srand(turbulenceSeed)
+	pi = 2*acos(0.0);
+	phase = 0;
+
+	maxDensityLambdaX = 100
+	minDensityLambdaX = 50
+	maxDensityLambdaY = 100
+	minDensityLambdaY = 50
+	maxDensityLambdaZ = 20
+	minDensityLambdaZ = 20
+
+	turbulentDensityFraction = 0.5 !less then 0.5!
+
+	maxKx = maxDensityLambdaX/minDensityLambdaX;
+	maxKy = maxDensityLambdaY/minDensityLambdaY;
+	maxKz = maxDensityLambdaZ/minDensityLambdaZ;
+
+	print *, maxKx, maxKy, maxKz
+
+	tempDensity = 0
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+#ifdef twoD
+			kk = 0
+#else
+			!do kk = 0, mz0-5
+			do kk = 0, maxKz
+#endif
+				kx = ki*2*pi/maxDensityLambdaX;
+				ky = kj*2*pi/maxDensityLambdaY;
+				kz = kk*2*pi/maxDensityLambdaZ;
+				print *, kx, ky, kz
+				if(ki + kj + kk .gt. 0) then
+					tempDensity = tempDensity + evaluate_density_amplitude(kx, ky, kz)
+				end if
+#ifndef twoD
+			end do
+#endif
+		end do
+	end do
+
+
+	print *, 'tempDensity = ', tempDensity
+
+	if(tempDensity > 0)then
+		densityCorrection = (turbulentDensityFraction/(1.0 - turbulentDensityFraction))/tempDensity
+	else
+		densityCorrection = 1.0
+	end if
+
+	print *, 'dc = ', densityCorrection
+
+	do ki = 0, maxKx
+		do kj = 0, maxKy
+#ifdef twoD
+			kk = 0
+#else
+			!do kk = 0, mz0-5
+			do kk = 0, maxKz
+#endif
+				kx = ki*2*pi/maxDensityLambdaX;
+				ky = kj*2*pi/maxDensityLambdaY;
+				kz = kk*2*pi/maxDensityLambdaZ;
+				if(ki + kj + kk .gt. 0) then
+					tempDensity = evaluate_density_amplitude(kx, ky, kz)*densityCorrection
+					phase = 2*pi*rand()
+					do i = 1,mx
+						do j = 1,my
+							do k = 1,mz
+								kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+								turbulent_density(i,j,k) = turbulent_density(i,j,k) + tempDensity*sin(kmultr + phase)
+								!print *, i,j,k, turbulent_density(i,j,k)
+							end do
+						end do
+					end do
+				end if
+#ifndef twoD
+			end do
+#endif
+		end do
+	end do
+
+	maxDensity = 0;
+	do i = 1,mx
+		do j = 1,my
+			do k = 1,mz
+				if(turbulent_density(i,j,k) > maxDensity) then
+					maxDensity = turbulent_density(i,j,k)
+				end if
+			end do
+		end do
+	end do
+
+	do i = 1,mx
+		do j = 1,my
+			do k = 1,mz
+				turbulent_density(i,j,k) = turbulent_density(i,j,k)/maxDensity
+			end do
+		end do
+	end do
 end subroutine
+
+real function evaluate_density_amplitude(kx, ky, kz)
+	real kx, ky, kz, kw
+#ifdef twoD
+		kz = 0
+#endif
+		kw = sqrt(kx*kx + ky*ky + kz*kz);
+		print *,'kw = ', kw
+
+#ifdef twoD
+		evaluate_density_amplitude = 1.0/(kw**(8.0/3.0))
+#else
+		evaluate_density_amplitude = 1.0/(kw**(11.0/3.0))
+#endif
+end function evaluate_density_amplitude
 
 subroutine turbulence_coordinates_random(minx, miny, minz, delta_x, delta_y, delta_z, x, y, z, turbulent_density)
 	real minx, miny, minz, delta_x, delta_y, delta_z
@@ -803,9 +933,7 @@ subroutine turbulence_coordinates_random(minx, miny, minz, delta_x, delta_y, del
 
 	integer boolean
 
-	length = 1000.0;
 	boolean = 0;
-	pi = 2*acos(0.0);
 
 
 	do while (boolean .eq. 0)
@@ -822,7 +950,21 @@ end subroutine turbulence_coordinates_random
 real function get_turbulent_density(x,y,z, turbulent_density)
 	real x,y,z
 	real, allocatable, dimension(:,:,:) :: turbulent_density
-	get_turbulent_density = 1
+
+	integer i, j, k
+
+	!i = iloc(int(x))
+	!j = jloc(int(y))
+	!k = kloc(int(z))
+
+	i = int(x)
+	j = int(y)
+	k = int(z)
+
+	!print *, x,y,z
+	!print *, i,j,k
+
+	get_turbulent_density = turbulent_density(i-2,j-2,k-2)
 end function get_turbulent_density
 
 
