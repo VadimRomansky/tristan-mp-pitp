@@ -75,7 +75,7 @@ enlarge		= 0 			# if 1, enlarge box in the x direction if injector is close to r
 <fields>
 
 btheta	= 90			# bfield angle bx=B*cos(btheta)  by=B*sin(btheta)*sin(bphi) bz=B*sin(btheta)*cos(bphi)
-bphi	= 90 			#
+bphi	= 0 			#
 
 <particles>
 

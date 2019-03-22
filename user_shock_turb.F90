@@ -252,7 +252,7 @@ subroutine init_EMfields_user()
 		enddo
 	enddo
 #ifdef turbulence
-	call init_turbulent_field()
+	!call init_turbulent_field()
 #endif
 
 end subroutine init_EMfields_user
@@ -807,14 +807,14 @@ subroutine init_turbulent_density(turbulent_density)
 	pi = 2*acos(0.0);
 	phase = 0;
 
-	maxDensityLambdaX = 100
-	minDensityLambdaX = 50
-	maxDensityLambdaY = 100
-	minDensityLambdaY = 50
-	maxDensityLambdaZ = 20
-	minDensityLambdaZ = 20
+	maxDensityLambdaX = 2000
+	minDensityLambdaX = 2000
+	maxDensityLambdaY = 2000
+	minDensityLambdaY = 2000
+	maxDensityLambdaZ = 2000
+	minDensityLambdaZ = 2000
 
-	turbulentDensityFraction = 0.5 !less then 0.5!
+	turbulentDensityFraction = 0.8 !less then 0.5!
 
 	maxKx = maxDensityLambdaX/minDensityLambdaX;
 	maxKy = maxDensityLambdaY/minDensityLambdaY;
@@ -901,6 +901,9 @@ subroutine init_turbulent_density(turbulent_density)
 		do j = 1,my
 			do k = 1,mz
 				turbulent_density(i,j,k) = turbulent_density(i,j,k)/maxDensity
+if turbulent_density(i,j,k) .lt. 0 then
+	turbulent_density(i,j,k) = 0.05
+end if
 			end do
 		end do
 	end do
