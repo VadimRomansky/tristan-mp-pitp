@@ -1,12 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.005';
+file_number = '.010';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'isotropic','simple anisotropic','slab + 2d'};
+LegendTitle = {'parallel','perpendicular','turbulent'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

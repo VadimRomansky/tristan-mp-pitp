@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.012';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -76,9 +76,9 @@ end;
 pne(1:5) = 0;
 pnp(1:5) = 0;
 
-pnp(1) = 135;
-pnp(2) = 140;
-pnp(3) = 150;
+pnp(1) = 145;
+pnp(2) = 148;
+pnp(3) = 151;
 pnp(4) = 155;
 pnp(5) = 160;
 
@@ -90,7 +90,7 @@ pne(5) = 160;
 
 for i = 1:Nx,
     for j = 1:5,
-        for k = -2:2,
+        for k = -1:1,
             Fp(j,i)=Fp(j,i) + fp(i,pnp(j)+k)*(Pp(pnp(j)+k))/(1+g(pnp(j)+k))*(Pp(pnp(j) + k + 1) - Pp(pnp(j) + k));
             Fe(j,i)=Fe(j,i) + fe(i,pne(j)+k)*(Pe(pne(j)+k))/(1+g(pne(j)+k))*(Pe(pne(j) + k + 1) - Pe(pne(j) + k));
         end;

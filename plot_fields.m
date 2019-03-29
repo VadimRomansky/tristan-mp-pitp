@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.005';
+file_number = '.020';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -110,3 +110,10 @@ title ('theta');
 xlabel ('x');
 ylabel ('theta');
 grid ;
+
+dlmwrite('Bx.dat',Bx(:,ypoint));
+dlmwrite('By.dat',By(:,ypoint));
+dlmwrite('Bz.dat',Bz(:,ypoint));
+dlmwrite('Ex.dat',Ex(:,ypoint));
+dlmwrite('Ey.dat',Ey(:,ypoint));
+dlmwrite('Ez.dat',Ez(:,ypoint));

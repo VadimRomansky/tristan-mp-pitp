@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.005';
+file_number = '.020';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = hdf5info(full_name);
 np = hdf5read(full_name,'densi');
@@ -44,3 +44,5 @@ title ('ne');
 xlabel ('x');
 ylabel ('ne');
 grid ;
+
+dlmwrite('np.dat',np(:,fix(Ny/2)+1));

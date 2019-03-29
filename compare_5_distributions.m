@@ -1,13 +1,13 @@
 clear;
-directory_name = './output3/';
+directory_name = './output4/';
 file_name = 'spect';
-file_number = '.008';
+file_number = '.010';
 Nd = 5;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
 %LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-LegendTitle = {'isotropic','simple anisotropic','slab + 2d','iso pf','aniso pf'};
+LegendTitle = {'0.5','0.6','0.7','0.8','0.9'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
