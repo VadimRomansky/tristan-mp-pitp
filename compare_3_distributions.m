@@ -6,7 +6,7 @@ Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'parallel','perpendicular','turbulent'};
+LegendTitle = {'k_{min} = 2 pi /5 r_g','k_{min} = 2 pi /10 r_g','k_{min} = 2 pi /20 r_g'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -64,7 +64,7 @@ figure(1);
 hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
-ylabel ('Fp*p^4');
+ylabel ('Fp p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
@@ -75,7 +75,7 @@ figure(2);
 hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
-ylabel ('F_e*p^4');
+ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;

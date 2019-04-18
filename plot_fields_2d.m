@@ -117,9 +117,13 @@ rho = rho*samplingFactor;
 %grid ;
 
 figure(7);
+hold on;
 colormap Jet;
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx/2)*rho);
-surf(X, Y, Bnorm/B0);
+%surf(X, Y, Bnorm/B0);
+%contourf(X,Y,Bnorm);
+imagesc(1:Ny,1:Nx/2,Bnorm);
+plot(1:Ny,(1:Ny)*10,'red');
 shading interp;
 title ('B/B_0');
 xlabel ('y \omega /c');

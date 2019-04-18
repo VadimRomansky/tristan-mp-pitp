@@ -3311,438 +3311,438 @@ subroutine output_tot()
 
 
 
-!!---------------------------------------------------------------
-!!     goto 127
-!     !--------------------------------------
-!     ! PRTL.TOT. saving: now write particles
-!     !--------------------------------------
-!     if (rank.eq.0)print *,"",fnameprt
-!
-!     !user input: number of variables to be saved for prtl.tot.
-!     nvars=21
-!     midvars=nvars/2
-!
-!     !user input: array of variables to be saved for prtl.tot.
-!     !usage:
-!     !-the first entry should have the largest number of characters
-!     !(if needed, supplemented with empty spaces)
-!     !-same number of entries for electrons and ions
-!     !to be chosen from:
-!     !xi,yi,zi,xe,ye,ze:position
-!     !ui,vi,wi,ue,ve,we:4-velocity (momentum)
-!     !chi,che:weight
-!     !gammai,gammae:energy
-!     !indi,inde:index
-!     !proci,proce:processor
-!     dsetname(1:nvars)=(/&
-!          'gammai','xi    ','yi    ','zi    '&
-!          ,'ui    ','vi    ','wi    '&
-!          ,'chi   ','indi  ','proci '&
-!          ,'gammae','xe    ','ye    ','ze    '&
-!          ,'ue    ','ve    ','we    '&
-!          ,'che   ','inde  ','proce ','time  '&
-!          /)
-!
-!     !find out number of ions and lecs
-!      datarank=1
-!#ifdef MPI
-!     tmp1=max(ions,1)
-!     call mpi_allgather(tmp1,1,mpi_integer,all_ions,1 &
-!          ,mpi_integer,mpi_comm_world, error)
-!     tmp1=max(lecs,1)
-!     call mpi_allgather(tmp1,1,mpi_integer,all_lecs,1, &
-!          mpi_integer,mpi_comm_world, error)
-!     if(rank.eq.0.and.debug)print *,"all_ions",all_ions,tmp1
-!     all_ions_lng=all_ions
-!     all_lecs_lng=all_lecs
-!#else
-!     all_ions_lng=ions
-!     all_lecs_lng=lecs
-!#endif
-!     where(all_ions .lt. stride)all_ions=stride
-!     where(all_lecs .lt. stride)all_lecs=stride
-!     where(all_ions_lng .lt. stride)all_ions_lng=stride
-!     where(all_lecs_lng .lt. stride)all_lecs_lng=stride
-!     dimsfions(1)=sum(all_ions_lng/stride)
-!     dimsflecs(1)=sum(all_lecs_lng/stride)
-!     dimsfiions(1)=dimsfions(1)
-!     dimsfilecs(1)=dimsflecs(1)
-!     dimsfiions(2:7)=0
-!     dimsfilecs(2:7)=0
-!     if(rank .eq. 0 .and. debug) then
-!        print *, "all_ions", all_ions_lng
-!        print *, "all_lecs", all_lecs_lng
-!        print *,"dimsions", sum(all_ions_lng/stride)
-!        print *,"dimslecs", sum(all_lecs_lng/stride)
-!     endif
-!        ! allocate arrays
-!     allocate(temporary_vec(max(max(ions/stride,lecs/stride),1)))
-!#ifdef serIO
-!     if (rank .eq. 0) then
-!        allocate(temporary0_vec(max(maxval(all_ions_lng/stride), &
-!             maxval(all_lecs_lng/stride))))
-!        temporary0_vec(:)=0.
-!     endif
-!#endif
-!     !
-!     !  Initialize FORTRAN predefined datatypes
-!     !
-!#ifdef serIO
-!     if (rank .eq. 0) then
-!        call h5open_f(error)
-!     endif
-!#else
-!     call h5open_f(error)
-!#endif
-!
-!     !
-!     ! Setup file access property list with parallel I/O access.
-!     !
-!#ifdef MPI
-!#ifndef serIO
-!     call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, error)
-!     !      call H5Pset_sieve_buf_size_f(plist_id, 262144,error)
-!     !      call H5Pset_alignment_f(plist_id, 524288, 262144,error)
-!     call h5pset_fapl_mpio_f(plist_id, mpi_comm_world, &
-!          FILE_INFO_TEMPLATE,error)
-!#endif
-!#endif
-!
-!     !
-!     ! Create the file
-!     !
-!#ifdef MPI
-!#ifdef serIO
-!     if (rank .eq. 0) then
-!        call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error, &
-!             h5p_default_f,h5p_default_f)
-!     endif
-!#else
-!     call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error, &
-!          access_prp = plist_id)
-!     call h5pclose_f(plist_id, error)
-!#endif
-!#else
-!     call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error)
-!#endif
-!
-!     !
-!     ! Create the data space for the  dataset.
-!     !
-!#ifdef serIO
-!     if (rank .eq. 0) then
-!        do i=1,midvars
-!           call h5screate_simple_f(datarank, dimsfions(1), filespace(i), &
-!                error)
-!        enddo
-!        do i=midvars+1,nvars
-!           call h5screate_simple_f(datarank, dimsflecs(1), filespace(i), &
-!                error)
-!        enddo
-!     endif
-!#else
-!     do i=1,midvars
-!        call h5screate_simple_f(datarank, dimsfions(1), filespace(i), &
-!             error)
-!     enddo
-!     do i=midvars+1,nvars
-!        call h5screate_simple_f(datarank, dimsflecs(1), filespace(i), &
-!             error)
-!     enddo
-!#endif
-!
-!     !
-!     ! Create property list for collective dataset write
-!     !
-!#ifndef serIO
-!#ifdef MPI
-!     call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, error)
-!     call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, error)
-!#endif
-!#endif
-!
-!
-!     !looping nvars
-!     do i=1,nvars
-!
-!        varname=trim(dsetname(i))
-!
-!        !define temporary_vec for every proc
-!        temporary_vec=0.
-!        !IONS
-!        if(varname.eq.'xi') temporary_vec(1:ions/stride)=p(1:ions:stride)%x &
-!        	 +mxcum
-!        if(varname.eq.'yi') temporary_vec(1:ions/stride)=p(1:ions:stride)%y &
-!             +mycum
-!        if(varname.eq.'zi') temporary_vec(1:ions/stride)=p(1:ions:stride)%z &
-!        	 +mzcum
-!        if(varname.eq.'ui') temporary_vec(1:ions/stride)=p(1:ions:stride)%u
-!        if(varname.eq.'vi') temporary_vec(1:ions/stride)=p(1:ions:stride)%v
-!        if(varname.eq.'wi') temporary_vec(1:ions/stride)=p(1:ions:stride)%w
-!        if(varname.eq.'chi') temporary_vec(1:ions/stride)=p(1:ions:stride)%ch
-!        if(varname.eq.'gammai') temporary_vec(1:ions/stride)=sqrt(1. &
-!             +(p(1:ions:stride)%u**2+p(1:ions:stride)%v**2 &
-!             +p(1:ions:stride)%w**2))
-!        if(varname.eq.'indi') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
-!             %ind,4)
-!        if(varname.eq.'proci') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
-!             %proc,4)
-!        !ELECTRONS
-!        if(varname.eq.'xe') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%x+mxcum
-!        if(varname.eq.'ye') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%y+mycum
-!        if(varname.eq.'ze') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%z+mzcum
-!        if(varname.eq.'ue') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%u
-!        if(varname.eq.'ve') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%v
-!        if(varname.eq.'we') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-!             +lecs:stride)%w
-!        if(varname.eq.'che') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf+lecs:stride)%ch
-!        if(varname.eq.'gammae') temporary_vec(1:lecs/stride)=sqrt(1. +(p(maxhlf &
-!             +1:maxhlf+lecs:stride)%u**2+p(maxhlf+1:maxhlf +lecs:stride &
-!             )%v**2+p(maxhlf +1:maxhlf+lecs:stride)%w**2))
-!        if(varname.eq.'inde')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
-!             +lecs:stride)%ind,4)
-!        if(varname.eq.'proce')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
-!             +lecs:stride)%proc,4)
-!
-!#ifdef serIO
-!        !
-!        ! Serial writing of prtl.tot.
-!        !
-!
-!        do procn=0,size0-1
-!
-!           if (rank .eq. 0) then
-!
-!              if (procn .ne. 0) then !receive from procn
-!#ifdef MPI
-!                 if(i .le. midvars) then
-!                    call MPI_Recv(temporary0_vec(1:all_ions_lng(procn+1)/stride) &
-!                         ,all_ions_lng(procn+1)/ &
-!                         stride,mpi_real,procn,1, &
-!                         MPI_COMM_WORLD,status,error)
-!                 else
-!                    call MPI_Recv(temporary0_vec(1:all_lecs_lng(procn+1)/stride) &
-!                         ,all_lecs_lng(procn+1)/ &
-!                         stride,mpi_real,procn,1, &
-!                         MPI_COMM_WORLD,status,error)
-!                 endif
-!#endif
-!              else           !procn eq 0
-!                 if (i .le. midvars) then
-!                    temporary0_vec(1:all_ions_lng(1)/stride)= &
-!                         temporary_vec(1:all_ions_lng(1)/stride)
-!                 else
-!                    temporary0_vec(1:all_lecs_lng(1)/stride)= &
-!                         temporary_vec(1:all_lecs_lng(1)/stride)
-!                 endif
-!              endif
-!
-!              !define count and offset
-!              if(i.le.midvars)countpart = max(all_ions_lng(procn+1)/ &
-!                   stride,1)
-!              if(i.gt.midvars)countpart = max(all_lecs_lng(procn+1)/ &
-!                   stride,1)
-!
-!              offsetpart = 0
-!              if(procn .gt. 0) then
-!                 if(i .le. midvars) then
-!                    offsetpart = sum(all_ions_lng(1:procn)/stride)
-!                 else
-!                    offsetpart = sum(all_lecs_lng(1:procn)/stride)
-!                 endif
-!              endif
-!
-!
-!              !hyperslab selection
-!#ifdef MPI
-!              ! this is necessary only if I close the filespace above
-!              !               call h5dget_space_f(dset_id(i), filespace(i), error)
-!              call h5sselect_hyperslab_f(filespace(i),H5S_SELECT_SET_F &
-!                   ,offsetpart,countpart,error)
-!#endif
-!
-!              if(debug)print *,rank,": selected hyperslab"
-!
-!
-!              !memory space
-!#ifdef MPI
-!              call h5screate_simple_f(1, countpart, memspace, error)
-!#endif
-!
-!              !dataset creation/opening
-!              if (procn .eq. 0) then
-!                 call h5dcreate_f(file_id,varname,H5T_NATIVE_REAL, &
-!                      filespace(i),dset_id(i), error)
-!              else
-!                 call h5dopen_f(file_id,varname,dset_id(i),error)
-!              endif
-!
-!
-!              !writing
-!#ifdef MPI
-!			  !print *, 'mpi'
-!              if(i .le. midvars) then
-!                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                      temporary0_vec(1:all_ions_lng(procn+1)/stride),  &
-!                      dimsfiions,error,filespace(i),  &
-!                      memspace)
-!              else
-!                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                      temporary0_vec(1:all_lecs_lng(procn+1)/stride),  &
-!                      dimsfilecs,error,filespace(i),  &
-!                      memspace)
-!              endif
-!
-!#else
-!              if(i .le. midvars) then
-!                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                      temporary_vec(1:max(ions/stride,1)),  &
-!                      dimsfiions,error)
-!              else
-!                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                      temporary_vec(1:max(lecs/stride,1)),  &
-!                      dimsfilecs,error)
-!              endif
-!#endif
-!
-!
-!              !closing dataset and memory space
-!              if(debug)print *, rank, ": ", i, "closing d"
-!              call h5dclose_f(dset_id(i), error)
-!              if(debug)print *, rank, ": ", i, "closing m"
-!              call h5sclose_f(memspace, error)
-!
-!           else !rank ne 0
-!              if (procn .eq. rank) then
-!#ifdef MPI
-!                 if(i .le. midvars) then
-!                    call MPI_Send(temporary_vec,all_ions_lng(procn+1)/ &
-!                         stride,mpi_real,0,1, &
-!                         MPI_COMM_WORLD,error)
-!                 else
-!                    call MPI_Send(temporary_vec,all_lecs_lng(procn+1)/ &
-!                         stride,mpi_real,0,1, &
-!                         MPI_COMM_WORLD,error)
-!                 endif
-!#endif
-!              endif
-!           endif               !rank ne 0
-!
-!        enddo!procn
-!!else (finished serial writing)
-!#else
-!        !
-!        ! Parallel writing of prtl.tot.
-!        !
-!
-!        !
-!        ! Create the dataset with default properties.
-!        !
-!        call h5dcreate_f(file_id,varname, H5T_NATIVE_REAL, &
-!             filespace(i),dset_id(i), error)
-!        call h5sclose_f(filespace(i), error)
-!
-!        !
-!        ! Each process defines dataset in memory and writes it to the hyperslab
-!        ! in the file.
-!        !
-!        if(i.le.midvars)countpart = max(ions/stride,1)
-!        if(i.gt.midvars)countpart = max(lecs/stride,1)
-!
-!        offsetpart = 0
-!        if(rank .gt. 0) then
-!           if(i .le. midvars) then
-!              offsetpart = sum(all_ions_lng(1:rank)/stride)
-!           else
-!              offsetpart = sum(all_lecs_lng(1:rank)/stride)
-!           endif
-!        endif
-!
-!#ifdef MPI
-!        call h5screate_simple_f(1, countpart, memspace, error)
-!        call h5dget_space_f(dset_id(i), filespace(i), error)
-!        call h5sselect_hyperslab_f(filespace(i),H5S_SELECT_SET_F &
-!             ,offsetpart,countpart, error)
-!#endif
-!
-!#ifdef MPI
-!        if(i .le. midvars) then
-!           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                temporary_vec(1:max(ions/stride,1)), dimsfiions,error &
-!                ,filespace(i), memspace &
-!                ,h5p_default_f)
-!        else
-!           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error &
-!                ,filespace(i), memspace &
-!                ,h5p_default_f)
-!        endif
-!
-!#else
-!        if(i .le. midvars) then
-!           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                temporary_vec(1:max(ions/stride,1)), dimsfiions,error)
-!        else
-!           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
-!                temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error)
-!        endif
-!#endif
-!
-!	if(debug)print *, rank, ": ", i, "closing m"
-!#ifdef MPI
-!        call h5sclose_f(memspace,error)
-!#endif
-!        if(debug)print *, rank, ": ", i, "closing d"
-!        call h5dclose_f(dset_id(i), error)
-!!endif finished parallel writing
-!#endif
+!---------------------------------------------------------------
+!     goto 127
+     !--------------------------------------
+     ! PRTL.TOT. saving: now write particles
+     !--------------------------------------
+     if (rank.eq.0)print *,"",fnameprt
+
+     !user input: number of variables to be saved for prtl.tot.
+     nvars=21
+     midvars=nvars/2
+
+     !user input: array of variables to be saved for prtl.tot.
+     !usage:
+     !-the first entry should have the largest number of characters
+     !(if needed, supplemented with empty spaces)
+     !-same number of entries for electrons and ions
+     !to be chosen from:
+     !xi,yi,zi,xe,ye,ze:position
+     !ui,vi,wi,ue,ve,we:4-velocity (momentum)
+     !chi,che:weight
+     !gammai,gammae:energy
+     !indi,inde:index
+     !proci,proce:processor
+     dsetname(1:nvars)=(/&
+          'gammai','xi    ','yi    ','zi    '&
+          ,'ui    ','vi    ','wi    '&
+          ,'chi   ','indi  ','proci '&
+          ,'gammae','xe    ','ye    ','ze    '&
+          ,'ue    ','ve    ','we    '&
+          ,'che   ','inde  ','proce ','time  '&
+          /)
+
+     !find out number of ions and lecs
+      datarank=1
+#ifdef MPI
+     tmp1=max(ions,1)
+     call mpi_allgather(tmp1,1,mpi_integer,all_ions,1 &
+          ,mpi_integer,mpi_comm_world, error)
+     tmp1=max(lecs,1)
+     call mpi_allgather(tmp1,1,mpi_integer,all_lecs,1, &
+          mpi_integer,mpi_comm_world, error)
+     if(rank.eq.0.and.debug)print *,"all_ions",all_ions,tmp1
+     all_ions_lng=all_ions
+     all_lecs_lng=all_lecs
+#else
+     all_ions_lng=ions
+     all_lecs_lng=lecs
+#endif
+     where(all_ions .lt. stride)all_ions=stride
+     where(all_lecs .lt. stride)all_lecs=stride
+     where(all_ions_lng .lt. stride)all_ions_lng=stride
+     where(all_lecs_lng .lt. stride)all_lecs_lng=stride
+     dimsfions(1)=sum(all_ions_lng/stride)
+     dimsflecs(1)=sum(all_lecs_lng/stride)
+     dimsfiions(1)=dimsfions(1)
+     dimsfilecs(1)=dimsflecs(1)
+     dimsfiions(2:7)=0
+     dimsfilecs(2:7)=0
+     if(rank .eq. 0 .and. debug) then
+        print *, "all_ions", all_ions_lng
+        print *, "all_lecs", all_lecs_lng
+        print *,"dimsions", sum(all_ions_lng/stride)
+        print *,"dimslecs", sum(all_lecs_lng/stride)
+     endif
+        ! allocate arrays
+     allocate(temporary_vec(max(max(ions/stride,lecs/stride),1)))
+#ifdef serIO
+     if (rank .eq. 0) then
+        allocate(temporary0_vec(max(maxval(all_ions_lng/stride), &
+             maxval(all_lecs_lng/stride))))
+        temporary0_vec(:)=0.
+     endif
+#endif
+     !
+     !  Initialize FORTRAN predefined datatypes
+     !
+#ifdef serIO
+     if (rank .eq. 0) then
+        call h5open_f(error)
+     endif
+#else
+     call h5open_f(error)
+#endif
+
+     !
+     ! Setup file access property list with parallel I/O access.
+     !
+#ifdef MPI
+#ifndef serIO
+     call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, error)
+     !      call H5Pset_sieve_buf_size_f(plist_id, 262144,error)
+     !      call H5Pset_alignment_f(plist_id, 524288, 262144,error)
+     call h5pset_fapl_mpio_f(plist_id, mpi_comm_world, &
+          FILE_INFO_TEMPLATE,error)
+#endif
+#endif
+
+     !
+     ! Create the file
+     !
+#ifdef MPI
+#ifdef serIO
+     if (rank .eq. 0) then
+        call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error, &
+             h5p_default_f,h5p_default_f)
+     endif
+#else
+     call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error, &
+          access_prp = plist_id)
+     call h5pclose_f(plist_id, error)
+#endif
+#else
+     call h5fcreate_f(fnameprt, H5F_ACC_TRUNC_F, file_id, error)
+#endif
+
+     !
+     ! Create the data space for the  dataset.
+     !
+#ifdef serIO
+     if (rank .eq. 0) then
+        do i=1,midvars
+           call h5screate_simple_f(datarank, dimsfions(1), filespace(i), &
+                error)
+        enddo
+        do i=midvars+1,nvars
+           call h5screate_simple_f(datarank, dimsflecs(1), filespace(i), &
+                error)
+        enddo
+     endif
+#else
+     do i=1,midvars
+        call h5screate_simple_f(datarank, dimsfions(1), filespace(i), &
+             error)
+     enddo
+     do i=midvars+1,nvars
+        call h5screate_simple_f(datarank, dimsflecs(1), filespace(i), &
+             error)
+     enddo
+#endif
+
+     !
+     ! Create property list for collective dataset write
+     !
+#ifndef serIO
+#ifdef MPI
+     call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, error)
+     call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, error)
+#endif
+#endif
+
+
+     !looping nvars
+     do i=1,nvars
+
+        varname=trim(dsetname(i))
+
+        !define temporary_vec for every proc
+        temporary_vec=0.
+        !IONS
+        if(varname.eq.'xi') temporary_vec(1:ions/stride)=p(1:ions:stride)%x &
+        	 +mxcum
+        if(varname.eq.'yi') temporary_vec(1:ions/stride)=p(1:ions:stride)%y &
+             +mycum
+        if(varname.eq.'zi') temporary_vec(1:ions/stride)=p(1:ions:stride)%z &
+        	 +mzcum
+        if(varname.eq.'ui') temporary_vec(1:ions/stride)=p(1:ions:stride)%u
+        if(varname.eq.'vi') temporary_vec(1:ions/stride)=p(1:ions:stride)%v
+        if(varname.eq.'wi') temporary_vec(1:ions/stride)=p(1:ions:stride)%w
+        if(varname.eq.'chi') temporary_vec(1:ions/stride)=p(1:ions:stride)%ch
+        if(varname.eq.'gammai') temporary_vec(1:ions/stride)=sqrt(1. &
+             +(p(1:ions:stride)%u**2+p(1:ions:stride)%v**2 &
+             +p(1:ions:stride)%w**2))
+        if(varname.eq.'indi') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
+             %ind,4)
+        if(varname.eq.'proci') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
+             %proc,4)
+        !ELECTRONS
+        if(varname.eq.'xe') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%x+mxcum
+        if(varname.eq.'ye') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%y+mycum
+        if(varname.eq.'ze') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%z+mzcum
+        if(varname.eq.'ue') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%u
+        if(varname.eq.'ve') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%v
+        if(varname.eq.'we') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+             +lecs:stride)%w
+        if(varname.eq.'che') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf+lecs:stride)%ch
+        if(varname.eq.'gammae') temporary_vec(1:lecs/stride)=sqrt(1. +(p(maxhlf &
+             +1:maxhlf+lecs:stride)%u**2+p(maxhlf+1:maxhlf +lecs:stride &
+             )%v**2+p(maxhlf +1:maxhlf+lecs:stride)%w**2))
+        if(varname.eq.'inde')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
+             +lecs:stride)%ind,4)
+        if(varname.eq.'proce')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
+             +lecs:stride)%proc,4)
+
+#ifdef serIO
+        !
+        ! Serial writing of prtl.tot.
+        !
+
+        do procn=0,size0-1
+
+           if (rank .eq. 0) then
+
+              if (procn .ne. 0) then !receive from procn
+#ifdef MPI
+                 if(i .le. midvars) then
+                    call MPI_Recv(temporary0_vec(1:all_ions_lng(procn+1)/stride) &
+                         ,all_ions_lng(procn+1)/ &
+                         stride,mpi_real,procn,1, &
+                         MPI_COMM_WORLD,status,error)
+                 else
+                    call MPI_Recv(temporary0_vec(1:all_lecs_lng(procn+1)/stride) &
+                         ,all_lecs_lng(procn+1)/ &
+                         stride,mpi_real,procn,1, &
+                         MPI_COMM_WORLD,status,error)
+                 endif
+#endif
+              else           !procn eq 0
+                 if (i .le. midvars) then
+                    temporary0_vec(1:all_ions_lng(1)/stride)= &
+                         temporary_vec(1:all_ions_lng(1)/stride)
+                 else
+                    temporary0_vec(1:all_lecs_lng(1)/stride)= &
+                         temporary_vec(1:all_lecs_lng(1)/stride)
+                 endif
+              endif
+
+              !define count and offset
+              if(i.le.midvars)countpart = max(all_ions_lng(procn+1)/ &
+                   stride,1)
+              if(i.gt.midvars)countpart = max(all_lecs_lng(procn+1)/ &
+                   stride,1)
+
+              offsetpart = 0
+              if(procn .gt. 0) then
+                 if(i .le. midvars) then
+                    offsetpart = sum(all_ions_lng(1:procn)/stride)
+                 else
+                    offsetpart = sum(all_lecs_lng(1:procn)/stride)
+                 endif
+              endif
+
+
+              !hyperslab selection
+#ifdef MPI
+              ! this is necessary only if I close the filespace above
+              !               call h5dget_space_f(dset_id(i), filespace(i), error)
+              call h5sselect_hyperslab_f(filespace(i),H5S_SELECT_SET_F &
+                   ,offsetpart,countpart,error)
+#endif
+
+              if(debug)print *,rank,": selected hyperslab"
+
+
+              !memory space
+#ifdef MPI
+              call h5screate_simple_f(1, countpart, memspace, error)
+#endif
+
+              !dataset creation/opening
+              if (procn .eq. 0) then
+                 call h5dcreate_f(file_id,varname,H5T_NATIVE_REAL, &
+                      filespace(i),dset_id(i), error)
+              else
+                 call h5dopen_f(file_id,varname,dset_id(i),error)
+              endif
+
+
+              !writing
+#ifdef MPI
+			  !print *, 'mpi'
+              if(i .le. midvars) then
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                      temporary0_vec(1:all_ions_lng(procn+1)/stride),  &
+                      dimsfiions,error,filespace(i),  &
+                      memspace)
+              else
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                      temporary0_vec(1:all_lecs_lng(procn+1)/stride),  &
+                      dimsfilecs,error,filespace(i),  &
+                      memspace)
+              endif
+
+#else
+              if(i .le. midvars) then
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                      temporary_vec(1:max(ions/stride,1)),  &
+                      dimsfiions,error)
+              else
+                 call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                      temporary_vec(1:max(lecs/stride,1)),  &
+                      dimsfilecs,error)
+              endif
+#endif
+
+
+              !closing dataset and memory space
+              if(debug)print *, rank, ": ", i, "closing d"
+              call h5dclose_f(dset_id(i), error)
+              if(debug)print *, rank, ": ", i, "closing m"
+              call h5sclose_f(memspace, error)
+
+           else !rank ne 0
+              if (procn .eq. rank) then
+#ifdef MPI
+                 if(i .le. midvars) then
+                    call MPI_Send(temporary_vec,all_ions_lng(procn+1)/ &
+                         stride,mpi_real,0,1, &
+                         MPI_COMM_WORLD,error)
+                 else
+                    call MPI_Send(temporary_vec,all_lecs_lng(procn+1)/ &
+                         stride,mpi_real,0,1, &
+                         MPI_COMM_WORLD,error)
+                 endif
+#endif
+              endif
+           endif               !rank ne 0
+
+        enddo!procn
+!else (finished serial writing)
+#else
+        !
+        ! Parallel writing of prtl.tot.
+        !
+
+        !
+        ! Create the dataset with default properties.
+        !
+        call h5dcreate_f(file_id,varname, H5T_NATIVE_REAL, &
+             filespace(i),dset_id(i), error)
+        call h5sclose_f(filespace(i), error)
+
+        !
+        ! Each process defines dataset in memory and writes it to the hyperslab
+        ! in the file.
+        !
+        if(i.le.midvars)countpart = max(ions/stride,1)
+        if(i.gt.midvars)countpart = max(lecs/stride,1)
+
+        offsetpart = 0
+        if(rank .gt. 0) then
+           if(i .le. midvars) then
+              offsetpart = sum(all_ions_lng(1:rank)/stride)
+           else
+              offsetpart = sum(all_lecs_lng(1:rank)/stride)
+           endif
+        endif
+
+#ifdef MPI
+        call h5screate_simple_f(1, countpart, memspace, error)
+        call h5dget_space_f(dset_id(i), filespace(i), error)
+        call h5sselect_hyperslab_f(filespace(i),H5S_SELECT_SET_F &
+             ,offsetpart,countpart, error)
+#endif
+
+#ifdef MPI
+        if(i .le. midvars) then
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                temporary_vec(1:max(ions/stride,1)), dimsfiions,error &
+                ,filespace(i), memspace &
+                ,h5p_default_f)
+        else
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error &
+                ,filespace(i), memspace &
+                ,h5p_default_f)
+        endif
+
+#else
+        if(i .le. midvars) then
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                temporary_vec(1:max(ions/stride,1)), dimsfiions,error)
+        else
+           call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
+                temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error)
+        endif
+#endif
+
+	if(debug)print *, rank, ": ", i, "closing m"
+#ifdef MPI
+        call h5sclose_f(memspace,error)
+#endif
+        if(debug)print *, rank, ": ", i, "closing d"
+        call h5dclose_f(dset_id(i), error)
+!endif finished parallel writing
+#endif
        
         
-!        !
-!        ! Close dataspaces.
-!        !
-!        if(debug)print *, rank, ": ", i, "closing s"
-!#ifdef MPI
-!#ifdef serIO
-!        if (rank .eq. 0) then
-!           call h5sclose_f(filespace(i), error)
-!        endif
-!#else
-!        call h5sclose_f(filespace(i), error)
-!#endif
-!#endif
-!
-!     enddo!nvars
+        !
+        ! Close dataspaces.
+        !
+        if(debug)print *, rank, ": ", i, "closing s"
+#ifdef MPI
+#ifdef serIO
+        if (rank .eq. 0) then
+           call h5sclose_f(filespace(i), error)
+        endif
+#else
+        call h5sclose_f(filespace(i), error)
+#endif
+#endif
+
+     enddo!nvars
 
      
-!#ifdef serIO
-!     if (rank .eq. 0) then
-!        if(debug)print *, rank, ": ", "closing f"
-!        call h5fclose_f(file_id, error)
-!        if(debug)print *, rank, ": ", "closing h5"
-!        call h5close_f(error)
-!        deallocate(temporary0_vec)
-!     endif
-!#else
-!     if(debug)print *, rank, ": ", "closing p"
-!#ifdef MPI
-!     call h5pclose_f(plist_id, error)
-!#endif
-!     if(debug)print *, rank, ": ", "closing f"
-!     call h5fclose_f(file_id, error)
-!     if(debug)print *, rank, ": ", "closing h5"
-!     call h5close_f(error)
-!#endif
-!
-!     if(debug) print *, rank,": finished writing particles"
-!
-!     deallocate(temporary_vec)
-!
+#ifdef serIO
+     if (rank .eq. 0) then
+        if(debug)print *, rank, ": ", "closing f"
+        call h5fclose_f(file_id, error)
+        if(debug)print *, rank, ": ", "closing h5"
+        call h5close_f(error)
+        deallocate(temporary0_vec)
+     endif
+#else
+     if(debug)print *, rank, ": ", "closing p"
+#ifdef MPI
+     call h5pclose_f(plist_id, error)
+#endif
+     if(debug)print *, rank, ": ", "closing f"
+     call h5fclose_f(file_id, error)
+     if(debug)print *, rank, ": ", "closing h5"
+     call h5close_f(error)
+#endif
+
+     if(debug) print *, rank,": finished writing particles"
+
+     deallocate(temporary_vec)
+
 127  continue
      
 #ifdef MPI

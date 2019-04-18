@@ -1,14 +1,14 @@
 clear;
-directory_name = './output2/';
+directory_name = './output4/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 6;
 start = 0;
 
-Color = {'red','blue','green','black','cyan','magenta'};
+Color = {'blue','yellow','green','black','red','magenta','cyan',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
 %LegendTitle = {'90', '75', '60', '45','30','15'};
-LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence b out of plane', 'isotropic turbulence','anisotropic turbulence b in plane','maltese cross'};
+LegendTitle = {'0','50', '60', '70','80','90'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -38,8 +38,8 @@ for j = 1:Nd,
             Fp(j,i) = Fp(j,i) + fp(k,i);
             Fe(j,i) = Fe(j,i) + fe(k,i);
         end;
-        Fp(j,i)=Fp(j,i)*(Pp(j,i)^4)/(1+g(j,i));
-        Fe(j,i)=Fe(j,i)*(Pe(j,i)^4)/(1+g(j,i));
+        Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
+        Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));
     end;
 end;
 
@@ -67,7 +67,7 @@ figure(1);
 hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
-ylabel ('Fp*p^3');
+ylabel ('Fp p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
@@ -78,7 +78,7 @@ figure(2);
 hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
-ylabel ('F_e*p^3');
+ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;

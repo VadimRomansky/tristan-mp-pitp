@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.007';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -80,12 +80,12 @@ for i = 1:Np,
 end;
 
 figure(1);
-%plot (Pp(1:Np),Fp(1:Np), 'red');
-plot (Pp(1:Np),Fp(1:Np), 'red',Pp(1:Np), Fpjuttner(1:Np), 'blue');
+plot (Pp(1:Np),Fp(1:Np), 'red');
+%plot (Pp(1:Np),Fp(1:Np), 'red',Pp(1:Np), Fpjuttner(1:Np), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
-legend('Fp', 'Juttner','Location','southeast');
+legend('Fp','Location','southeast');
 grid ;
 
 figure(2);

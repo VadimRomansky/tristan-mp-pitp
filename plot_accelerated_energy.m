@@ -2,7 +2,7 @@ clear;
 directory_name = './output/';
 file_name = 'spect';
 density_name = 'flds.tot';
-file_number = '.010';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -31,10 +31,11 @@ Pe(1:Np)=0;
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
-me = 0.91*10^-27;
-mass_ratio = 16;
+me = 4.67307679E-03;
+mass_ratio = 64;
 mp = me*mass_ratio;
-c = 2.99792458*10^10;
+c = 0.45;
+c0 = c;
 Te = 9*10^9;
 Tp = 3.5*10^10;
 kB = 1.3806488*10^-16;
@@ -45,12 +46,8 @@ fractionp = 0.5;
 
 Nskinlength = 10;
 
-c0 = 2.998*10^10;
-mass_ratio = 20;
-mp = 1.67262*10^-24;
-me = mp/mass_ratio;
-q = 4.80320427*10^-10;
-n = 10^-4;
+q = 4.67307679E-03;
+n = 4;
 
 omega = sqrt(4*pi*n*q*q/me);
 
@@ -61,7 +58,7 @@ tau = c1*rho/c0;
 
 fieldFactor = me*rho/(q*tau*tau);
 
-samplingFactor = Nx/Nxn;
+samplingFactor = round(Nx/Nxn);
 
 rho = rho*samplingFactor;
 rho = 1/Nskinlength;
@@ -105,6 +102,10 @@ totalEnergy = 0;
 concentrationP(1:Nx) = 0;
 concentrationE(1:Nx) = 0;
 
+if Nxn>Nx
+    Nxn = Nx;
+end;
+
 averageConcentrationP(1:Nxn,2) = 0;
 averageConcentrationE(1:Nxn,2) = 0;
 for i = 1:Nx,
@@ -113,16 +114,16 @@ for i = 1:Nx,
     acceleratedP = 0;
     acceleratedE = 0;
     for j = 2:Np,
-        concentrationP(i) = concentrationP(i) + fp(i,j)*(g(j) - g(j-1));
-        concentrationE(i) = concentrationE(i) + fe(i,j)*(g(j) - g(j-1));
-        totalEnergyP(i) = totalEnergyP(i) +  mass_ratio*fp(i,j)*(1 + g(j))*(g(j) - g(j-1));
-        totalEnergyE(i) = totalEnergyE(i) +  fe(i,j)*(1 + g(j))*(g(j) - g(j-1));
+        concentrationP(i) = concentrationP(i) + fp(i,j)*(g(j) - g(j-1))/(4*pi);
+        concentrationE(i) = concentrationE(i) + fe(i,j)*(g(j) - g(j-1))/(4*pi);
+        totalEnergyP(i) = totalEnergyP(i) +  mp*fp(i,j)*(1 + g(j))*(g(j) - g(j-1));
+        totalEnergyE(i) = totalEnergyE(i) +  me*fe(i,j)*(1 + g(j))*(g(j) - g(j-1));
         if(j > startAccelerationP)
-            acceleratedEnergyP = acceleratedEnergyP + mass_ratio*fp(i,j)*(1 + g(j))*(g(j) - g(j-1));
+            acceleratedEnergyP = acceleratedEnergyP + mp*fp(i,j)*(1 + g(j))*(g(j) - g(j-1));
             acceleratedP = acceleratedP + fp(i,j)*(g(j) - g(j-1));
         end;
         if(j > startAccelerationE)
-            acceleratedEnergyE = acceleratedEnergyE + fe(i,j)*(1 + g(j))*(g(j) - g(j-1));
+            acceleratedEnergyE = acceleratedEnergyE + me*fe(i,j)*(1 + g(j))*(g(j) - g(j-1));
             acceleratedE = acceleratedE + fe(i,j)*(g(j) - g(j-1));
         end;
     end;
@@ -139,9 +140,12 @@ for i=1:Nxn,
     averageConcentrationP(i,1) = concentrationP((i-1)*samplingFactor + 1);
     averageConcentrationE(i,1) = concentrationE((i-1)*samplingFactor + 1);
     for j = 1:Nyn,
-        averageConcentrationP(i,2) = averageConcentrationP(i,2) + np(i,j);
-        averageConcentrationE(i,2) = averageConcentrationE(i,2) + (ne(i,j) - np(i,j));
+        averageConcentrationP(i,2) = averageConcentrationP(i,2) + np(i,j)/Nyn;
+        averageConcentrationE(i,2) = averageConcentrationE(i,2) + (ne(i,j) - np(i,j))/Nyn;
     end;
+    
+    %averageConcentrationP(i,2) = np(i,fix(Nyn/2));
+    %averageConcentrationE(i,2) = (ne(i,fix(Nyn/2)) - np(i,fix(Nyn/2)));
 end;
 
 figure(1);
