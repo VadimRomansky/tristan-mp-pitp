@@ -2530,7 +2530,7 @@ contains
 
 
 		if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
-
+			!if(rank.eq.0) print *, "start output tot"
 			!timestamp of the saved output
 			ind=(lap-pltstart)/interval
 			write(fnamefld,"(a16,i3.3)") "output/flds.tot.",ind
@@ -3273,6 +3273,7 @@ contains
 			deallocate(temporary1)
 
 
+			!print*,"output particles"
 
 			!---------------------------------------------------------------
 			!     goto 127
@@ -3549,15 +3550,17 @@ contains
 						!writing
 #ifdef MPI
               if(i .le. midvars) then
-							call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+							!print *,'output 11'
+							call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
 									temporary0_vec(1:all_ions_lng(procn+1)/stride),  &
-									dimsfiions,error,file_space_id = filespace(i),  &
-									mem_space_id=memspace)
+									dimsfiions,error, memspace,  &
+									filespace(i))
 						else
-							call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+							!print *,'output 33'
+							call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
 									temporary0_vec(1:all_lecs_lng(procn+1)/stride),  &
-									dimsfilecs,error,file_space_id = filespace(i),  &
-									mem_space_id=memspace)
+									dimsfilecs,error, memspace,  &
+									filespace(i))
 						endif
 
 #else
@@ -3631,17 +3634,19 @@ contains
 				call h5sselect_hyperslab_f(filespace(i),H5S_SELECT_SET_F &
 						,offsetpart,countpart, error)
 #endif
-
+!print *, 'output2222'
 #ifdef MPI
         if(i .le. midvars) then
-					call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+					!print *, 'output2'
+					call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
 							temporary_vec(1:max(ions/stride,1)), dimsfiions,error &
-							,file_space_id = filespace(i), mem_space_id=memspace &
+							,filespace(i), memspace &
 							,xfer_prp = h5p_default_f)
 				else
-					call h5dwrite_real_1(dset_id(i), H5T_NATIVE_REAL, &
+					!print *,'output 4'
+					call h5dwrite_f(dset_id(i), H5T_NATIVE_REAL, &
 							temporary_vec(1:max(lecs/stride,1)), dimsfilecs,error &
-							,file_space_id = filespace(i), mem_space_id=memspace &
+							,filespace(i), memspace &
 							,xfer_prp = h5p_default_f)
 				endif
 
