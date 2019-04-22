@@ -9,7 +9,7 @@ Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
 Bz = hdf5read(full_name,'bz');
 fileinfo = hdf5info(full_part_name);
-last_number = 10;
+last_number = 100;
 a = last_number;
 
 if(a < 10)
@@ -25,6 +25,8 @@ if(a < 10)
     end;
 
 gammae = hdf5read(full_part_name, 'gammae');
+inde = hdf5read(full_part_name, 'inde');
+proce = hdf5read(full_part_name, 'proce');
 xe = hdf5read(full_part_name, 'xe');
 ye = hdf5read(full_part_name, 'ye');
 ze = hdf5read(full_part_name, 'ze');
@@ -32,6 +34,7 @@ ve = hdf5read(full_part_name, 've');
 ue = hdf5read(full_part_name, 'ue');
 we = hdf5read(full_part_name, 'we');
 gammai = hdf5read(full_part_name, 'gammai');
+indi = hdf5read(full_part_name, 'indi');
 xi = hdf5read(full_part_name, 'xi');
 yi = hdf5read(full_part_name, 'yi');
 zi = hdf5read(full_part_name, 'zi');
@@ -53,14 +56,16 @@ for i = 1: size(gammae,1),
     end;
 end;
 
+Npart = size(gammae,1);
+part_index = inde(max_number);
 part_number = max_number;
 
-Bnorm(1:Ny, 1:Nx) = 0;
+Bnorm(1:Ny, 1:Nx/2) = 0;
 
 
 
 
-for i=1:Nx,
+for i=1:Nx/2,
     for j = 1:Ny,
         Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
        % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -90,10 +95,10 @@ rho = 0.1;
 c1=0.45;
 
 tau = c1*rho/c0;
-samplingFactor = 1;
+samplingFactor = 10;
 fieldFactor = me*rho/(q*tau*tau);
 rho = rho*samplingFactor;
-
+rho = 5;
 
 %figure(7);
 %hold on;
@@ -119,7 +124,7 @@ grid on;
 hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
-fig = imagesc((1:Nx)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
+fig = imagesc((1:Nx/2)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
 fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 30);
 %pos = get(gcf, 'Position');
 %width = pos(3);
@@ -139,7 +144,7 @@ for a = 1:last_number,
             full_part_name = strcat(directory_name, part_name, '.', num2str(a));
         end;
     end;
-    for i=1:Nx,
+    for i=1:Nx/2,
         for j = 1:Ny,
             Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
         % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -155,6 +160,12 @@ for a = 1:last_number,
     ze = hdf5read(full_part_name, 'ze');
     
     set(fig, 'CData', Bnorm);
+    
+    for p = 1:Npart,
+        if(inde(p) == part_index)
+            part_number = p;
+        end;
+    end;
     
     set(fig_part, 'Xdata', xe(part_number));
     set(fig_part, 'Ydata', ye(part_number));
