@@ -67,7 +67,7 @@ module m_output_3d
     ! save test particles
 	integer :: dlaplec, dlapion, teststartlec, teststartion, testendlec, testendion
 	! save fields frequently
-			   
+
 	! particle tracking		   
 	logical :: writetestlec, writetestion
 	
@@ -3496,24 +3496,24 @@ subroutine output_tot()
 
 
 		particlecounter = 1;
-		do particlei = 1,ions
-			if ((mod((p(particlei)%ind-1)/2, stride) .eq. 0) .and. (particlecounter .le. ions/stride)) then
-				if(varname.eq.'xi') temporary_vec(particlecounter)=p(particlei)%x &
+		do particlei = 1,lecs
+			if ((mod((p(particlei)%ind)/2, stride) .eq. 0) .and. (particlecounter .le. lecs/stride)) then
+				if(varname.eq.'xe') temporary_vec(particlecounter)=p(maxhlf+particlei)%x&
 						+mxcum
-				if(varname.eq.'yi') temporary_vec(particlecounter)=p(particlei)%y &
+				if(varname.eq.'ye') temporary_vec(particlecounter)=p(maxhlf+particlei)%y&
 						+mycum
-				if(varname.eq.'zi') temporary_vec(particlecounter)=p(particlei)%z &
+				if(varname.eq.'ze') temporary_vec(particlecounter)=p(maxhlf+particlei)%z&
 						+mzcum
-				if(varname.eq.'ui') temporary_vec(particlecounter)=p(particlei)%u
-				if(varname.eq.'vi') temporary_vec(particlecounter)=p(particlei)%v
-				if(varname.eq.'wi') temporary_vec(particlecounter)=p(particlei)%w
-				if(varname.eq.'chi') temporary_vec(particlecounter)=p(particlei)%ch
-				if(varname.eq.'gammai') temporary_vec(particlecounter)=sqrt(1. &
-						+(p(particlei)%u**2+p(particlei)%v**2 &
-								+p(particlei)%w**2))
-				if(varname.eq.'indi') temporary_vec(particlecounter)=real(p(particlei) &
+				if(varname.eq.'ue') temporary_vec(particlecounter)=p(maxhlf+particlei)%u
+				if(varname.eq.'ve') temporary_vec(particlecounter)=p(maxhlf+particlei)%v
+				if(varname.eq.'we') temporary_vec(particlecounter)=p(maxhlf+particlei)%w
+				if(varname.eq.'che') temporary_vec(particlecounter)=p(maxhlf+particlei)%ch
+				if(varname.eq.'gammae') temporary_vec(particlecounter)=sqrt(1.&
+				+(p(maxhlf+particlei)%u**2+p(maxhlf+particlei &
+						)%v**2+p(maxhlf +particlei)%w**2))
+				if(varname.eq.'inde')temporary_vec(particlecounter)=real(p(maxhlf+particlei)&
 						%ind,4)
-				if(varname.eq.'proci') temporary_vec(particlecounter)=real(p(particlei) &
+				if(varname.eq.'proce')temporary_vec(particlecounter)=real(p(maxhlf+particlei)&
 						%proc,4)
 				particlecounter = particlecounter + 1
 			end if
@@ -3537,26 +3537,27 @@ subroutine output_tot()
         !if(varname.eq.'proci') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
         !     %proc,4)
         !ELECTRONS
-        if(varname.eq.'xe') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%x+mxcum
-        if(varname.eq.'ye') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%y+mycum
-        if(varname.eq.'ze') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%z+mzcum
-        if(varname.eq.'ue') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%u
-        if(varname.eq.'ve') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%v
-        if(varname.eq.'we') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
-             +lecs:stride)%w
-        if(varname.eq.'che') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf+lecs:stride)%ch
-        if(varname.eq.'gammae') temporary_vec(1:lecs/stride)=sqrt(1. +(p(maxhlf &
-             +1:maxhlf+lecs:stride)%u**2+p(maxhlf+1:maxhlf +lecs:stride &
-             )%v**2+p(maxhlf +1:maxhlf+lecs:stride)%w**2))
-        if(varname.eq.'inde')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
-             +lecs:stride)%ind,4)
-        if(varname.eq.'proce')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
-             +lecs:stride)%proc,4)
+
+        !if(varname.eq.'xe') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%x+mxcum
+        !if(varname.eq.'ye') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%y+mycum
+        !if(varname.eq.'ze') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%z+mzcum
+        !if(varname.eq.'ue') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%u
+        !if(varname.eq.'ve') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%v
+        !if(varname.eq.'we') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%w
+        !if(varname.eq.'che') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf+lecs:stride)%ch
+        !if(varname.eq.'gammae') temporary_vec(1:lecs/stride)=sqrt(1. +(p(maxhlf &
+        !     +1:maxhlf+lecs:stride)%u**2+p(maxhlf+1:maxhlf +lecs:stride &
+        !     )%v**2+p(maxhlf +1:maxhlf+lecs:stride)%w**2))
+        !if(varname.eq.'inde')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%ind,4)
+        !if(varname.eq.'proce')temporary_vec(1:lecs/stride)=real(p(maxhlf+1:maxhlf &
+        !     +lecs:stride)%proc,4)
 
 #ifdef serIO
         !
