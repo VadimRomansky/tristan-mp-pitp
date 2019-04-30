@@ -2534,6 +2534,7 @@ subroutine output_tot()
   integer ::token,request,status2(MPI_STATUS_SIZE),request1 &
       ,status1(MPI_STATUS_SIZE)
   logical :: writecurr
+  integer :: particlei, particlecounter
  
 
   !if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
@@ -3469,24 +3470,72 @@ subroutine output_tot()
 
         !define temporary_vec for every proc
         temporary_vec=0.
+		particlecounter = 1;
+		do particlei = 1,ions
+			if ((mod((p(particlei)%ind-1)/2, stride) .eq. 0) .and. (particlecounter .le. ions/stride)) then
+				if(varname.eq.'xi') temporary_vec(particlecounter)=p(particlei)%x &
+						+mxcum
+				if(varname.eq.'yi') temporary_vec(particlecounter)=p(particlei)%y &
+						+mycum
+				if(varname.eq.'zi') temporary_vec(particlecounter)=p(particlei)%z &
+						+mzcum
+				if(varname.eq.'ui') temporary_vec(particlecounter)=p(particlei)%u
+				if(varname.eq.'vi') temporary_vec(particlecounter)=p(particlei)%v
+				if(varname.eq.'wi') temporary_vec(particlecounter)=p(particlei)%w
+				if(varname.eq.'chi') temporary_vec(particlecounter)=p(particlei)%ch
+				if(varname.eq.'gammai') temporary_vec(particlecounter)=sqrt(1. &
+						+(p(particlei)%u**2+p(particlei)%v**2 &
+								+p(particlei)%w**2))
+				if(varname.eq.'indi') temporary_vec(particlecounter)=real(p(particlei) &
+						%ind,4)
+				if(varname.eq.'proci') temporary_vec(particlecounter)=real(p(particlei) &
+						%proc,4)
+				particlecounter = particlecounter + 1
+			end if
+		end do
+
+
+		particlecounter = 1;
+		do particlei = 1,ions
+			if ((mod((p(particlei)%ind-1)/2, stride) .eq. 0) .and. (particlecounter .le. ions/stride)) then
+				if(varname.eq.'xi') temporary_vec(particlecounter)=p(particlei)%x &
+						+mxcum
+				if(varname.eq.'yi') temporary_vec(particlecounter)=p(particlei)%y &
+						+mycum
+				if(varname.eq.'zi') temporary_vec(particlecounter)=p(particlei)%z &
+						+mzcum
+				if(varname.eq.'ui') temporary_vec(particlecounter)=p(particlei)%u
+				if(varname.eq.'vi') temporary_vec(particlecounter)=p(particlei)%v
+				if(varname.eq.'wi') temporary_vec(particlecounter)=p(particlei)%w
+				if(varname.eq.'chi') temporary_vec(particlecounter)=p(particlei)%ch
+				if(varname.eq.'gammai') temporary_vec(particlecounter)=sqrt(1. &
+						+(p(particlei)%u**2+p(particlei)%v**2 &
+								+p(particlei)%w**2))
+				if(varname.eq.'indi') temporary_vec(particlecounter)=real(p(particlei) &
+						%ind,4)
+				if(varname.eq.'proci') temporary_vec(particlecounter)=real(p(particlei) &
+						%proc,4)
+				particlecounter = particlecounter + 1
+			end if
+		end do
         !IONS
-        if(varname.eq.'xi') temporary_vec(1:ions/stride)=p(1:ions:stride)%x &
-        	 +mxcum
-        if(varname.eq.'yi') temporary_vec(1:ions/stride)=p(1:ions:stride)%y &
-             +mycum
-        if(varname.eq.'zi') temporary_vec(1:ions/stride)=p(1:ions:stride)%z &
-        	 +mzcum
-        if(varname.eq.'ui') temporary_vec(1:ions/stride)=p(1:ions:stride)%u
-        if(varname.eq.'vi') temporary_vec(1:ions/stride)=p(1:ions:stride)%v
-        if(varname.eq.'wi') temporary_vec(1:ions/stride)=p(1:ions:stride)%w
-        if(varname.eq.'chi') temporary_vec(1:ions/stride)=p(1:ions:stride)%ch
-        if(varname.eq.'gammai') temporary_vec(1:ions/stride)=sqrt(1. &
-             +(p(1:ions:stride)%u**2+p(1:ions:stride)%v**2 &
-             +p(1:ions:stride)%w**2))
-        if(varname.eq.'indi') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
-             %ind,4)
-        if(varname.eq.'proci') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
-             %proc,4)
+        !if(varname.eq.'xi') temporary_vec(1:ions/stride)=p(1:ions:stride)%x &
+        !	 +mxcum
+        !if(varname.eq.'yi') temporary_vec(1:ions/stride)=p(1:ions:stride)%y &
+        !     +mycum
+        !if(varname.eq.'zi') temporary_vec(1:ions/stride)=p(1:ions:stride)%z &
+        !	 +mzcum
+        !if(varname.eq.'ui') temporary_vec(1:ions/stride)=p(1:ions:stride)%u
+        !if(varname.eq.'vi') temporary_vec(1:ions/stride)=p(1:ions:stride)%v
+        !if(varname.eq.'wi') temporary_vec(1:ions/stride)=p(1:ions:stride)%w
+        !if(varname.eq.'chi') temporary_vec(1:ions/stride)=p(1:ions:stride)%ch
+        !if(varname.eq.'gammai') temporary_vec(1:ions/stride)=sqrt(1. &
+        !     +(p(1:ions:stride)%u**2+p(1:ions:stride)%v**2 &
+        !     +p(1:ions:stride)%w**2))
+        !if(varname.eq.'indi') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
+        !     %ind,4)
+        !if(varname.eq.'proci') temporary_vec(1:ions/stride)=real(p(1:ions:stride) &
+        !     %proc,4)
         !ELECTRONS
         if(varname.eq.'xe') temporary_vec(1:lecs/stride)=p(maxhlf+1:maxhlf &
              +lecs:stride)%x+mxcum
