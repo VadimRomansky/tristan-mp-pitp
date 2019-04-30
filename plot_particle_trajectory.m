@@ -45,7 +45,6 @@ B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 
-frameTime = 1.0/last_number;
 
 maxGamma = 1.0;
 max_number = 1;
@@ -59,13 +58,17 @@ end;
 Npart = size(gammae,1);
 part_index = inde(max_number);
 part_number = max_number;
+part_number = 200000;
 
-Bnorm(1:Ny, 1:Nx/2) = 0;
+part_index = inde(part_number);
+part_proc = proce(part_number);
+
+Bnorm(1:Ny, 1:Nx) = 0;
 
 
 
 
-for i=1:Nx/2,
+for i=1:Nx,
     for j = 1:Ny,
         Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
        % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -118,20 +121,20 @@ rho = 5;
 
 figure(1);
 %title ('E_x');
-xlabel ('x\omega_p/c');
-ylabel ('E_x gauss');
+xlabel ('Nx');
+ylabel ('Ny');
 grid on;
 hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
-fig = imagesc((1:Nx/2)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
-fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 30);
-%pos = get(gcf, 'Position');
-%width = pos(3);
-%height = pos(4);
-%mov(1:height, 1:width, 1:1, 1:last_number)=0;
-%f = getframe(gcf);
-%[mov(:,:,1,1), map]=rgb2ind(f.cdata, colorcube(256));
+fig = imagesc((1:Nx)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
+fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 15);
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1, 1:last_number)=0;
+f = getframe(gcf);
+[mov(:,:,1,1), map]=rgb2ind(f.cdata, colorcube(256));
 for a = 1:last_number,
     if(a < 10)
         full_name = strcat(directory_name, file_name, '.00', num2str(a));
@@ -144,7 +147,7 @@ for a = 1:last_number,
             full_part_name = strcat(directory_name, part_name, '.', num2str(a));
         end;
     end;
-    for i=1:Nx/2,
+    for i=1:Nx,
         for j = 1:Ny,
             Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
         % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -169,9 +172,9 @@ for a = 1:last_number,
     
     set(fig_part, 'Xdata', xe(part_number));
     set(fig_part, 'Ydata', ye(part_number));
-    %f = getframe(gcf);
-    %mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
-    pause(frameTime*10);
+    f = getframe(gcf);
+    mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
+    pause(1);
 end;
-%imwrite(mov, map, 'Ex.gif','DelayTime',frameTime,'LoopCount',1);
+imwrite(mov, map, 'T.gif','DelayTime',0.5,'LoopCount',1);
 
