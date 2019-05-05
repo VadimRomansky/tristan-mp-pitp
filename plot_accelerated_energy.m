@@ -1,5 +1,5 @@
 clear;
-directory_name = './output/';
+directory_name = './output1/';
 file_name = 'spect';
 density_name = 'flds.tot';
 file_number = '.000';

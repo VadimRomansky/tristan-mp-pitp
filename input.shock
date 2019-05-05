@@ -6,8 +6,8 @@
 
 <node_configuration>
 
-sizex	= 140                    # number of cpus in x direction
-sizey 	= 2			# number of cpus in the y direction
+sizex	= 280                    # number of cpus in x direction
+sizey 	= 1			# number of cpus in the y direction
 sizez = 1
 
 <time>
@@ -44,11 +44,11 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 10000        # plot interval
+interval	= 100        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
-istep		= 10 		# downsampling factor for grid output
-stride		= 100		# particle stride for particle output?
+istep		= 20 		# downsampling factor for grid output
+stride		= 4000		# particle stride for particle output?
 
 ###############################################################
 writetestlec    = 0             # write test electrons for tracking 

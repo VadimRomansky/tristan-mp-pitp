@@ -13,7 +13,7 @@ LD= h5pfc
 # 
 USER= user_weibel
 USER= user_twostream
-USER= user_shock
+USER= user_shock_turb
 
 # Executable name
 EXECUTABLE= tristan-mp2d
