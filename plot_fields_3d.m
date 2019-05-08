@@ -1,7 +1,7 @@
 clear;
-directory_name = './output/';
-file_name = 'flds.tot';
-file_number = '.008';
+directory_name = './output6/';
+file_name = 'flds0.tot';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -118,6 +118,7 @@ rho = rho*samplingFactor;
 
 figure(7);
 colormap Jet;
+caxis ([0 8])
 [X, Y] = meshgrid((1:Ny)*rho, (1:Nx/2)*rho);
 surf(X, Y, Bnorm/B0);
 shading interp;
