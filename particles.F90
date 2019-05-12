@@ -1721,7 +1721,7 @@ subroutine inject_from_wall(x1,x2,y1,y2,z1,z2,ppc,gamma_drift,delgam_i,delgam_e,
 	   z1new=z1
 	   z2new=z2
 	endif
-	print*,'inject from wall'
+
 	call inject_plasma_region(x1new,x2new,y1new,y2new,z1new,z2new,ppc,gamma_drift,delgam_i,delgam_e,&
            weight,direction,upsamp_e,upsamp_i)
 
@@ -1830,8 +1830,6 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 	endif
 	
 	delta_x=(maxx-minx)
-
-	print *, 'delta_x = ', delta_x
 	
 	jglob_min=3+mycum !global extent of the y boundaries on this processor
 	jglob_max=(my-2)+mycum

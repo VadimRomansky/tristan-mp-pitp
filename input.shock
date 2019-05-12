@@ -44,11 +44,11 @@ namedrestartint = 80000000      # interval for saving named restart files, like 
 
 <output>
 
-interval	= 100        # plot interval
+interval	= 10000        # plot interval
 pltstart	= 0		# starting iteration for first plot
 
-istep		= 20 		# downsampling factor for grid output
-stride		= 4000		# particle stride for particle output?
+istep		= 10 		# downsampling factor for grid output
+stride		= 1000		# particle stride for particle output?
 
 ###############################################################
 writetestlec    = 0             # write test electrons for tracking 
@@ -79,14 +79,14 @@ bphi	= 0 			#
 
 <particles>
 
-sigma	= 1.0		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
+sigma	= 2.0		# magnetization number (omega_ce/omega_pe)^2, including gamma0 for inertia B = sqrt(gamma0*.5*ppc0*(1+me/mi)*c**2*(me)*sigma)
 maxptl0 = 1e10		# max number of particles in the simulation
 ppc0 	= 8		# number of particles per cell
 
 
 delgam 	= 1.0e-4	         # delta gamma for ions (delgam = k T_i / m_i c^2, T_i is ion temperature)
 me	= 1.0				# electron mass
-mi	= 25.0			# ion mass (actually mass to charge ratio)
+mi	= 50.0			# ion mass (actually mass to charge ratio)
 
 gamma0	= 1.5			# flow drift gamma. If < 1, interpreted as v/c. 
 				# the drift of background plasma in the negative x direction

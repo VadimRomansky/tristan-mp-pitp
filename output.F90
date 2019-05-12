@@ -301,7 +301,7 @@ subroutine Diagnostics()
                 call output_tot()
 		!print *, 'finish output tot'
 !                call output_hug()
-               !call save_spectrum()
+               call save_spectrum()
 		!print *, 'finish save spectrum'
 !              call save_spectrum_2d()
 !                call save_momentumspec()
@@ -3497,11 +3497,7 @@ subroutine output_tot()
 
 		particlecounter = 1;
 		do particlei = 1,lecs
-<<<<<<< HEAD
 			if ((mod((p(maxhlf+particlei)%ind)/2, stride) .eq. 0) .and. (particlecounter .le. lecs/stride)) then
-=======
-			if ((mod((p(particlei)%ind)/2, stride) .eq. 0) .and. (particlecounter .le. lecs/stride)) then
->>>>>>> de72b2dcd599c45f348eefa3b2f5f3ba5e99e9ec
 				if(varname.eq.'xe') temporary_vec(particlecounter)=p(maxhlf+particlei)%x&
 						+mxcum
 				if(varname.eq.'ye') temporary_vec(particlecounter)=p(maxhlf+particlei)%y&

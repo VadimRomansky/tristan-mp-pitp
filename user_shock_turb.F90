@@ -84,7 +84,7 @@ module m_user_3d
 	public :: init_EMfields_user, init_particle_distribution_user, &
 	inject_particles_user, read_input_user, field_bc_user, get_external_fields, &
 	particle_bc_user, shift_domain_user
-	public :: init_turbulent_field, init_turbulent_density
+	public :: init_turbulent_field
 
 	public :: evaluate_turbulent_b
 	public :: evaluate_turbulent_b_slab, evaluate_turbulent_b_2d
@@ -252,7 +252,7 @@ subroutine init_EMfields_user()
 		enddo
 	enddo
 #ifdef turbulence
-	!call init_turbulent_field()
+	call init_turbulent_field()
 #endif
 
 end subroutine init_EMfields_user
@@ -269,706 +269,51 @@ subroutine init_particle_distribution_user()
 
 	implicit none
 
-	!call init_particle_distribution_regular()
-	call init_particle_distribution_density_turb()
+	! local variables
+	
+	integer :: i, n, direction
+	real    gamma_drift, delgam_i, delgam_e, ppc, weight
 
+	real(sprec) :: x1,x2,y1,y2,z1,z2
+
+	pcosthmult=0 !if 0 the Maxwellian distribution corresponding to 
+	             ! temperature is initialized in 2D (z temperature = 0), 1 for 3D distribution (z temp nonzero). 
+                     ! 1 is default
+
+	!set initial injection points 
+ 
+        leftwall=20.
+	xinject=leftwall
+	xinject2=(mx0-2.) 
+        walloc = leftwall
+	! ------------------------------------------
+
+!initialize left going upstream
+
+	gamma_drift=-gamma0 ! negative gamma_drift will send the plasma in the negative direction
+	delgam_i=delgam  !delgam is read from input file in particles
+	delgam_e=delgam*mi/me*Temperature_ratio
+
+	x1=xinject  
+	x2=xinject2 
+
+	y1=3. !in global coordinates
+	y2=my0-2.  
+	z1=3.
+	z2=mz0-2. !if 2D, it will reset automatically
+	ppc=ppc0
+	weight=1.
+
+	direction=1  !drift along x, + or - determined by the sign of gamma_drift
+ 
+	call inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,&
+             gamma_drift,delgam_i,delgam_e,weight,direction)
+
+
+	call check_overflow()
+	call reorder_particles()
+	
 end subroutine init_particle_distribution_user
-
-		subroutine init_particle_distribution_regular()
-
-			implicit none
-
-			! local variables
-
-			integer :: i, n, direction
-			real    gamma_drift, delgam_i, delgam_e, ppc, weight
-
-			real(sprec) :: x1,x2,y1,y2,z1,z2
-
-			pcosthmult=0 !if 0 the Maxwellian distribution corresponding to
-			! temperature is initialized in 2D (z temperature = 0), 1 for 3D distribution (z temp nonzero).
-			! 1 is default
-
-			!set initial injection points
-
-			leftwall=20.
-			xinject=leftwall
-			xinject2=(mx0-2.)
-			walloc = leftwall
-			! ------------------------------------------
-
-			!initialize left going upstream
-
-			gamma_drift=-gamma0 ! negative gamma_drift will send the plasma in the negative direction
-			delgam_i=delgam  !delgam is read from input file in particles
-			delgam_e=delgam*mi/me*Temperature_ratio
-
-			x1=xinject
-			x2=xinject2
-
-			y1=3. !in global coordinates
-			y2=my0-2.
-			z1=3.
-			z2=mz0-2. !if 2D, it will reset automatically
-			ppc=ppc0
-			weight=1.
-
-			direction=1  !drift along x, + or - determined by the sign of gamma_drift
-
-			call inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,&
-					gamma_drift,delgam_i,delgam_e,weight,direction)
-
-
-			call check_overflow()
-			call reorder_particles()
-
-end subroutine init_particle_distribution_regular
-
-		!-------------------------------------------------------------------------------
-		! 						subroutine init_particle_distribution_user()
-		!
-		! Sets the particle distrubtion for a user defined case
-		!
-		!-------------------------------------------------------------------------------
-
-subroutine init_particle_distribution_density_turb()
-
-			implicit none
-
-			! local variables
-
-			integer :: i, n, direction
-			real    gamma_drift, delgam_i, delgam_e, ppc, weight
-
-			real(sprec) :: x1,x2,y1,y2,z1,z2
-
-			pcosthmult=0 !if 0 the Maxwellian distribution corresponding to
-			! temperature is initialized in 2D (z temperature = 0), 1 for 3D distribution (z temp nonzero).
-			! 1 is default
-
-			!set initial injection points
-
-			leftwall=20.
-			xinject=leftwall
-			xinject2=(mx0-2.)
-			walloc = leftwall
-			! ------------------------------------------
-
-			!initialize left going upstream
-
-			gamma_drift=-gamma0 ! negative gamma_drift will send the plasma in the negative direction
-			delgam_i=delgam  !delgam is read from input file in particles
-			delgam_e=delgam*mi/me*Temperature_ratio
-
-			x1=xinject
-			x2=xinject2
-
-			y1=3. !in global coordinates
-			y2=my0-2.
-			z1=3.
-			z2=mz0-2. !if 2D, it will reset automatically
-			ppc=ppc0
-			weight=1.
-
-			direction=1  !drift along x, + or - determined by the sign of gamma_drift
-
-			call inject_plasma_region_turb(x1,x2,y1,y2,z1,z2,ppc,&
-					gamma_drift,delgam_i,delgam_e,weight,direction)
-
-
-			call check_overflow()
-			call reorder_particles()
-
-end subroutine init_particle_distribution_density_turb
-
-		!-------------------------------------------------------------------------------
-		! 				subroutine inject_plasma_region_turb()
-		!
-		! Injects plasma in a region set by global coordinates with turbulent density. Plasma can be a Maxwellian
-		! with individual ion and electron temperatures (set as spread in gamma factor,
-		! the distribution in momentum space is exp(-gamma/delgame), exp(-gamma/delgami) )
-		!
-		!-------------------------------------------------------------------------------
-
-subroutine inject_plasma_region_turb(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
-				delgam_i,delgam_e,weight,direction,upsamp_e_in,upsamp_i_in)
-			implicit none
-
-			real(sprec):: x1,x2,y1,y2,z1,z2 !to accurately calculate differences between x-s, which may be >64k, use doubles
-			real ppc,delgam_i,delgam_e,gamma_drift,gamma_drift_in,weight
-			logical use_density_profile
-			integer direction, ions0, ions1, n1
-
-			real(sprec), dimension(3) :: values
-
-			real dx, dy, dz, len !hack
-
-			!tables for pre-computed maxwellian distributions. Can add more here
-			real, dimension(pdf_sz) :: pdf_table_i, gamma_table_i, pdf_table_e, gamma_table_e
-
-			integer :: i, n, iglob_min, iglob_max, jglob_min, jglob_max
-			real :: minz, maxz, delta_z, numps, tmp
-			real(sprec) :: minx, maxx, miny, maxy, inject_minx, inject_maxx, inject_miny, inject_maxy, delta_y, delta_x
-
-#ifndef twoD
-	integer :: kglob_min, kglob_max
-			real :: inject_minz, inject_maxz
-#endif
-
-			integer downsmp, subsamp, ionsdwn, ionindx !hack for downsmp
-			integer ne, ni
-			real corrfact
-			integer, optional, intent(in) :: upsamp_e_in, upsamp_i_in
-			integer :: upsamp_e,upsamp_i
-
-			real gammaprt, gammaperp, betaxprt, corrweight, beta_drift
-
-			real, allocatable, dimension(:,:,:) :: turbulent_density
-			real x, y, z
-
-
-			print *, 'inject plasma region turb'
-
-			allocate(turbulent_density(1:mx, 1:my, 1:mz))
-			turbulent_density = 1.0;
-
-			call init_turbulent_density(turbulent_density)
-
-			if(.not. present(upsamp_e_in)) then
-				upsamp_e = 1
-			else
-				upsamp_e = upsamp_e_in
-			endif
-			if(.not. present(upsamp_i_in)) then
-				upsamp_i = 1
-			else
-				upsamp_i = upsamp_i_in
-			endif
-
-			if(upsamp_e < 1) then
-				print *,"upsamp_e<1. Reduce ppc. Stopping!"
-				stop
-			endif
-
-			if(abs(gamma_drift_in) .lt. 1) then
-				gamma_drift=sign(sqrt(1./(1.-gamma_drift_in**2)),gamma_drift_in) !gamma_drift_in can be used as velocity/c, to simplify non-relativistic drift assignment.
-			else
-				gamma_drift=gamma_drift_in
-			endif
-
-
-			! init_maxw assumes dimensionality of the Maxwellian based on the dimensionality of simulation
-			! and whether B field is non-zero (then you can have 3D maxwellians even in 2D).
-			! choice of dimensionality should be made user assigned in a more transparent way.
-			! Additional tables can be defined in particles.F90
-
-			call init_maxw_table(delgam_i, gamma_table_i, pdf_table_i)
-			call init_maxw_table(delgam_e, gamma_table_e, pdf_table_e)
-
-			!	call init_maxw_table(1e-4*mi/me, gamma_table_cold, pdf_table_cold)
-
-
-			iglob_min=3+mxcum
-			iglob_max=(mx-2)+mxcum
-
-			minx=3.
-			maxx=3.
-
-			if(x2 < x1) then
-				print *, rank, ": Inject_Plasma_Region. x2 < x1. x1=",x1," x2=",x2
-				stop
-			endif
-
-			inject_minx=x1
-			inject_maxx=x2
-
-			if(inject_minx<iglob_min) minx=3.
-			if(inject_maxx<iglob_min) maxx=3.
-			if(inject_minx>=iglob_max) minx=mx-2
-			if(inject_maxx>=iglob_max) maxx=mx-2
-
-			if(inject_minx>=iglob_min .and. inject_minx<iglob_max) then
-				minx=inject_minx-1.*mxcum
-			endif
-			if(inject_maxx>=iglob_min .and. inject_maxx<iglob_max) then
-				maxx=inject_maxx-1.*mxcum
-			endif
-
-			delta_x=(maxx-minx)
-
-			print *, 'delta_x = ', delta_x
-
-			jglob_min=3+mycum !global extent of the y boundaries on this processor
-			jglob_max=(my-2)+mycum
-
-			miny=3.
-			maxy=3.
-
-			if(y2 < y1) then
-				print *, rank, ": Inject_Plasma_Region. y2 < y1. y1=",y1," y2=",y2
-				stop
-			endif
-
-			inject_miny=y1
-			inject_maxy=y2
-
-			! inject_miny and inject_maxy are global coordinates
-			! jglob_min and jglob_max are global coordinates
-			! minx and miny are local coordinates
-
-			if(inject_miny<jglob_min) miny=3.
-			if(inject_maxy<jglob_min) maxy=3.
-			if(inject_miny>=jglob_max) miny=my-2
-			if(inject_maxy>=jglob_max) maxy=my-2
-
-			if(inject_miny>=jglob_min .and. inject_miny<jglob_max) then
-				miny=inject_miny-mycum
-			endif
-			if(inject_maxy>=jglob_min .and. inject_maxy<jglob_max) then
-				maxy=inject_maxy-mycum
-			endif
-
-			delta_y=(maxy-miny)
-
-			if(delta_y < 0) print *,"deltay", miny, maxy, inject_miny, inject_maxy
-
-			if (maxy==0 .or. miny==0) then !injection region is outside this CPU's domain
-				delta_y=0
-				maxy=0
-				miny=0
-			endif
-
-
-#ifdef twoD
-	maxz=4.
-			minz=3.
-			delta_z=(maxz-minz)
-#endif
-
-#ifndef twoD
-
-			kglob_min=3+mzcum !global extent of the y boundaries on this processor
-			kglob_max=(mz-2)+mzcum
-
-			minz=3.
-			maxz=3.
-
-			if(z2 < z1) then
-				print *, rank, ": In inject_Plasma_Region. z2 < z1. z1=",z1," z2=",z2
-				stop
-			endif
-
-			inject_minz=z1
-			inject_maxz=z2
-
-			if(inject_minz<kglob_min) minz=3.
-			if(inject_maxz<kglob_min) maxz=3.
-			if(inject_minz>=kglob_max) minz=mz-2.
-			if(inject_maxz>=kglob_max) maxz=mz-2.
-
-			if(inject_minz>=kglob_min .and. inject_minz<kglob_max) then
-				!	   minz=inject_minz-rank/(sizex*sizey)*(mzall-5)
-				minz=inject_minz-mzcum
-			endif
-
-			if(inject_maxz>=kglob_min .and. inject_maxz<kglob_max) then
-				!	   maxz=inject_maxz-rank/(sizex*sizey)*(mzall-5)
-				maxz=inject_maxz-mzcum
-			endif
-
-			delta_z=(maxz-minz)
-
-			if (maxz==0 .or. minz==0) then !injection region is outside this CPU's domain
-				delta_z=0
-				maxz=0
-				minz=0
-			endif
-
-#endif
-
-			!now ready to inject the plasma region
-
-			n=0
-
-			!compute number to be injected from Poisson statistics
-
-			numps=(.5*ppc)*delta_z*delta_y*delta_x
-
-			if(numps < 10) then
-				if(numps .ne. 0.) then
-					numps=poisson(numps)
-				else
-					numps=0. !avoid unlikely event of poisson returning nonzero number for numps=0
-				endif
-			else
-				numps=ceiling(numps)
-			endif
-
-			ions0=ions
-
-			call check_overflow_num(numps)
-
-			do while(n < int(numps))
-
-				n=n+1
-				ions=ions+1
-
-				!  Add some random spread:
-
-				!p(ions)%x=minx+delta_x * random(dseed)
-				!p(ions)%y=miny+delta_y * random(dseed)
-				!p(ions)%z=minz+delta_z * random(dseed)
-
-				call turbulence_coordinates_random(minx, miny, minz, delta_x, delta_y, delta_z, x, y, z, turbulent_density);
-
-				p(ions)%x=x
-				p(ions)%y=y
-				p(ions)%z=z
-
-				call maxwell_dist(gamma_drift,c,dseed,p(ions)%u,p(ions)%v,p(ions &
-						)%w,gamma_table_i, pdf_table_i,pdf_sz ) ! , 0., 1.)
-
-				p(ions)%ch=weight
-
-				if(direction.eq.2)then
-					tmp=p(ions)%u
-					p(ions)%u=p(ions)%v
-					p(ions)%v=tmp
-				endif
-
-				if(direction.eq.3)then
-					tmp=p(ions)%u
-					p(ions)%u=p(ions)%w
-					p(ions)%w=tmp
-				endif
-
-				beta_drift=sign(sqrt(1.-1./gamma_drift**2),gamma_drift)
-
-				gammaprt=sqrt(1.+p(ions)%u**2+p(ions)%v**2+p(ions)%w**2)
-				gammaperp=1.+p(ions)%v**2+p(ions)%w**2
-				betaxprt=p(ions)%u/gammaprt
-				corrweight=gammaprt**2*(1.+beta_drift*betaxprt)/ &
-						(gammaprt**2+gammaperp*gamma_drift**2-gammaperp)
-				p(ions)%ch=p(ions)%ch*corrweight
-
-
-				totalpartnum =totalpartnum+1
-				p(ions)%ind=totalpartnum
-				p(ions)%proc=rank
-				p(ions)%splitlev=1
-
-				if (use_density_profile) then
-					values(1)=(p(ions)%x-3.)/c_omp
-					values(2)=((p(ions)%y+modulo(rank,sizey)*(myall-5)) -3.)/c_omp
-					values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
-					p(ions)%ch=evalf(1,real(values,8))
-				endif
-
-
-				!  Place electrons in the same locations as ions for zero charge
-				!  density (consistent with zero or uniform inital electric fields):
-
-
-
-				ne=0
-				do while (ne < upsamp_e)
-					ne=ne+1
-					lecs=lecs+1
-
-					p(maxhlf+lecs)%x=p(ions)%x
-					p(maxhlf+lecs)%y=p(ions)%y
-					p(maxhlf+lecs)%z=p(ions)%z
-
-					p(maxhlf+lecs)%ch=weight/upsamp_e
-
-					if (use_density_profile) then
-						values(1)=(p(ions)%x-3.)/c_omp
-						values(2)=((p(ions)%y+modulo(rank,sizey)*(myall-5)) -3.)/c_omp
-						values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
-						p(maxhlf+lecs)%ch=evalf(1,real(values,8))
-					endif
-
-					call maxwell_dist(gamma_drift,c,dseed,p(lecs+maxhlf)%u,p(lecs+maxhlf)%v,p(lecs &
-							+maxhlf)%w,gamma_table_e, pdf_table_e,pdf_sz) !, 0., 1.)
-
-					if(direction.eq.2)then
-						tmp=p(maxhlf+lecs)%u
-						p(maxhlf+lecs)%u=p(maxhlf+lecs)%v
-						p(maxhlf+lecs)%v=tmp
-					endif
-
-					if(direction.eq.3)then
-						tmp=p(maxhlf+lecs)%u
-						p(maxhlf+lecs)%u=p(maxhlf+lecs)%w
-						p(maxhlf+lecs)%w=tmp
-					endif
-
-					beta_drift=sign(sqrt(1.-1./gamma_drift**2),gamma_drift)
-
-					gammaprt=sqrt(1.+p(lecs+maxhlf)%u**2+p(lecs+maxhlf)%v**2+p(lecs+maxhlf)%w**2)
-					gammaperp=1.+p(lecs+maxhlf)%v**2+p(lecs+maxhlf)%w**2
-					betaxprt=p(lecs+maxhlf)%u/gammaprt
-					corrweight=gammaprt**2*(1.+beta_drift*betaxprt)/ &
-							(gammaprt**2+gammaperp*gamma_drift**2-gammaperp)
-					p(maxhlf+lecs)%ch=p(maxhlf+lecs)%ch*corrweight
-
-					totalpartnum =totalpartnum+1
-					p(maxhlf+lecs)%ind=totalpartnum
-					p(maxhlf+lecs)%proc=rank
-					p(maxhlf+lecs)%splitlev=1
-
-				enddo
-
-			enddo
-
-			injectedions=injectedions+n
-			injectedlecs=injectedlecs+ne
-
-			ions1=ions
-
-			!now go through all ions I just created and split them
-			if(upsamp_i .ne. 1) print *, "upsamp_i", upsamp_i
-			if(upsamp_i > 1) then
-				n=ions0
-				do while(n <= ions1) ! go through all injected ions
-					n1=n
-					if( p(n1)%ch .gt. .7 ) then !check if the ion is up for splitting; all should be here
-						ni=0
-						do while (ni < upsamp_i)
-							ni=ni+1
-							ions=ions+1
-							call copyprt(p(n1), p(ions))
-							p(ions)%ch=p(ions)%ch/upsamp_i
-
-							call maxwell_dist(gamma_drift,c,dseed,p(ions)%u,p(ions)%v,p(ions &
-									)%w,gamma_table_i, pdf_table_i,pdf_sz ) ! , 0., 1.)
-
-							if(direction.eq.2)then
-								tmp=p(ions)%u
-								p(ions)%u=p(ions)%v
-								p(ions)%v=tmp
-							endif
-
-							if(direction.eq.3)then
-								tmp=p(ions)%u
-								p(ions)%u=p(ions)%w
-								p(ions)%w=tmp
-							endif
-
-							beta_drift=sign(sqrt(1.-1./gamma_drift**2),gamma_drift)
-
-							gammaprt=sqrt(1.+p(ions)%u**2+p(ions)%v**2+p(ions)%w**2)
-							gammaperp=1.+p(ions)%v**2+p(ions)%w**2 !this assumes drift in x only
-							betaxprt=p(ions)%u/gammaprt
-							corrweight=gammaprt**2*(1.+beta_drift*betaxprt)/ &
-									(gammaprt**2+gammaperp*gamma_drift**2-gammaperp)
-							p(ions)%ch=p(ions)%ch*corrweight
-
-
-							totalpartnum =totalpartnum+1
-							p(ions)%ind=totalpartnum
-							p(ions)%proc=rank
-							p(ions)%splitlev=1
-
-						enddo
-
-						!remove the original high weight ion
-						call copyprt(p(ions),p(n1))
-						ions=ions-1
-						n=n-1
-						!			 totalpartnum=totalpartnum -1
-					endif	!if ch > .7
-
-					n=n+1
-				enddo	!while n < ions
-
-			endif		!if upsamp_i > 1
-
-			deallocate(turbulent_density)
-end subroutine inject_plasma_region_turb
-
-subroutine init_turbulent_density(turbulent_density)
-	real, allocatable, dimension(:,:,:) :: turbulent_density
-	integer i, j, k
-	integer ki, kj, kk
-	real pi
-	real kx, ky, kz, kmultr
-	real phase
-	integer maxKx, maxKy, maxKz
-	integer maxDensityLambdaX, minDensityLambdaX, &
-			maxDensityLambdaY, minDensityLambdaY, maxDensityLambdaZ, minDensityLambdaZ
-	real turbulentDensityFraction
-	real tempDensity
-	real densityCorrection
-	real maxDensity
-
-
-	call srand(turbulenceSeed)
-	pi = 2*acos(0.0);
-	phase = 0;
-
-	maxDensityLambdaX = 2000
-	minDensityLambdaX = 2000
-	maxDensityLambdaY = 2000
-	minDensityLambdaY = 2000
-	maxDensityLambdaZ = 2000
-	minDensityLambdaZ = 2000
-
-	turbulentDensityFraction = 0.8 !less then 0.5!
-
-	maxKx = maxDensityLambdaX/minDensityLambdaX;
-	maxKy = maxDensityLambdaY/minDensityLambdaY;
-	maxKz = maxDensityLambdaZ/minDensityLambdaZ;
-
-	print *, maxKx, maxKy, maxKz
-
-	tempDensity = 0
-
-	do ki = 0, maxKx
-		do kj = 0, maxKy
-#ifdef twoD
-			kk = 0
-#else
-			!do kk = 0, mz0-5
-			do kk = 0, maxKz
-#endif
-				kx = ki*2*pi/maxDensityLambdaX;
-				ky = kj*2*pi/maxDensityLambdaY;
-				kz = kk*2*pi/maxDensityLambdaZ;
-				print *, kx, ky, kz
-				if(ki + kj + kk .gt. 0) then
-					tempDensity = tempDensity + evaluate_density_amplitude(kx, ky, kz)
-				end if
-#ifndef twoD
-			end do
-#endif
-		end do
-	end do
-
-
-	print *, 'tempDensity = ', tempDensity
-
-	if(tempDensity > 0)then
-		densityCorrection = (turbulentDensityFraction/(1.0 - turbulentDensityFraction))/tempDensity
-	else
-		densityCorrection = 1.0
-	end if
-
-	print *, 'dc = ', densityCorrection
-
-	do ki = 0, maxKx
-		do kj = 0, maxKy
-#ifdef twoD
-			kk = 0
-#else
-			!do kk = 0, mz0-5
-			do kk = 0, maxKz
-#endif
-				kx = ki*2*pi/maxDensityLambdaX;
-				ky = kj*2*pi/maxDensityLambdaY;
-				kz = kk*2*pi/maxDensityLambdaZ;
-				if(ki + kj + kk .gt. 0) then
-					tempDensity = evaluate_density_amplitude(kx, ky, kz)*densityCorrection
-					phase = 2*pi*rand()
-					do i = 1,mx
-						do j = 1,my
-							do k = 1,mz
-								kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-								turbulent_density(i,j,k) = turbulent_density(i,j,k) + tempDensity*sin(kmultr + phase)
-								!print *, i,j,k, turbulent_density(i,j,k)
-							end do
-						end do
-					end do
-				end if
-#ifndef twoD
-			end do
-#endif
-		end do
-	end do
-
-	maxDensity = 0;
-	do i = 1,mx
-		do j = 1,my
-			do k = 1,mz
-				if(turbulent_density(i,j,k) > maxDensity) then
-					maxDensity = turbulent_density(i,j,k)
-				end if
-			end do
-		end do
-	end do
-
-	do i = 1,mx
-		do j = 1,my
-			do k = 1,mz
-				turbulent_density(i,j,k) = turbulent_density(i,j,k)/maxDensity
-if turbulent_density(i,j,k) .lt. 0 then
-	turbulent_density(i,j,k) = 0.05
-end if
-			end do
-		end do
-	end do
-end subroutine
-
-real function evaluate_density_amplitude(kx, ky, kz)
-	real kx, ky, kz, kw
-#ifdef twoD
-		kz = 0
-#endif
-		kw = sqrt(kx*kx + ky*ky + kz*kz);
-		print *,'kw = ', kw
-
-#ifdef twoD
-		evaluate_density_amplitude = 1.0/(kw**(8.0/3.0))
-#else
-		evaluate_density_amplitude = 1.0/(kw**(11.0/3.0))
-#endif
-end function evaluate_density_amplitude
-
-subroutine turbulence_coordinates_random(minx, miny, minz, delta_x, delta_y, delta_z, x, y, z, turbulent_density)
-	real minx, miny, minz, delta_x, delta_y, delta_z
-	real, intent(out) :: x, y, z
-	real length
-	real result
-	real a,b
-	real pi
-	real temp_density
-	real, allocatable, dimension(:,:,:) :: turbulent_density
-
-	integer boolean
-
-	boolean = 0;
-
-
-	do while (boolean .eq. 0)
-		x = minx + delta_x*rand();
-		y = miny + delta_y*rand();
-		z = minz + delta_z*rand();
-		temp_density = rand();
-		if(temp_density < get_turbulent_density(x,y,z, turbulent_density))then
-			boolean = 1;
-		end if
-	end do
-end subroutine turbulence_coordinates_random
-
-real function get_turbulent_density(x,y,z, turbulent_density)
-	real x,y,z
-	real, allocatable, dimension(:,:,:) :: turbulent_density
-
-	integer i, j, k
-
-	!i = iloc(int(x))
-	!j = jloc(int(y))
-	!k = kloc(int(z))
-
-	i = int(x)
-	j = int(y)
-	k = int(z)
-
-	!print *, x,y,z
-	!print *, i,j,k
-
-	get_turbulent_density = turbulent_density(i-2,j-2,k-2)
-end function get_turbulent_density
 
 
 !-------------------------------------------------------------------------------
@@ -2291,18 +1636,18 @@ subroutine init_turbulent_field_slab_lab_frame(turbulenceEnergyFraction)
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -2569,7 +1914,7 @@ real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 
 end subroutine init_turbulent_field_isotropic_plasma_frame
 
-subroutine init_turbulent_field_isotropic_lab_frame(turbulenceEnergyFraction)
+		subroutine init_turbulent_field_isotropic_lab_frame(turbulenceEnergyFraction)
 			real turbulenceEnergyFraction
 
 			integer maxKx, maxKy, maxKz
@@ -2727,18 +2072,18 @@ subroutine init_turbulent_field_isotropic_lab_frame(turbulenceEnergyFraction)
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 
@@ -3170,18 +2515,18 @@ subroutine init_turbulent_field_simple_anisotropic_lab_frame(turbulenceEnergyFra
 									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
 									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
 
-									kmultr = kx*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
+									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
 									localB1 = Bturbulent*sin(kmultr + phase1);
 									localB2 = Bturbulent*sin(kmultr + phase2);
 									!localB2 = 0
 
 									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)
+									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
+									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
 
 									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*(localB1*cosTheta*cosPhi - localB2*sinPhi)
+									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
+									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
 
 
 

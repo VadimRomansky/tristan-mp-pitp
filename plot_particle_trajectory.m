@@ -1,5 +1,5 @@
 clear;
-directory_name = './output/';
+directory_name = './output2/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 360;
+last_number = 3;
 a = last_number;
 first_number = 1;
 
@@ -48,37 +48,51 @@ zi = hdf5read(full_part_name, 'zi');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx/10;
+Nx = Nx/2;
 
 frameTime = 1.0/10;
 
-maxGamma = 1.0;
-max_number = 1;
+maxGamma1 = 1.0;
+max_number1 = 1;
+maxGamma2 = 1.0;
+max_number2 = 1;
+maxGamma3 = 1.0;
+max_number3 = 1;
 for i = 1: size(gammae,1),
-    if (gammae(i) > maxGamma)
-        max_number = i;
-        maxGamma = gammae(i);
-    end;
+    if (gammae(i) > maxGamma1)        
+        max_number3 = max_number2;
+        maxGamma3 = maxGamma2;
+        max_number2 = max_number1;
+        maxGamma2 = maxGamma1;
+        max_number1 = i;
+        maxGamma1 = gammae(i);
+    else
+        if (gammae(i) > maxGamma2) 
+            max_number3 = max_number2;
+            maxGamma3 = maxGamma2;
+            max_number2 = i;
+            maxGamma2 = gammae(i);
+        else
+            if (gammae(i) > maxGamma3)
+                max_number3 = i;
+                maxGamma3 = gammae(i);
+            end
+        end
+    end
 end;
 
 Npart = size(gammae,1);
-part_index = inde(max_number);
-part_number = max_number;
+part_index = inde(max_number1);
+part_number = max_number1;
 
 %part_number = 400000;
 part_indes = inde(part_number);
 
 part_proc = proce(part_number);
-part_number2 = fix(Npart/20);
-part_number3 = fix(Npart/30);
-for i=1:Npart,
-    if((part_number2 == fix(Npart/20)) &&(gammae(i) > 100) && (i ~= part_number))
-        part_number2 = i;
-    end;
-    if((part_number3 == fix(Npart/30)) &&(gammae(i) > 100) && (i ~= part_number) && (i ~= part_number2))
-        part_number3 = i;
-    end;
-end;
+
+part_number2 = max_number2;
+part_number3 = max_number3;
+
 
 %part_number2 = 6000;
 part_index2 = inde(part_number2);
@@ -142,6 +156,8 @@ g3(1:(last_number-first_number + 1)) = 0;
 figure('Position', [10 10 900 600]);
 xlabel ('x');
 ylabel ('\gamma');
+grid on;
+hold on;
 for a = first_number:last_number,
     if(a < 10)
         full_name = strcat(directory_name, file_name, '.00', num2str(a));
@@ -176,6 +192,8 @@ for a = first_number:last_number,
     end;
     if(a == first_number)
         plot(xe(part_number), gammae(part_number), 'ro', 'MarkerSize', 15);
+        plot(xe(part_number2), gammae(part_number2), 'ro', 'MarkerSize', 15, 'Color','green');
+        plot(xe(part_number3), gammae(part_number3), 'ro', 'MarkerSize', 15, 'Color', 'black');
     end;
     x1(a - first_number+1) = xe(part_number);
     g1(a - first_number+1) = gammae(part_number);
@@ -184,9 +202,7 @@ for a = first_number:last_number,
     x3(a - first_number+1) = xe(part_number3);
     g3(a - first_number+1) = gammae(part_number3);
 end;
-grid on;
-hold on;
-plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red');
+plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red',x2(1:(last_number-first_number + 1)),g2(1:(last_number-first_number + 1)),'green', x3(1:(last_number-first_number + 1)),g3(1:(last_number-first_number + 1)),'black');
 grid;
 
 %figure(2);
