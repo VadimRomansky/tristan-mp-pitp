@@ -1,5 +1,5 @@
 clear;
-directory_name = './output1/';
+directory_name = './output8/';
 file_name = 'spect';
 density_name = 'flds.tot';
 file_number = '.010';
@@ -32,8 +32,9 @@ Pe(1:Np)=0;
 Fp(1:Np)=0;
 Fe(1:Np)=0;
 
-me = 4.67307679E-03;
-mass_ratio = 64;
+%me = 4.67307679E-03;
+me = 1;
+mass_ratio = 25;
 mp = me*mass_ratio;
 c = 0.45;
 c0 = 0.45;
@@ -118,9 +119,11 @@ totalEnergy = 0;
 fieldEnergy = 0;
 fieldEnergyFraction = 0;
 
-mag_e_init = 0.02;
-mag_e_0 = 0.0002375;
-
+mag_e_init = 0.002;
+%mag_e_0 = 2.7695E-6; %for mass 25
+%mag_e_0 = 2.5579E-6; %for mass 50
+mag_e_0  = 2.7914E-7; %for mass25 sigma 0.1
+    
 for i = 20:endx/samplingFactor,
     for j = 1:Nyn,
         fieldEnergy = fieldEnergy + ((Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j)))*samplingFactor/Nyn;
@@ -162,10 +165,10 @@ acceleratedElectronFraction = acceleratedE/concentrationE;
     
 totalEnergy = fieldEnergy + totalEnergyP + totalEnergyE;
     
-acceleratedProtonEnergyFraction = acceleratedEnergyP/totalEnergy;
-%acceleratedProtonEnergyFraction = (acceleratedEnergyP/totalEnergyP)*(mp*(meangp - 1))/(mp*(g0 - 1));
-acceleratedElectronEnergyFraction = acceleratedEnergyE/totalEnergy;
-%acceleratedElectronEnergyFraction = (acceleratedEnergyE/totalEnergyE)*(me*(meange - 1))/(mp*(g0 - 1));
+%acceleratedProtonEnergyFraction = acceleratedEnergyP/totalEnergy;
+acceleratedProtonEnergyFraction = (acceleratedEnergyP/totalEnergyP)*(mp*(meangp - 1))/(mp*(g0 - 1));
+%acceleratedElectronEnergyFraction = acceleratedEnergyE/totalEnergy;
+acceleratedElectronEnergyFraction = (acceleratedEnergyE/totalEnergyE)*(me*(meange - 1))/(mp*(g0 - 1));
 fieldEnergyFraction = fieldEnergy/(totalEnergyP + totalEnergyE);
 
 

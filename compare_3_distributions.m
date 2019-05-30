@@ -1,12 +1,12 @@
 clear;
-directory_name = './output3/';
+directory_name = './output9/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'k_{min} = 2 pi /5 r_g','k_{min} = 2 pi /10 r_g','k_{min} = 2 pi /20 r_g'};
+LegendTitle = {'0.5','0.7','0.9'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);

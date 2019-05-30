@@ -1,24 +1,28 @@
 clear;
-directory_name = './output1/';
+directory_name = './output3/';
 file_name = 'flds.tot';
-file_number = '.018';
+file_number = '.001';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
 Bz = hdf5read(full_name,'bz');
-%Ex = hdf5read(full_name,'ex');
-%Ey = hdf5read(full_name,'ey');
-%Ez = hdf5read(full_name,'ez');
+Ex = hdf5read(full_name,'ex');
+Ey = hdf5read(full_name,'ey');
+Ez = hdf5read(full_name,'ez');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 
 Bnorm(1:Nx/2, 1:Ny) = 0;
+Ediff(1:Nx/2, 1:Ny) = 0;
 %Bperp(1:Nx, 1:Ny) = 0;
+g = 1.5;
+beta = sqrt(1-1/(g*g));
 
 for i=1:Nx/2,
     for j = 1:Ny,
         Bnorm(i,j) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
+        Ediff(i,j) = sqrt((Ex(i,j))*(Ex(i,j)) + (Ey(i,j) +beta*Bz(i,j))*(Ey(i,j) +beta*Bz(i,j)) + (Ez(i,j) - beta*By(i,j))*(Ez(i,j) - beta*By(i,j)))/Bnorm(i,j);
        % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
     end;
 end;
@@ -83,38 +87,38 @@ rho = rho*samplingFactor;
 %zlabel ('Bz');
 %grid ;
 
-%figure(4);
-%colormap Jet;
-%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-%surf(X, Y, Ex*fieldFactor);
-%shading interp;
-%title ('Ex');
-%xlabel ('y');
-%ylabel ('x');
-%zlabel ('Ex');
+figure(4);
+colormap Jet;
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+surf(X, Y, Ex/B0);
+shading interp;
+title ('Ex/B0');
+xlabel ('y');
+ylabel ('x');
+zlabel ('Ex');
 %grid ;
 
-%figure(5);
-%colormap Jet;
-%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-%surf(X, Y, Ey*fieldFactor);
-%shading interp;
-%title ('Ey');
-%xlabel ('y');
-%ylabel ('x');
-%zlabel ('Ey');
-%grid ;
+figure(5);
+colormap Jet;
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+surf(X, Y, Ey/B0);
+shading interp;
+title ('Ey');
+xlabel ('y');
+ylabel ('x');
+zlabel ('Ey');
+grid ;
 
-%figure(6);
-%colormap Jet;
-%[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
-%surf(X, Y, Ez*fieldFactor);
-%shading interp;
-%title ('Ez');
-%xlabel ('y');
-%ylabel ('x');
-%zlabel ('Ez');
-%grid ;
+figure(6);
+colormap Jet;
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+surf(X, Y, Ez/B0);
+shading interp;
+title ('Ez');
+xlabel ('y');
+ylabel ('x');
+zlabel ('Ez');
+grid ;
 
 figure(7);
 colormap Jet;
@@ -140,3 +144,15 @@ grid ;
 %ylabel ('x');
 %zlabel ('B');
 %grid ;
+
+figure(9);
+colormap Jet;
+caxis ([0 8])
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx/2)*rho);
+surf(X, Y, Ediff);
+shading interp;
+title ('(E-vxB)/B');
+xlabel ('y \omega /c');
+ylabel ('x \omega /c');
+zlabel ('E');
+grid ;

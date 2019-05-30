@@ -1,12 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output3/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'8000','2000'};
+LegendTitle = {'m_p/m_e = 25','m_p/m_e = 50'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');

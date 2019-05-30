@@ -1,5 +1,5 @@
 clear;
-directory_name = './output2/';
+directory_name = './output6/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 3;
+last_number = 600;
 a = last_number;
 first_number = 1;
 
@@ -48,7 +48,7 @@ zi = hdf5read(full_part_name, 'zi');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx/2;
+Nx = Nx;
 
 frameTime = 1.0/10;
 
@@ -138,7 +138,7 @@ rho = 0.1;
 c1=0.45;
 
 tau = c1*rho/c0;
-samplingFactor = 20;
+samplingFactor = 10;
 fieldFactor = me*rho/(q*tau*tau);
 rho = rho*samplingFactor;
 rho = 5;
