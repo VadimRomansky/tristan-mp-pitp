@@ -302,6 +302,7 @@ subroutine Diagnostics()
 		!print *, 'finish output tot'
 !                call output_hug()
                call save_spectrum()
+				call save_spectrum_angular()
 		!print *, 'finish save spectrum'
 !              call save_spectrum_2d()
 !                call save_momentumspec()
@@ -786,6 +787,472 @@ subroutine save_spectrum()
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
 	
 end subroutine save_spectrum
+
+
+!-------------------------------------------------------------------------------
+! 						subroutine save_spectrum_angular
+!
+! Saves energy spectrum of particles, in x slices
+!
+!-------------------------------------------------------------------------------
+
+subroutine save_spectrum_angular()
+
+	implicit none
+
+	! local variables
+
+	integer :: gambins, xbin, nbins, gbin,  ierr
+	integer :: mubins, phibins, mubin, phibin
+	real gammin, gammax, gammax1, gammin1, dgam
+	real dxslice, gam
+	integer :: n, i,j, k, ind, procn
+	integer :: iL, iR, jL, jR, mxmin, mxmax
+	real vr, gvr, vx, vy, vz
+	character fname*20
+	character(len=10) dsetname(20)
+
+#ifdef HDF5
+	integer(HID_T) :: file_id       ! File identifier
+	integer(HID_T) :: dset_id       ! Dataset identifier
+	integer(HID_T) :: dspace_id
+	integer(HSIZE_T) data_dims2(4), data_dims1(1)
+	integer(HSIZE_T) data_dims3(3)
+#endif
+
+	integer ::datarank, error
+
+	real, allocatable:: spece(:,:,:,:), specp(:,:,:,:)
+	real, allocatable::	specein(:,:,:,:), specpin(:,:,:,:)
+	real, allocatable :: xgamma(:), xslice(:)
+	real, allocatable :: mu(:), phi(:)
+
+
+	real pi, dmu, dphi, momentump, costheta, phip
+
+	integer :: status(MPI_STATUS_SIZE)
+
+	!!spectrum in the flow rest frame
+	!real, allocatable :: speceprime(:,:), specpprime(:,:)
+	!real, allocatable :: umean(:), vmean(:), wmean(:), numdens(:)	! mean flow speed, mean number density
+
+	!if(lap .ge.pltstart .and. modulo((lap-pltstart),interval) .eq.0)then
+	if((modulo((lap-pltstart),interval) .eq.0) .or. (lap .eq. (pltstart + 1)))then
+
+		mubins = 10
+		phibins = 10
+
+		gammin=1
+		gammax=1
+		gambins=100*2	! number of energy bins
+
+		mxmin=3
+		mxmax=mx0-2
+
+		pi = 4.0*atan(1.0)
+
+		nbins=max((mxmax-mxmin)/1,1)
+
+		allocate(spece(nbins,gambins, mubins, phibins),specp(nbins,gambins, mubins, phibins))
+		allocate(xgamma(gambins),xslice(nbins))
+		allocate(mu(mubins), phi(phibins))
+		allocate(specpin(nbins,gambins, mubins, phibins),specein(nbins,gambins, mubins, phibins))
+
+		!!flow rest frame *********
+		!allocate(speceprime(nbins,gambins),specpprime(nbins,gambins))
+		!allocate(umean(nbins),vmean(nbins),wmean(nbins))
+		!allocate(numdens(nbins))
+		!********************
+
+		!bin size in each cpu. note that bin sizes are different in different cpus
+		dxslice=1.*(mxmax-mxmin)/nbins
+		do i=1, nbins
+			xslice(i)=dxslice*(i-1)+.5*dxslice+mxmin
+		enddo
+
+		dmu = 2.0/mubins
+		do i = 1, mubins
+			mu(i) = dmu*(i-1) + 0.5*dmu - 1.0
+		end do
+
+		dphi = 2*pi/phibins
+		do i = 1, phibins
+			phi(i) = dphi*(i-1) + 0.5*dphi
+		end do
+
+		! local gamma min and max
+		do i=1,ions
+			gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+			if(gam .gt. gammax) gammax=gam
+			if(gam .lt. gammin) gammin=gam
+
+		enddo
+		do i=maxhlf+1,maxhlf+lecs
+			gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+			if(gam .gt. gammax) gammax=gam
+			if(gam .lt. gammin) gammin=gam
+
+		enddo
+
+		! global gamma min and max
+		call mpi_allreduce(gammax,gammax1,1,mpi_read,mpi_max &
+						,mpi_comm_world,ierr)
+		gammax=gammax1
+		call mpi_allreduce(gammin,gammin1,1,mpi_read,mpi_min &
+						,mpi_comm_world,ierr)
+		gammin=gammin1
+
+		gammin=max(gammin, 1.+1e-6)
+		dgam=(log10(gammax-1)-log10(gammin-1))/gambins
+
+		do i=1, gambins
+			xgamma(i)=10.**((i-1.)*dgam+log10(gammin-1))
+		enddo
+
+
+		!umean=0.
+		!vmean=0.
+		!wmean=0.
+		!numdens=0.
+		specp=0.
+		!specpprime=0.
+
+		!!(ion) flow mean velocity ***********
+		!do i=1,ions
+		!	xbin=int((p(i)%x+mxcum-mxmin)/dxslice+1)
+		!	if(xbin .ge. 1 .and. xbin .le. nbins) then
+		!		numdens(xbin)=numdens(xbin)+real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+		!		umean(xbin)=umean(xbin)+(p(i)%u/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		vmean(xbin)=vmean(xbin)+(p(i)%v/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		wmean(xbin)=wmean(xbin)+(p(i)%w/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!	endif
+		!enddo
+
+		!umean=umean/numdens
+		!vmean=vmean/numdens
+		!wmean=wmean/numdens
+
+
+		!compute the spectrum
+		if(debug) print *, "in spec, b4 ions"
+		do i=1,ions
+			xbin=int((p(i)%x+mxcum-mxmin)/dxslice+1)
+			if(xbin .ge. 1 .and. xbin .le. nbins) then
+				gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+				gbin=int((alog10(gam-1)-alog10(gammin-1))/dgam+1)
+				if(gbin .ge. 1 .and. gbin .le. gambins ) then
+					momentump = sqrt(p(i)%u**2+p(i)%v**2+p(i)%w**2)
+					costheta = p(i)%u/momentump
+					mubin = int((costheta + 1.0)/dmu + 1)
+
+					if((mubin .ge. 1) .and. (mubin .le. mubins)) then
+						phip = atan2(p(i)%w,p(i)%u)
+						phibin = int(phip/dphi + 1)
+						if((phibin .ge. 1) .and. (phibin .le. phibins)) then
+							specp(xbin,gbin, mubin, phibin)=specp(xbin,gbin, mubin, phibin)+real(splitratio)**(1. &
+									-real(p(i)%splitlev))*p(i)%ch
+						endif
+					endif
+				endif
+				!energy sepectrum in the flow rest frame
+				!Lorentz transformation in the flow rest frame
+				!vx=umean(xbin)
+				!vy=vmean(xbin)
+				!vz=wmean(xbin)
+				!vr=sqrt(vx**2+vy**2+vz**2)
+				!gvr=1./sqrt(1.-vr**2)
+				!uprime= -vx*gvr*gam+ &
+				!				(1+(gvr-1)*vx**2/vr**2)*p(i)%u+ &
+				!				(gvr-1)*vx*vy/vr**2*p(i)%v+ &
+				!				(gvr-1)*vx*vz/vr**2*p(i)%w
+				!vprime= -vy*gvr*gam+ &
+				!				(gvr-1)*vx*vy/vr**2*p(i)%u+ &
+				!				(1+(gvr-1)*vy**2/vr**2)*p(i)%v+ &
+				!				(gvr-1)*vy*vz/vr**2*p(i)%w
+				!wprime= -vz*gvr*gam+ &
+				!				(gvr-1)*vx*vz/vr**2*p(i)%u+ &
+				!				(gvr-1)*vy*vz/vr**2*p(i)%v+ &
+				!				(1+(gvr-1)*vz**2/vr**2)*p(i)%w
+				!gamprime=sqrt(1+(uprime**2+vprime**2+wprime**2))
+				!gbin=int((alog10(gamprime-1)-alog10(gammin-1))/dgam+1)
+				!if(gbin .ge. 1 .and. gbin .le. gambins ) then
+				!	specpprime(xbin,gbin)=specpprime(xbin,gbin)+real(splitratio)**(1. &
+				!					-real(p(i)%splitlev))*p(i)%ch
+				!endif
+			endif !if(xbin .ge. 1 .and. xbin .le. nxbins) then
+		enddo
+
+		call mpi_allreduce(specp,specpin,nbins*gambins*mubins*phibins,mpi_read,mpi_sum &
+				,mpi_comm_world,ierr)
+		specp=specpin
+
+		!call mpi_allreduce(specpprime,specpin,nbins*gambins,mpi_read,mpi_sum &
+		!		,mpi_comm_world,ierr)
+		!specpprime=specpin
+
+		do i=1, nbins
+			do j = 1, mubins
+				do k = 1, phibins
+					specp(i,:, j, k)=specp(i,:, j, k)/xgamma(:)
+		!			specpprime(i,:, j, k)=specpprime(i,:, j, k)/xgamma(:)
+				enddo
+			enddo
+		enddo
+
+
+		!umean=0.
+		!vmean=0.
+		!wmean=0.
+		!numdens=0.
+		spece=0.
+		!speceprime=0.
+
+		!(electron) flow mean velocity ***********
+		!do i=maxhlf,maxhlf+lecs
+		!	xbin=int((p(i)%x+mxcum-mxmin)/dxslice+1)
+		!	if(xbin .ge. 1 .and. xbin .le. nbins) then
+		!		numdens(xbin)=numdens(xbin)+real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+		!		umean(xbin)=umean(xbin)+(p(i)%u/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		vmean(xbin)=vmean(xbin)+(p(i)%v/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!		wmean(xbin)=wmean(xbin)+(p(i)%w/gam)*real(splitratio)**(1.-real(p(i &
+		!						)%splitlev))*p(i)%ch
+		!	endif
+		!enddo
+
+		!umean=umean/numdens
+		!vmean=vmean/numdens
+		!wmean=wmean/numdens
+
+
+		if(debug) print *, "in spec, b4 lecs"
+		do i=maxhlf,maxhlf+lecs
+			xbin=int((p(i)%x+mxcum-mxmin)/dxslice+1)
+
+			if(xbin .ge. 1 .and. xbin .le. nbins) then
+				gam=sqrt(1+(p(i)%u**2+p(i)%v**2+p(i)%w**2))
+				gbin=int((alog10(gam-1)-alog10(gammin-1))/dgam+1)
+				if(gbin .ge. 1 .and. gbin .le. gambins ) then
+					momentump = sqrt(p(i)%u**2+p(i)%v**2+p(i)%w**2)
+					costheta = p(i)%u/momentump
+					mubin = int((costheta + 1.0)/dmu + 1)
+					if((mubin .ge. 1) .and. (mubin .le. mubins)) then
+						phip = atan2(p(i)%w,p(i)%u)
+						phibin = int(phip/dphi + 1)
+						if((phibin .ge. 1) .and. (phibin .le. phibins)) then
+							spece(xbin,gbin, mubin, phibin)=spece(xbin,gbin, mubin, phibin)+real(splitratio)**(1. &
+									-real(p(i)%splitlev))*p(i)%ch
+						endif
+					endif
+				endif
+				!vx=umean(xbin)
+				!vy=vmean(xbin)
+				!vz=wmean(xbin)
+				!vr=sqrt(vx**2+vy**2+vz**2)
+				!gvr=1./sqrt(1.-vr**2)
+				!uprime= -vx*gvr*gam+ &
+				!				(1+(gvr-1)*vx**2/vr**2)*p(i)%u+ &
+				!				(gvr-1)*vx*vy/vr**2*p(i)%v+ &
+				!				(gvr-1)*vx*vz/vr**2*p(i)%w
+				!vprime= -vy*gvr*gam+ &
+				!				(gvr-1)*vx*vy/vr**2*p(i)%u+ &
+				!				(1+(gvr-1)*vy**2/vr**2)*p(i)%v+ &
+				!				(gvr-1)*vy*vz/vr**2*p(i)%w
+				!wprime= -vz*gvr*gam+ &
+				!				(gvr-1)*vx*vz/vr**2*p(i)%u+ &
+				!				(gvr-1)*vy*vz/vr**2*p(i)%v + &
+				!				(1+(gvr-1)*vz**2/vr**2)*p(i)%w
+				!gamprime=sqrt(1+(uprime**2+vprime**2+wprime**2))
+				!gbin=int((alog10(gamprime-1)-alog10(gammin-1))/dgam+1)
+				!if(gbin .ge. 1 .and. gbin .le. gambins ) then
+				!	speceprime(xbin,gbin)=speceprime(xbin,gbin)+real(splitratio)**(1. &
+				!					-real(p(i)%splitlev))*p(i)%ch
+				!endif
+			endif  !if(xbin .ge. 1 .and. xbin .le. nxbins) then
+		enddo
+
+
+		call mpi_allreduce(spece,specein,nbins*gambins*mubins*phibins,mpi_read,mpi_sum &
+						,mpi_comm_world,ierr)
+		spece=specein
+
+		!call mpi_allreduce(speceprime,specein,nbins*gambins,mpi_read,mpi_sum &
+		!				,mpi_comm_world,ierr)
+		!speceprime=specein
+
+		do i=1, nbins
+			do j = 1, mubins
+				do k = 1, phibins
+					spece(i,:, j, k)=spece(i,:, j, k)/xgamma(:)
+					!speceprime(i,:, j, k)=speceprime(i,:, j, k)/xgamma(:)
+				enddo
+			enddo
+		enddo
+
+
+		if(debug) print*, rank, "done spec calculation, start writing"
+
+		if(rank .eq. 0) then
+
+			ind=(lap-pltstart)/interval
+
+			write(indchar,"(i3.3)")ind
+
+			fname="output/spect_ang."//trim(indchar)
+			print *,"",fname
+
+			open(unit=11,file=fname,form='unformatted')
+			close(11,status='delete')
+
+			if(debug) print *,rank, ": in spec,starting save"
+
+#ifdef HDF5
+			!
+			!  Initialize FORTRAN predefined datatypes
+			!
+
+			call h5open_f(error)
+			call h5fcreate_f(fname,H5F_ACC_TRUNC_F,file_id,error)
+
+			dsetname(1)="spece"
+			datarank=4
+			data_dims2(1)=nbins
+			data_dims2(2)=gambins
+			data_dims2(3) = mubins
+			data_dims2(4) = phibins
+			call h5screate_simple_f(datarank, data_dims2, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(1), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,spece, data_dims2, error)
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+			dsetname(1)="specp"
+			datarank=4
+			data_dims2(1)=nbins
+			data_dims2(2)=gambins
+			data_dims2(3) = mubins
+			data_dims2(4) = phibins
+			call h5screate_simple_f(datarank, data_dims2, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(1), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,specp, data_dims2, error)
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+			!!flow rest **********************
+			!dsetname(1)="specerest"
+			!datarank=2
+			!data_dims2(1)=nbins
+			!data_dims2(2)=gambins
+			!call h5screate_simple_f(datarank, data_dims2, dspace_id, error)
+			!call h5dcreate_f(file_id, dsetname(1), H5T_NATIVE_REAL &
+		!					,dspace_id,dset_id,error)
+			!call h5dwrite_f(dset_id, H5T_NATIVE_REAL,speceprime, data_dims2, error)
+			!call h5dclose_f(dset_id,error)
+			!call h5sclose_f(dspace_id,error)
+
+			!dsetname(1)="specprest"
+			!datarank=2
+			!data_dims2(1)=nbins
+			!data_dims2(2)=gambins
+			!call h5screate_simple_f(datarank, data_dims2, dspace_id, error)
+			!call h5dcreate_f(file_id, dsetname(1), H5T_NATIVE_REAL &
+			!				,dspace_id,dset_id,error)
+			!call h5dwrite_f(dset_id, H5T_NATIVE_REAL,specpprime, data_dims2, error)
+			!call h5dclose_f(dset_id,error)
+			!call h5sclose_f(dspace_id,error)
+
+
+			dsetname(2)="gamma"
+			datarank=1
+			data_dims1(1)=gambins
+			call h5screate_simple_f(datarank, data_dims1, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(2), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,xgamma,data_dims1,error)
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+
+			dsetname(2)="xsl"
+			datarank=1
+			data_dims1(1)=nbins
+			call h5screate_simple_f(datarank, data_dims1, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(2), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,xslice,data_dims1,error)
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+			dsetname(2)="gmin"
+			datarank=1
+			data_dims1(1)=1
+			call h5screate_simple_f(datarank, data_dims1, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(2), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,gammin,data_dims1 &
+							,error)
+
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+			dsetname(2)="gmax"
+			datarank=1
+			data_dims1(1)=1
+			call h5screate_simple_f(datarank, data_dims1, dspace_id, error)
+			call h5dcreate_f(file_id, dsetname(2), H5T_NATIVE_REAL &
+							,dspace_id,dset_id,error)
+			call h5dwrite_f(dset_id, H5T_NATIVE_REAL,gammax,data_dims1 &
+							,error)
+			call h5dclose_f(dset_id,error)
+			call h5sclose_f(dspace_id,error)
+
+
+			call h5fclose_f(file_id, error)
+			call h5close_f(error)
+
+
+#endif
+		endif !if rank eq 0
+
+		call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+
+		if(allocated(xgamma)) deallocate(xgamma)
+		if(allocated(xslice)) deallocate(xslice)
+		if(allocated(specp)) deallocate(specp)
+		if(allocated(spece)) deallocate(spece)
+
+		if(allocated(specpin)) deallocate(specpin)
+		if(allocated(specein)) deallocate(specein)
+
+		if(allocated(mu)) deallocate(mu)
+		if(allocated(phi)) deallocate(phi)
+
+		!if(allocated(speceprime)) deallocate(speceprime)
+		!if(allocated(specpprime)) deallocate(specpprime)
+
+		!if(allocated(umean)) deallocate(umean)
+		!if(allocated(vmean)) deallocate(vmean)
+		!if(allocated(numdens)) deallocate(numdens)
+
+		if(debug) print *, rank, "done spec"
+
+
+	endif ! if lap is right for output
+
+
+	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+
+end subroutine save_spectrum_angular
 
 !-------------------------------------------------------------------------------
 ! 						subroutine save_spectrum_2d					 
