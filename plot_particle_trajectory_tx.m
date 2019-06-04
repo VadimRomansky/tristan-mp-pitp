@@ -1,5 +1,5 @@
 clear;
-directory_name = './output/';
+directory_name = './output2/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
