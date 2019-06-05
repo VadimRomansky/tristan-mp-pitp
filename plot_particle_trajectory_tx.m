@@ -1,5 +1,5 @@
 clear;
-directory_name = './output2/';
+directory_name = './output/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 400;
+last_number = 750;
 a = last_number;
 first_number = 1;
 
@@ -48,7 +48,7 @@ zi = hdf5read(full_part_name, 'zi');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx/4;
+Nx = Nx;
 
 frameTime = 1.0/10;
 
@@ -148,11 +148,23 @@ rho = 5;
 
 
 x1(1:(last_number-first_number + 1)) = 0;
+y1(1:(last_number-first_number + 1)) = 0;
 g1(1:(last_number-first_number + 1)) = 0;
+u1(1:(last_number-first_number + 1)) = 0;
+v1(1:(last_number-first_number + 1)) = 0;
+w1(1:(last_number-first_number + 1)) = 0;
 x2(1:(last_number-first_number + 1)) = 0;
+y2(1:(last_number-first_number + 1)) = 0;
 g2(1:(last_number-first_number + 1)) = 0;
+u2(1:(last_number-first_number + 1)) = 0;
+v2(1:(last_number-first_number + 1)) = 0;
+w2(1:(last_number-first_number + 1)) = 0;
 x3(1:(last_number-first_number + 1)) = 0;
+y3(1:(last_number-first_number + 1)) = 0;
 g3(1:(last_number-first_number + 1)) = 0;
+u3(1:(last_number-first_number + 1)) = 0;
+v3(1:(last_number-first_number + 1)) = 0;
+w3(1:(last_number-first_number + 1)) = 0;
 
 %figure(1)
 figure('Position', [10 10 900 600]);
@@ -198,14 +210,109 @@ for a = first_number:last_number,
         plot(xe(part_number3), gammae(part_number3), 'ro', 'MarkerSize', 15, 'Color', 'black');
     end;
     x1(a - first_number+1) = xe(part_number);
+    y1(a - first_number+1) = ye(part_number);
     g1(a - first_number+1) = gammae(part_number);
+    u1(a - first_number+1) = ue(part_number);
+    v1(a - first_number+1) = ve(part_number);
+    w1(a - first_number+1) = we(part_number);
     x2(a - first_number+1) = xe(part_number2);
+    y2(a - first_number+1) = ye(part_number2);
     g2(a - first_number+1) = gammae(part_number2);
+    u2(a - first_number+1) = ue(part_number2);
+    v2(a - first_number+1) = ve(part_number2);
+    w2(a - first_number+1) = we(part_number2);
     x3(a - first_number+1) = xe(part_number3);
+    y3(a - first_number+1) = ye(part_number3);
     g3(a - first_number+1) = gammae(part_number3);
+    u3(a - first_number+1) = ue(part_number3);
+    v3(a - first_number+1) = ve(part_number3);
+    w3(a - first_number+1) = we(part_number3);
 end;
 plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red',x2(1:(last_number-first_number + 1)),g2(1:(last_number-first_number + 1)),'green', x3(1:(last_number-first_number + 1)),g3(1:(last_number-first_number + 1)),'black');
 grid;
+
+%figure(2);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nx');
+ylabel ('Ny');
+grid on;
+hold on;
+plot(x1(1:(last_number-first_number + 1)),y1(1:(last_number-first_number + 1)),'red');
+plot(x2(1:(last_number-first_number + 1)),y2(1:(last_number-first_number + 1)),'green');
+plot(x3(1:(last_number-first_number + 1)),y3(1:(last_number-first_number + 1)),'black');
+plot(x1(1), y1(1), 'ro', 'MarkerSize', 15);
+plot(x2(1), y2(1), 'ro', 'MarkerSize', 15, 'Color','green');
+plot(x3(1), y3(1), 'ro', 'MarkerSize', 15, 'Color', 'black');
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+
+outname = strcat(directory_name,'xy',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
+
+%figure(2);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nt');
+ylabel ('u');
+grid on;
+hold on;
+plot(1:(last_number-first_number + 1),u1(1:(last_number-first_number + 1)),'red');
+plot(1:(last_number-first_number + 1),u2(1:(last_number-first_number + 1)),'green');
+plot(1:(last_number-first_number + 1),u3(1:(last_number-first_number + 1)),'black');
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+
+outname = strcat(directory_name,'ut',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
+
+%figure(2);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nt');
+ylabel ('v');
+grid on;
+hold on;
+plot(1:(last_number-first_number + 1),v1(1:(last_number-first_number + 1)),'red');
+plot(1:(last_number-first_number + 1),v2(1:(last_number-first_number + 1)),'green');
+plot(1:(last_number-first_number + 1),v3(1:(last_number-first_number + 1)),'black');
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+
+outname = strcat(directory_name,'vt',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
+
+%figure(2);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nt');
+ylabel ('w');
+grid on;
+hold on;
+plot(1:(last_number-first_number + 1),w1(1:(last_number-first_number + 1)),'red');
+plot(1:(last_number-first_number + 1),w2(1:(last_number-first_number + 1)),'green');
+plot(1:(last_number-first_number + 1),w3(1:(last_number-first_number + 1)),'black');
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+
+outname = strcat(directory_name,'wt',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
 
 %figure(2);
 figure('Position', [10 50 1200 600]);

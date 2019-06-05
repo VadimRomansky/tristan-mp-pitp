@@ -3939,7 +3939,7 @@ subroutine output_tot()
         temporary_vec=0.
 		particlecounter = 1;
 		do particlei = 1,ions
-			if ((mod((p(particlei)%ind-1)/2, stride) .eq. 0) .and. (particlecounter .le. ions/stride)) then
+			if ((mod((p(particlei)%ind-1)/2, stride*4) .eq. 0) .and. (particlecounter .le. ions/stride)) then
 				if(varname.eq.'xi') temporary_vec(particlecounter)=p(particlei)%x &
 						+mxcum
 				if(varname.eq.'yi') temporary_vec(particlecounter)=p(particlei)%y &
@@ -3964,7 +3964,7 @@ subroutine output_tot()
 
 		particlecounter = 1;
 		do particlei = 1,lecs
-			if ((mod((p(maxhlf+particlei)%ind)/2, stride) .eq. 0) .and. (particlecounter .le. lecs/stride)) then
+			if ((mod((p(maxhlf+particlei)%ind)/2, stride*4) .eq. 0) .and. (particlecounter .le. lecs/stride)) then
 				if(varname.eq.'xe') temporary_vec(particlecounter)=p(maxhlf+particlei)%x&
 						+mxcum
 				if(varname.eq.'ye') temporary_vec(particlecounter)=p(maxhlf+particlei)%y&

@@ -1,5 +1,5 @@
 clear;
-directory_name = './output1/';
+directory_name = './output/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 900;
+last_number = 750;
 a = last_number;
 first_number = 1;
 
@@ -48,7 +48,7 @@ zi = hdf5read(full_part_name, 'zi');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx/10;
+Nx = Nx/2;
 
 frameTime = 1.0/10;
 
@@ -146,10 +146,13 @@ rho = 5;
 
 
 x1(1:(last_number-first_number + 1)) = 0;
+y1(1:(last_number-first_number + 1)) = 0;
 g1(1:(last_number-first_number + 1)) = 0;
 x2(1:(last_number-first_number + 1)) = 0;
+y2(1:(last_number-first_number + 1)) = 0;
 g2(1:(last_number-first_number + 1)) = 0;
 x3(1:(last_number-first_number + 1)) = 0;
+y3(1:(last_number-first_number + 1)) = 0;
 g3(1:(last_number-first_number + 1)) = 0;
 
 %figure(1)
@@ -196,60 +199,62 @@ for a = first_number:last_number,
         plot(xe(part_number3), gammae(part_number3), 'ro', 'MarkerSize', 15, 'Color', 'black');
     end;
     x1(a - first_number+1) = xe(part_number);
+    y1(a - first_number+1) = ye(part_number);
     g1(a - first_number+1) = gammae(part_number);
     x2(a - first_number+1) = xe(part_number2);
+    y2(a - first_number+1) = ye(part_number2);
     g2(a - first_number+1) = gammae(part_number2);
     x3(a - first_number+1) = xe(part_number3);
+    y3(a - first_number+1) = ye(part_number3);
     g3(a - first_number+1) = gammae(part_number3);
 end;
 plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red',x2(1:(last_number-first_number + 1)),g2(1:(last_number-first_number + 1)),'green', x3(1:(last_number-first_number + 1)),g3(1:(last_number-first_number + 1)),'black');
 grid;
 
-%%figure(2);
-%figure('Position', [10 50 1200 600]);
-%%title ('E_x');
-%xlabel ('Nt');
-%ylabel ('\gamma');
-%grid on;
-%hold on;
-%plot(1:(last_number-first_number + 1),g1(1:(last_number-first_number + 1)),'red');
-%plot(1:(last_number-first_number + 1),g2(1:(last_number-first_number + 1)),'green');
-%plot(1:(last_number-first_number + 1),g3(1:(last_number-first_number + 1)),'black');
-%fig_part = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','red');
-%fig_part2 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','green');
-%fig_part3 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','black');
-%pos = get(gcf, 'Position');
-%width = pos(3);
-%height = pos(4);
-%mov(1:height, 1:width, 1:1)=0;
-%f = getframe(gcf);
-%[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
-%for a = first_number:last_number,
-%    if(a < 10)
-%        full_name = strcat(directory_name, file_name, '.00', num2str(a));
-%        full_part_name = strcat(directory_name, part_name, '.00', num2str(a));
-%    else if (a < 100)
-%            full_name = strcat(directory_name, file_name, '.0', num2str(a));
-%            full_part_name = strcat(directory_name, part_name, '.0', num2str(a));  
-%        else 
-%            full_name = strcat(directory_name, file_name, '.', num2str(a));
-%            full_part_name = strcat(directory_name, part_name, '.', num2str(a));
-%        end;
-%    end;
+%figure(2);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nt');
+ylabel ('\gamma');
+grid on;
+hold on;
+plot(1:(last_number-first_number + 1),g1(1:(last_number-first_number + 1)),'red');
+plot(1:(last_number-first_number + 1),g2(1:(last_number-first_number + 1)),'green');
+plot(1:(last_number-first_number + 1),g3(1:(last_number-first_number + 1)),'black');
+fig_part = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','red');
+fig_part2 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','green');
+fig_part3 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','black');
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+for a = first_number:last_number,
+    if(a < 10)
+        full_name = strcat(directory_name, file_name, '.00', num2str(a));
+        full_part_name = strcat(directory_name, part_name, '.00', num2str(a));
+    else if (a < 100)
+            full_name = strcat(directory_name, file_name, '.0', num2str(a));
+            full_part_name = strcat(directory_name, part_name, '.0', num2str(a));  
+        else 
+            full_name = strcat(directory_name, file_name, '.', num2str(a));
+            full_part_name = strcat(directory_name, part_name, '.', num2str(a));
+        end;
+    end;
    
-%    set(fig_part, 'Xdata', a-first_number+1);
-%    set(fig_part, 'Ydata', g1(a-first_number+1));
-%    set(fig_part2, 'Xdata', a-first_number+1);
-%    set(fig_part2, 'Ydata', g2(a-first_number+1));
-%    set(fig_part3, 'Xdata', a-first_number+1);
-%    set(fig_part3, 'Ydata', g3(a-first_number+1));
-%    f = getframe(gcf);
-%    %mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
-%    outname = strcat(directory_name,'g',int2str(a),'.jpg');
-%    imwrite(rgb2ind(f.cdata, map), map, outname);
-%    pause(1);
-%end;
-%imwrite(mov, map, 'T.gif','DelayTime',frameTime*3,'LoopCount',1);
+    set(fig_part, 'Xdata', a-first_number+1);
+    set(fig_part, 'Ydata', g1(a-first_number+1));
+    set(fig_part2, 'Xdata', a-first_number+1);
+    set(fig_part2, 'Ydata', g2(a-first_number+1));
+    set(fig_part3, 'Xdata', a-first_number+1);
+    set(fig_part3, 'Ydata', g3(a-first_number+1));
+    f = getframe(gcf);
+    %mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
+    outname = strcat(directory_name,'g',int2str(a),'.jpg');
+    imwrite(rgb2ind(f.cdata, map), map, outname);
+end;
+imwrite(mov, map, 'T.gif','DelayTime',frameTime*3,'LoopCount',1);
 
 
 %figure(3);
@@ -288,13 +293,7 @@ for a = first_number:last_number,
     Bx = hdf5read(full_name,'bx');
     By = hdf5read(full_name,'by');
     Bz = hdf5read(full_name,'bz');
-    gammae = hdf5read(full_part_name, 'gammae');
-    Npart = size(gammae,1);
-    inde = hdf5read(full_part_name, 'inde');
-    proce = hdf5read(full_part_name, 'proce');
-    xe = hdf5read(full_part_name, 'xe');
-    ye = hdf5read(full_part_name, 'ye');
-    ze = hdf5read(full_part_name, 'ze');
+    
     
     for i=1:Nx,
         for j = 1:Ny,
@@ -306,24 +305,24 @@ for a = first_number:last_number,
     
     set(fig, 'CData', Bnorm);
     
-    for p = 1:Npart,
-        if((inde(p) == part_index) && (proce(p)==part_proc))
-            part_number = p;
-        end;
-        if((inde(p) == part_index2) && (proce(p)==part_proc2))
-            part_number2 = p;
-        end;
-        if((inde(p) == part_index3) && (proce(p)==part_proc3))
-            part_number3 = p;
-        end;
-    end;
+    %for p = 1:Npart,
+    %    if((inde(p) == part_index) && (proce(p)==part_proc))
+    %        part_number = p;
+    %    end;
+    %    if((inde(p) == part_index2) && (proce(p)==part_proc2))
+    %        part_number2 = p;
+    %    end;
+    %    if((inde(p) == part_index3) && (proce(p)==part_proc3))
+    %        part_number3 = p;
+    %    end;
+    %end;
     
-    set(fig_part, 'Xdata', xe(part_number));
-    set(fig_part, 'Ydata', ye(part_number));
-    set(fig_part2, 'Xdata', xe(part_number2));
-    set(fig_part2, 'Ydata', ye(part_number2));
-    set(fig_part3, 'Xdata', xe(part_number3));
-    set(fig_part3, 'Ydata', ye(part_number3));
+    set(fig_part, 'Xdata', x1(a-first_number+1));
+    set(fig_part, 'Ydata', y1(a-first_number+1));
+    set(fig_part2, 'Xdata', x2(a-first_number+1));
+    set(fig_part2, 'Ydata', y2(a-first_number+1));
+    set(fig_part3, 'Xdata', x3(a-first_number+1));
+    set(fig_part3, 'Ydata', y3(a-first_number+1));
     f = getframe(gcf);
     %mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
     outname = strcat(directory_name,'T',int2str(a),'.jpg');
@@ -367,14 +366,6 @@ for a = first_number:last_number,
     Ex = hdf5read(full_name,'ex');
     Ey = hdf5read(full_name,'ey');
     Ez = hdf5read(full_name,'ez');
-
-    gammae = hdf5read(full_part_name, 'gammae');
-    Npart = size(gammae,1);
-    inde = hdf5read(full_part_name, 'inde');
-    proce = hdf5read(full_part_name, 'proce');
-    xe = hdf5read(full_part_name, 'xe');
-    ye = hdf5read(full_part_name, 'ye');
-    ze = hdf5read(full_part_name, 'ze');
     
     for i=1:Nx,
         for j = 1:Ny,
@@ -386,30 +377,28 @@ for a = first_number:last_number,
     
     set(fig, 'CData', Enorm);
     
-    for p = 1:Npart,
-        if((inde(p) == part_index) && (proce(p)==part_proc))
-            part_number = p;
-        end;
-        if((inde(p) == part_index2) && (proce(p)==part_proc2))
-            part_number2 = p;
-        end;
-        if((inde(p) == part_index3) && (proce(p)==part_proc3))
-            part_number3 = p;
-        end;
-    end;
+    %for p = 1:Npart,
+    %    if((inde(p) == part_index) && (proce(p)==part_proc))
+    %        part_number = p;
+    %    end;
+    %    if((inde(p) == part_index2) && (proce(p)==part_proc2))
+    %        part_number2 = p;
+    %    end;
+    %    if((inde(p) == part_index3) && (proce(p)==part_proc3))
+    %        part_number3 = p;
+    %    end;
+    %end;
     
-    set(fig_part, 'Xdata', xe(part_number));
-    set(fig_part, 'Ydata', ye(part_number));
-    set(fig_part2, 'Xdata', xe(part_number2));
-    set(fig_part2, 'Ydata', ye(part_number2));
-    set(fig_part3, 'Xdata', xe(part_number3));
-    set(fig_part3, 'Ydata', ye(part_number3));
+    set(fig_part, 'Xdata', x1(a-first_number + 1));
+    set(fig_part, 'Ydata', y1(a-first_number + 1));
+    set(fig_part2, 'Xdata', x2(a-first_number + 1));
+    set(fig_part2, 'Ydata', y2(a-first_number + 1));
+    set(fig_part3, 'Xdata', x3(a-first_number + 1));
+    set(fig_part3, 'Ydata', y3(a-first_number + 1));
     f = getframe(gcf);
     %mov(:,:,1,a+1)=rgb2ind(f.cdata, map);
     outname = strcat(directory_name,'TE',int2str(a),'.jpg');
     imwrite(rgb2ind(f.cdata, map), map, outname);
-
-    pause(1);
 end;
 %imwrite(mov, map, 'T.gif','DelayTime',frameTime*3,'LoopCount',1);
 
