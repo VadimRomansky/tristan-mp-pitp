@@ -1,10 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);
 full_part_name = strcat(directory_name, part_name, file_number);
+bounds_name = strcat(directory_name, 'bounds');
+bounds = importdata(bounds_name);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
 Bz = hdf5read(full_name,'bz');
@@ -12,7 +14,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 180;
+last_number = 400;
 a = last_number;
 first_number = 1;
 
@@ -49,9 +51,8 @@ B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 samplingFactor = 20;
-Nmpi = 280;
-Lmpi = fix((Nx*samplingFactor - 5)/Nmpi) + 5;
-xmpi(1:Nmpi) = (1:Nmpi)*(Lmpi-5);
+Nmpi = size(bounds,1);
+
 Nx = Nx;
 
 frameTime = 1.0/10;
@@ -83,6 +84,55 @@ for i = 1: size(gammae,1),
             end
         end
     end
+end;
+
+Nfast = 50;
+fastestGamma(1:Nfast) = 1;
+fastestNumber(1:Nfast) = 1;
+fastestIndex(1:Nfast) = 1;
+fastestProc(1:Nfast) = 1;
+fastestX(1:Nfast,1:(last_number-first_number + 1)) = 0;
+fastestTempGamma(1:Nfast,1:(last_number-first_number + 1)) = 0;
+fastestY(1:Nfast,1:(last_number-first_number + 1)) = 0;
+for i=1:Nfast,
+    fastestGamma(i) = gammae(i);
+    fastestNumber(i) = i;
+end;
+tempg=0;
+tempi=0;
+for i = 1:Nfast-1,
+    for j = 1:Nfast-i,
+        if(fastestGamma(j) > fastestGamma(j+1))
+            tempg = fastestGamma(j+1);
+            fastestGamma(j+1) = fastestGamma(j);
+            fastestGamma(j) = tempg;
+            tempi = fastestNumber(j+1);
+            fastestNumber(j+1) = fastestNumber(j);
+            fastestNumber(j) = tempi;
+        end;
+    end;
+end;
+
+for i = (Nfast+1): size(gammae,1),
+    if (gammae(i) > fastestGamma(1))
+        fastestGamma(1) = gammae(i);
+        fastestNumber(1) = i;
+        for j=1:Nfast-1,
+            if(fastestGamma(j) > fastestGamma(j+1))
+                tempg = fastestGamma(j+1);
+                fastestGamma(j+1) = fastestGamma(j);
+                fastestGamma(j) = tempg;
+                tempi = fastestNumber(j+1);
+                fastestNumber(j+1) = fastestNumber(j);
+                fastestNumber(j) = tempi;
+            end;
+        end;
+    end;
+end;
+
+for i = 1:Nfast,
+    fastestIndex(i) = inde(fastestNumber(i));
+    fastestProc(i) = proce(fastestNumber(i));
 end;
 
 Npart = size(gammae,1);
@@ -206,6 +256,13 @@ for a = first_number:last_number,
         end;
         if((inde(p) == part_index3) && (proce(p)==part_proc3))
             part_number3 = p;
+        end;
+        for i = 1:Nfast,
+            if((inde(p) == fastestIndex(i)) && (proce(p) == fastestProc(i)))
+                fastestX(i,a - first_number + 1) = xe(p);
+                fastestY(i,a - first_number + 1) = ye(p);
+                fastestTempGamma(i,a - first_number + 1) = gammae(p);
+            end;
         end;
     end;
     if(a == first_number)
@@ -385,11 +442,11 @@ plot(x3(1:(last_number-first_number + 1)),(first_number:last_number),'black');
 m=0;
 for m = 1:Nmpi,
     xtemp(1:2) = 0;
-    xtemp(1) = xmpi(m);
-    xtemp(2) = xmpi(m);
+    xtemp(1) = bounds(m,1);
+    xtemp(2) = bounds(m,1);
     plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
-    xtemp(1) = xmpi(m)-5;
-    xtemp(2) = xmpi(m)-5;
+    xtemp(1) = bounds(m,2);
+    xtemp(2) = bounds(m,2);
     plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
 end;
 
@@ -401,7 +458,40 @@ f = getframe(gcf);
 [mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
 outname = strcat(directory_name,'Tt',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
-pause(1);
+
+%figure(3);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nx');
+ylabel ('Nt');
+grid on;
+hold on;
+%axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
+%fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
+caxis ([0 5])
+fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number),Baverage);
+for i = 1:Nfast,
+    plot(fastestX(i,1:(last_number-first_number + 1)),(first_number:last_number),'red');
+end;
+m=0;
+for m = 1:Nmpi,
+    xtemp(1:2) = 0;
+    xtemp(1) = bounds(m,1);
+    xtemp(2) = bounds(m,1);
+    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
+    xtemp(1) = bounds(m,2);
+    xtemp(2) = bounds(m,2);
+    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
+end;
+
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+outname = strcat(directory_name,'Ttfastest',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
 
 
 
