@@ -99,6 +99,8 @@ subroutine mainloop()
 
 		integer n1
 		real xg,yg,zg
+
+	call out_boundaries()
 		
 	
 	do lap=lapst,last !every time step is called "lap"
@@ -503,6 +505,32 @@ subroutine energy()
 
 end subroutine energy
 
+
+subroutine out_boundaries()
+	implicit none
+	integer :: ierr
+	integer proccounter
+	character fnamen*20
+
+	write(fnamen,"(a15)") './output/bounds'
+
+	if(rank .eq. 0) then
+		open(unit=21,file=fnamen)
+		close(21,status='delete')
+		open(unit=21,file=fnamen)
+		close(21,status='keep')
+	end if
+	call mpi_barrier(mpi_comm_world,ierr)
+	do proccounter = 0,sizex*sizey*sizez-1
+		if(proccounter .eq. rank) then
+			print*, rank
+			open(unit=21,file=fnamen,status='old',position='APPEND')
+			write(21,fmt="(E15.6,' ',E15.6)") xglob(1.0), xglob(mx*1.0)
+			close(21)
+		end if
+		call mpi_barrier(mpi_comm_world,ierr)
+	enddo
+end subroutine out_boundaries
 
 
 !-------------------------------------------------------------------------------
