@@ -1,5 +1,5 @@
 clear;
-directory_name = './output/';
+directory_name = './output2/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 750;
+last_number = 180;
 a = last_number;
 first_number = 1;
 
@@ -48,6 +48,10 @@ zi = hdf5read(full_part_name, 'zi');
 B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
+samplingFactor = 20;
+Nmpi = 280;
+Lmpi = fix((Nx*samplingFactor - 5)/Nmpi) + 5;
+xmpi(1:Nmpi) = (1:Nmpi)*(Lmpi-5);
 Nx = Nx;
 
 frameTime = 1.0/10;
@@ -84,7 +88,7 @@ end;
 Npart = size(gammae,1);
 part_index = inde(max_number1);
 part_number = max_number1;
-
+%part_number = 10010;
 %part_number = 400000;
 part_indes = inde(part_number);
 
@@ -93,7 +97,8 @@ part_proc = proce(part_number);
 part_number2 = max_number2;
 part_number3 = max_number3;
 
-
+%part_number2 = 10011;
+%part_number3 = 10012;
 %part_number2 = 6000;
 part_index2 = inde(part_number2);
 part_proc2 = proce(part_number2);
@@ -140,7 +145,6 @@ rho = 0.1;
 c1=0.45;
 
 tau = c1*rho/c0;
-samplingFactor = 20;
 fieldFactor = me*rho/(q*tau*tau);
 rho = rho*samplingFactor;
 rho = 5;
@@ -378,6 +382,16 @@ fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number),Baverage);
 plot(x1(1:(last_number-first_number + 1)),(first_number:last_number),'red');
 plot(x2(1:(last_number-first_number + 1)),(first_number:last_number),'green');
 plot(x3(1:(last_number-first_number + 1)),(first_number:last_number),'black');
+m=0;
+for m = 1:Nmpi,
+    xtemp(1:2) = 0;
+    xtemp(1) = xmpi(m);
+    xtemp(2) = xmpi(m);
+    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
+    xtemp(1) = xmpi(m)-5;
+    xtemp(2) = xmpi(m)-5;
+    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
+end;
 
 pos = get(gcf, 'Position');
 width = pos(3);
