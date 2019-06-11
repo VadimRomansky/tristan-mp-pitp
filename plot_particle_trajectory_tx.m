@@ -17,6 +17,7 @@ fileinfo = hdf5info(full_part_name);
 last_number = 400;
 a = last_number;
 first_number = 1;
+timeStep = 250;
 
 if(a < 10)
     full_name = strcat(directory_name, file_name, '.00', num2str(a));
@@ -315,16 +316,16 @@ f = getframe(gcf);
 outname = strcat(directory_name,'xy',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
 
-%figure(2);
+%figure(3);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nt');
 ylabel ('u');
 grid on;
 hold on;
-plot(1:(last_number-first_number + 1),u1(1:(last_number-first_number + 1)),'red');
-plot(1:(last_number-first_number + 1),u2(1:(last_number-first_number + 1)),'green');
-plot(1:(last_number-first_number + 1),u3(1:(last_number-first_number + 1)),'black');
+plot((1:(last_number-first_number + 1))*timeStep,u1(1:(last_number-first_number + 1)),'red');
+plot((1:(last_number-first_number + 1))*timeStep,u2(1:(last_number-first_number + 1)),'green');
+plot((1:(last_number-first_number + 1))*timeStep,u3(1:(last_number-first_number + 1)),'black');
 pos = get(gcf, 'Position');
 width = pos(3);
 height = pos(4);
@@ -335,16 +336,16 @@ f = getframe(gcf);
 outname = strcat(directory_name,'ut',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
 
-%figure(2);
+%figure(4);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nt');
 ylabel ('v');
 grid on;
 hold on;
-plot(1:(last_number-first_number + 1),v1(1:(last_number-first_number + 1)),'red');
-plot(1:(last_number-first_number + 1),v2(1:(last_number-first_number + 1)),'green');
-plot(1:(last_number-first_number + 1),v3(1:(last_number-first_number + 1)),'black');
+plot((1:(last_number-first_number + 1))*timeStep,v1(1:(last_number-first_number + 1)),'red');
+plot((1:(last_number-first_number + 1))*timeStep,v2(1:(last_number-first_number + 1)),'green');
+plot((1:(last_number-first_number + 1))*timeStep,v3(1:(last_number-first_number + 1)),'black');
 pos = get(gcf, 'Position');
 width = pos(3);
 height = pos(4);
@@ -355,16 +356,16 @@ f = getframe(gcf);
 outname = strcat(directory_name,'vt',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
 
-%figure(2);
+%figure(5);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nt');
 ylabel ('w');
 grid on;
 hold on;
-plot(1:(last_number-first_number + 1),w1(1:(last_number-first_number + 1)),'red');
-plot(1:(last_number-first_number + 1),w2(1:(last_number-first_number + 1)),'green');
-plot(1:(last_number-first_number + 1),w3(1:(last_number-first_number + 1)),'black');
+plot((1:(last_number-first_number + 1))*timeStep,w1(1:(last_number-first_number + 1)),'red');
+plot((1:(last_number-first_number + 1))*timeStep,w2(1:(last_number-first_number + 1)),'green');
+plot((1:(last_number-first_number + 1))*timeStep,w3(1:(last_number-first_number + 1)),'black');
 pos = get(gcf, 'Position');
 width = pos(3);
 height = pos(4);
@@ -375,16 +376,16 @@ f = getframe(gcf);
 outname = strcat(directory_name,'wt',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
 
-%figure(2);
+%figure(6);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nt');
 ylabel ('\gamma');
 grid on;
 hold on;
-plot(1:(last_number-first_number + 1),g1(1:(last_number-first_number + 1)),'red');
-plot(1:(last_number-first_number + 1),g2(1:(last_number-first_number + 1)),'green');
-plot(1:(last_number-first_number + 1),g3(1:(last_number-first_number + 1)),'black');
+plot((1:(last_number-first_number + 1))*timeStep,g1(1:(last_number-first_number + 1)),'red');
+plot((1:(last_number-first_number + 1))*timeStep,g2(1:(last_number-first_number + 1)),'green');
+plot((1:(last_number-first_number + 1))*timeStep,g3(1:(last_number-first_number + 1)),'black');
 fig_part = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','red');
 fig_part2 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','green');
 fig_part3 = plot(1, g1(1), 'ro', 'MarkerSize', 10,'Color','black');
@@ -425,7 +426,7 @@ for a = first_number:last_number,
     end;
 end;
 
-%figure(3);
+%figure(7);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nx');
@@ -434,21 +435,21 @@ grid on;
 hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
-caxis ([0 5])
-fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number),Baverage);
-plot(x1(1:(last_number-first_number + 1)),(first_number:last_number),'red');
-plot(x2(1:(last_number-first_number + 1)),(first_number:last_number),'green');
-plot(x3(1:(last_number-first_number + 1)),(first_number:last_number),'black');
+caxis ([0 2.5])
+fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number)*timeStep,Baverage);
+plot(x1(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'red');
+plot(x2(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'green');
+plot(x3(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'black');
 m=0;
-for m = 1:Nmpi,
-    xtemp(1:2) = 0;
-    xtemp(1) = bounds(m,1);
-    xtemp(2) = bounds(m,1);
-    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
-    xtemp(1) = bounds(m,2);
-    xtemp(2) = bounds(m,2);
-    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
-end;
+%for m = 1:Nmpi,
+%    xtemp(1:2) = 0;
+%    xtemp(1) = bounds(m,1);
+%    xtemp(2) = bounds(m,1);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
+%    xtemp(1) = bounds(m,2);
+%    xtemp(2) = bounds(m,2);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
+%end;
 
 pos = get(gcf, 'Position');
 width = pos(3);
@@ -459,7 +460,7 @@ f = getframe(gcf);
 outname = strcat(directory_name,'Tt',int2str(a),'.jpg');
 imwrite(rgb2ind(f.cdata, map), map, outname);
 
-%figure(3);
+%figure(8);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
 xlabel ('Nx');
@@ -468,21 +469,21 @@ grid on;
 hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
-caxis ([0 5])
-fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number),Baverage);
+caxis ([0 2.5])
+fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number)*timeStep,Baverage);
 for i = 1:Nfast,
-    plot(fastestX(i,1:(last_number-first_number + 1)),(first_number:last_number),'red');
+    plot(fastestX(i,1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'red');
 end;
 m=0;
-for m = 1:Nmpi,
-    xtemp(1:2) = 0;
-    xtemp(1) = bounds(m,1);
-    xtemp(2) = bounds(m,1);
-    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
-    xtemp(1) = bounds(m,2);
-    xtemp(2) = bounds(m,2);
-    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
-end;
+%for m = 1:Nmpi,
+%    xtemp(1:2) = 0;
+%    xtemp(1) = bounds(m,1);
+%    xtemp(2) = bounds(m,1);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
+%    xtemp(1) = bounds(m,2);
+%    xtemp(2) = bounds(m,2);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
+%end;
 
 pos = get(gcf, 'Position');
 width = pos(3);
