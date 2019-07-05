@@ -1,7 +1,7 @@
 clear;
-directory_name = './output4/';
-file_name = 'flds4.tot';
-file_number = '.010';
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -13,10 +13,10 @@ B0 = 0.03030750;
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 
-Bnorm(1:Nx/2, 1:Ny) = 0;
+Bnorm(1:Nx, 1:Ny) = 0;
 %Bperp(1:Nx, 1:Ny) = 0;
 
-for i=1:Nx/2,
+for i=1:Nx,
     for j = 1:Ny,
         Bnorm(i,j) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
        % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -119,11 +119,11 @@ rho = rho*samplingFactor;
 figure(7);
 hold on;
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx/2)*rho);
-%surf(X, Y, Bnorm/B0);
+[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+surf(X, Y, Bnorm/B0);
 %contourf(X,Y,Bnorm);
-imagesc(1:Ny,1:Nx/2,Bnorm);
-plot(1:Ny,(1:Ny)*10,'red');
+%imagesc(1:Ny,1:Nx/2,Bnorm);
+%plot(1:Ny,(1:Ny)*10,'red');
 shading interp;
 title ('B/B_0');
 xlabel ('y \omega /c');

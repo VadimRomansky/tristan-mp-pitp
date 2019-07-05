@@ -591,9 +591,10 @@ subroutine init_turbulent_field
 	minTurbulentLambdaY = 500;
 	maxTurbulentLambdaZ = 2000;
 	minTurbulentLambdaZ = 500;
-	turbulenceEnergyFraction = 0.5
+	turbulenceEnergyFraction = 0.1
 	
-	call init_turbulent_field_isotropic_plasma_frame(turbulenceEnergyFraction)
+	!call init_turbulent_field_isotropic_plasma_frame(turbulenceEnergyFraction)
+	call init_turbulent_field_clumped(turbulenceEnergyFraction)
 
 	print *, 'finish initializing turbulence'
 
@@ -2548,11 +2549,11 @@ subroutine init_turbulent_field_simple_anisotropic_lab_frame(turbulenceEnergyFra
 			enddo
 end subroutine init_turbulent_field_simple_anisotropic_lab_frame
 
-subroutine init_turbulent_field_clumped_plasma_frame(turbulenceEnergyFraction)
+subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 	real turbulenceEnergyFraction
 
 	integer maxKx, maxKy, maxKz
-	integer :: i, j, k, ki, kj, kk
+	integer :: i, j, k, ki, kj, kk, clumpi, clumpN
 	real kw
 	real kx, ky, kz, kyz
 	real phase1, phase2
@@ -2562,235 +2563,91 @@ subroutine init_turbulent_field_clumped_plasma_frame(turbulenceEnergyFraction)
 	real localB1, localB2
 	real turbulenceEnergy
 	real tempB, tempBx, tempBn, tempB0, tempB0x, tempB0n;
-real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
+	real Bxreg, Byreg, Bzreg, Exreg, Eyreg, Ezreg
 	real Btheta0;
 	real pi;
+	real clumpR, clumpminR, clumpmaxR, clumpx, clumpy
+	real x,y , y1, y2, r
+	real turbulenceClumpedFraction;
+	real fieldFraction;
 
 	pi = 2.0*acos(0.0);
 
-	tempB = 1.0;
-	tempBx = tempB*cos(Btheta)
-	tempBn = tempB*sin(Btheta);
-	tempB0x = tempBx;
-	tempB0n = tempBn/gamma0;
-	Btheta0 = atan2(tempB0n, tempB0x);
-	tempB0 = sqrt(tempB0x*tempB0x + tempB0n*tempB0n);
-	print *,'theta0', Btheta0*180.0/pi;
+	!clumpN = 1000;
+	!be careful, turbulence fraction should be small
+	turbulenceClumpedFraction = 0.2;
+	fieldFraction = 0.5;
+	clumpmaxR = 50;
+	clumpminR = clumpmaxR/4;
 
+	clumpN = turbulenceClumpedFraction*mx0*my0/(clumpmaxR*clumpmaxR);
 
-	maxKx = maxTurbulentLambdaX/minTurbulentLambdaX;
-	maxKy = maxTurbulentLambdaY/minTurbulentLambdaY;
-	maxKz = maxTurbulentLambdaZ/minTurbulentLambdaZ;
+	print *,'n clumpes', clumpN;
 
-	!maxKy = 0
+	do i = 1,mx
+		do j = 1,my
+			do k = 1,mz
+				bx(i,j,k) = Binit*cos(Btheta);
+				by(i,j,k) = Binit*sin(Btheta)*sin(Bphi);
+				bz(i,j,k) = Binit*sin(Btheta)*cos(Bphi);
+			end do
+		end do
+	end do
 
-	print *, maxKx, maxKy, maxKz
+	do clumpi = 1,clumpN
+		clumpR = clumpminR + (clumpmaxR - clumpminR)*rand()
+		clumpx = mx0*rand();
+		clumpy = my0*rand();
+		do i = 1,mx
+			do j = 1,my
+				do k = 1,mz
+					if(yglob(j*1.0) > clumpy) then
+						y1 = yglob(j*1.0) - clumpy;
+						y2 = yglob(j*1.0) - clumpy - my0;
 
-	!turulence energy fraction correction in plasma frame
-
-	turbulenceEnergy = 0;
-
-#ifdef twoD
-	maxKz = 1;
-#endif
-
-
-		do ki = 0, maxKx
-
-			do kj = 0, maxKy
-#ifdef twoD
-			kk = 0
-#else
-			!do kk = 0, mz0-5
-				do kk = 0, maxKz
-#endif
-
-					if ((ki + kj + kk) .ne. 0) then
-
-
-						kx = ki*2*pi/maxTurbulentLambdaX;
-						ky = kj*2*pi/maxTurbulentLambdaY;
-						kz = kk*2*pi/maxTurbulentLambdaZ;
-
-
-						Bturbulent = evaluate_turbulent_b(kx, ky, kz);
-
-						turbulenceEnergy = turbulenceEnergy + Bturbulent*Bturbulent;
-					endif
-#ifndef twoD
-			enddo
-#endif
-		enddo
-	enddo
-
-	if (turbulenceEnergy > 0) then
-		turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*tempB0*tempB0/((1.0 - turbulenceEnergyFraction)*turbulenceEnergy));
-	else
-		turbulenceFieldCorrection = 1.0;
-	endif
-
-	!turbulence total energy correction in lab frame
-
-	turbulenceEnergy = tempB*tempB;
-
-#ifdef twoD
-	maxKz = 1;
-#endif
-
-
-	do ki = 0, maxKx
-
-		do kj = 0, maxKy
-#ifdef twoD
-			kk = 0
-#else
-			!do kk = 0, mz0-5
-		do kk = 0, maxKz
-#endif
-
-			if ((ki + kj + kk) .ne. 0) then
-
-
-				kx = ki*2*pi/maxTurbulentLambdaX;
-				ky = kj*2*pi/maxTurbulentLambdaY;
-				kz = kk*2*pi/maxTurbulentLambdaZ;
-
-
-				kw = sqrt(kx*kx + ky*ky + kz*kz);
-				kyz = sqrt(ky*ky + kz*kz);
-				cosTheta = kx/kw;
-				sinTheta = kyz/kw;
-				if(kj + kk .ne. 0) then
-					cosPhi = ky/kyz;
-					sinPhi = kz/kyz;
-				else
-					cosPhi = 1.0
-					sinPhi = 0.0
-				endif
-
-				Bturbulent = evaluate_turbulent_b(kx, ky, kz)*turbulenceFieldCorrection;
-
-				turbulenceEnergy = turbulenceEnergy + &
-				0.5*Bturbulent*Bturbulent*(gamma0*gamma0 + (sinTheta*sinTheta + cosTheta*cosTheta*gamma0*gamma0));
-			endif
-#ifndef twoD
-			enddo
-#endif
-		enddo
-	enddo
-
-	if (turbulenceEnergy > 0) then
-		tempB = Binit/sqrt(turbulenceEnergy);
-	else
-		tempB = Binit;
-	endif
-
-	Binit = tempB
-
-	!init fields
-
-	Bxreg = tempB*cos(Btheta);
-	Byreg = tempB*sin(Btheta)*sin(Bphi);
-	Bzreg = tempB*sin(Btheta)*cos(Bphi);
-
-	Exreg = 0;
-	Eyreg = -beta*Bzreg;
-	Ezreg = beta*Byreg;
-
-	do  k=1,mz
-		do  j=1,my
-			do  i=1,mx
-				! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-				!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
-
-				bx(i,j,k)=Bxreg
-				by(i,j,k)=Byreg
-				bz(i,j,k)=Bzreg
-
-				ex(i,j,k)=Exreg
-				ey(i,j,k)=Eyreg
-				ez(i,j,k)=Ezreg
-			enddo
-		enddo
-	enddo
-
-	do ki = 0, maxKx
-		do kj = 0, maxKy
-#ifdef twoD
-			kk = 0
-#else
-				do kk = 0, maxKz
-#endif
-				!print *, ki, kj, kk
-
-					if ((ki + kj + kk) .ne. 0) then
-
-						phase1 = 2*pi*rand();
-						phase2 = 2*pi*rand();
-
-
-						kx = ki*2*pi/maxTurbulentLambdaX;
-						ky = kj*2*pi/maxTurbulentLambdaY;
-						kz = kk*2*pi/maxTurbulentLambdaZ;
-
-						!print *,'k', kx, ky, kz
-
-
-						kw = sqrt(kx*kx + ky*ky + kz*kz);
-						kyz = sqrt(ky*ky + kz*kz);
-						cosTheta = kx/kw;
-						sinTheta = kyz/kw;
-						if(kj + kk .ne. 0) then
-							cosPhi = ky/kyz;
-							sinPhi = kz/kyz;
+						if(y1 > -y2) then
+							y = y2;
 						else
-							cosPhi = 1.0
-							sinPhi = 0.0
-						endif
+							y = y1;
+						end if
+					else
+						y1 = yglob(j*1.0) - clumpy;
+						y2 = yglob(j*1.0) - clumpy + my0;
+						if(y2 > -y1) then
+							y = y1;
+						else
+							y = y2;
+						end if
+					end if
+					x = xglob(i*1.0) - clumpx;
+					r = sqrt(x*x + y*y);
+					if(r < clumpR) then
+						!bz(i,j,k) = bz(i,j,k) - 0.5*Binit*(1.0 - r*r/(clumpR*clumpR));
 
-						Bturbulent = evaluate_turbulent_b(kx, ky, kz)*tempB*turbulenceFieldCorrection;
+						if(r > 0) then
+							cosphi = x/r;
+							sinphi = y/r;
 
+							bx(i,j,k) = bx(i,j,k) + sinphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
+							by(i,j,k) = by(i,j,k) - cosphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
+						end if
+					end if
+				end do
+			end do
+		end do
+	end do
 
-						!print *, 'Bturbulent', Bturbulent
-						do  k=1,mz
-							do  j=1,my
-								do  i=1,mx
-									! can have fields depend on xglob(i), yglob(j), zglob(j) or iglob(i), jglob(j), kglob(k)
-									!print *, xglob(1.0*i), yglob(1.0*j),zglob(1.0*k)
+	do i = 1,mx
+		do j = 1,my
+			do k = 1,mz
+				ex(i,j,k) = 0;
+				ey(i,j,k) = -beta*bz(i,j,k);
+				ez(i,j,k) = beta*by(i,j,k);
+			end do
+		end do
+	end do
 
-									kmultr = kx*gamma0*xglob(1.0*i) + ky*yglob(1.0*j) + kz*zglob(1.0*k)
-									localB1 = Bturbulent*sin(kmultr + phase1);
-									localB2 = Bturbulent*sin(kmultr + phase2);
-									!localB2 = 0
-
-									bx(i,j,k)=bx(i,j,k) - localB1*sinTheta
-									by(i,j,k)=by(i,j,k) + (localB1*cosTheta*cosPhi - localB2*sinPhi)*gamma0
-									bz(i,j,k)=bz(i,j,k) + (localB1*cosTheta*sinPhi + localB2*cosPhi)*gamma0
-
-									ex(i,j,k)=ex(i,j,k)
-									ey(i,j,k)=ey(i,j,k) - beta*gamma0*(localB1*cosTheta*sinPhi + localB2*cosPhi)
-									ez(i,j,k)=ez(i,j,k) + beta*gamma0*(localB1*cosTheta*cosPhi - localB2*sinPhi)
-
-
-
-									!bx(i,j,k)=bx(i,j,k) - localB1*cosTheta*cosPhi + localB2*sinPhi;
-									!by(i,j,k)=by(i,j,k) - localB1*cosTheta*sinPhi - localB2*cosPhi;
-									!bz(i,j,k)=bz(i,j,k) + localB1*sinTheta;
-
-									!ex(i,j,k)=ex(i,j,k);
-									!ey(i,j,k)=ey(i,j,k) - beta*(localB1*sinTheta);
-									!ez(i,j,k)=ez(i,j,k) + beta*(- localB1*cosTheta*sinPhi - localB2*cosPhi);
-								enddo
-							enddo
-						enddo
-					endif
-#ifndef twoD
-			enddo
-#endif
-		enddo
-	enddo
-
-end subroutine init_turbulent_field_clumped_plasma_frame
+end subroutine init_turbulent_field_clumped
 
 
 

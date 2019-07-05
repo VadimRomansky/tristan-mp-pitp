@@ -30,6 +30,8 @@ program tristan
 
 	! Initialization: read input file, initialize data structures, allocate memory
 
+	!print *, 2.0**-1000.0
+
 	call initialize()
 
 	call mainloop() 	! Tristan main loop
