@@ -1,8 +1,8 @@
 clear;
-directory_name = './output1/';
+directory_name = './output/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
-file_number = '.050';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 full_part_name = strcat(directory_name, part_name, file_number);
 bounds_name = strcat(directory_name, 'bounds');
@@ -14,9 +14,9 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 300;
+last_number = 10;
 a = last_number;
-first_number = 50;
+first_number = 1;
 timeStep = 250;
 
 if(a < 10)
@@ -248,6 +248,9 @@ for a = first_number:last_number,
     xe = hdf5read(full_part_name, 'xe');
     ye = hdf5read(full_part_name, 'ye');
     ze = hdf5read(full_part_name, 'ze');
+    ue = hdf5read(full_part_name, 'ue');
+    ve = hdf5read(full_part_name, 've');
+    we = hdf5read(full_part_name, 'we');
     inde = hdf5read(full_part_name, 'inde');
     proce = hdf5read(full_part_name, 'proce');
     
