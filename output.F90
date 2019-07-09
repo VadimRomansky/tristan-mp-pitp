@@ -302,7 +302,7 @@ subroutine Diagnostics()
 		!print *, 'finish output tot'
 !                call output_hug()
                call save_spectrum()
-				call save_spectrum_angular()
+				!call save_spectrum_angular()
 		!print *, 'finish save spectrum'
 !              call save_spectrum_2d()
 !                call save_momentumspec()

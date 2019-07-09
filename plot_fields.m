@@ -1,5 +1,5 @@
 clear;
-directory_name = './output2/';
+directory_name = './output/';
 file_name = 'flds.tot';
 file_number = '.005';
 full_name = strcat(directory_name, file_name, file_number);

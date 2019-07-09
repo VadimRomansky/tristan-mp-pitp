@@ -591,7 +591,7 @@ subroutine init_turbulent_field
 	minTurbulentLambdaY = 500;
 	maxTurbulentLambdaZ = 2000;
 	minTurbulentLambdaZ = 500;
-	turbulenceEnergyFraction = 0.1
+	turbulenceEnergyFraction = 0.9
 	
 	!call init_turbulent_field_isotropic_plasma_frame(turbulenceEnergyFraction)
 	call init_turbulent_field_clumped(turbulenceEnergyFraction)
@@ -2570,19 +2570,22 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 	real x,y , y1, y2, r
 	real turbulenceClumpedFraction;
 	real fieldFraction;
+	real turbulenceFieldCorrection;
 
 	pi = 2.0*acos(0.0);
 
 	!clumpN = 1000;
 	!be careful, turbulence fraction should be small
-	turbulenceClumpedFraction = 0.2;
-	fieldFraction = 0.5;
-	clumpmaxR = 50;
+	turbulenceClumpedFraction = 0.5;
+	fieldFraction = 1.0;
+	clumpmaxR = 1000;
 	clumpminR = clumpmaxR/4;
 
 	clumpN = turbulenceClumpedFraction*mx0*my0/(clumpmaxR*clumpmaxR);
 
 	print *,'n clumpes', clumpN;
+
+	Binit = Binit*sqrt(1.0 - turbulenceEnergyFraction);
 
 	do i = 1,mx
 		do j = 1,my
@@ -2593,6 +2596,10 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 			end do
 		end do
 	end do
+
+	turbulenceEnergy = 2*pi*(clumpmaxR*clumpmaxR + clumpmaxR*clumpminR + clumpminR*clumpminR)*clumpN/180.0;
+	turbulenceFieldCorrection = sqrt(turbulenceEnergyFraction*mx0*my0/(turbulenceEnergy*(1.0 - turbulenceEnergyFraction)));
+	
 
 	do clumpi = 1,clumpN
 		clumpR = clumpminR + (clumpmaxR - clumpminR)*rand()
@@ -2622,7 +2629,7 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 					x = xglob(i*1.0) - clumpx;
 					r = sqrt(x*x + y*y);
 					if(r < clumpR) then
-						!bz(i,j,k) = bz(i,j,k) - 0.5*Binit*(1.0 - r*r/(clumpR*clumpR));
+						!bz(i,j,k) = bz(i,j,k) - turbulenceFieldCorrection*Binit*(1.0 - r*r/(clumpR*clumpR));
 
 						if(r > 0) then
 							cosphi = x/r;
