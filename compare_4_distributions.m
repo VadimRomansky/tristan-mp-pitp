@@ -1,12 +1,12 @@
 clear;
-directory_name = './output3/';
+directory_name = './output/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black'};
-LegendTitle = {'\gamma = 1.5','\gamma = 1.7','\gamma = 2.0','\gamma = 1.4'};
+LegendTitle = {'sin modes','curles','holes','regular'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');

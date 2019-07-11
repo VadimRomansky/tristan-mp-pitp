@@ -6,7 +6,7 @@ Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'regular','curls'};
+LegendTitle = {'2-10rg','0.2-10rg'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');

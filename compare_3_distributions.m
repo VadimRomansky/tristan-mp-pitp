@@ -1,12 +1,12 @@
 clear;
-directory_name = './output3/';
+directory_name = './output/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'\gamma = 1.5','\gamma = 1.7','\gamma = 2.0'};
+LegendTitle = {'sin modes','curles','holes'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
