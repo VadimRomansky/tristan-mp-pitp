@@ -276,6 +276,8 @@ subroutine init_particle_distribution_user()
 
 	real(sprec) :: x1,x2,y1,y2,z1,z2
 
+	print*, 'init particles'
+
 	pcosthmult=0 !if 0 the Maxwellian distribution corresponding to 
 	             ! temperature is initialized in 2D (z temperature = 0), 1 for 3D distribution (z temp nonzero). 
                      ! 1 is default

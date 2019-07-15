@@ -151,6 +151,9 @@ subroutine initialize()
 	if (irestart .ne. 1) call init_particle_distribution() ! sets the initial particle distribution
 	print *, "init_particle_distribution"
 	call init_EMfields()		 ! Sets the initial EM fields
+
+	!if (irestart .ne. 1) call init_particle_distribution() ! sets the initial particle distribution
+	!print *, "init_particle_distribution"
 	
 	if(debug)print *,rank,": before barrier"
 	
