@@ -1,5 +1,5 @@
 clear;
-directory_name = './output1/';
+directory_name = './output/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.050';
@@ -14,9 +14,9 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 300;
+last_number = 250;
 a = last_number;
-first_number = 1;
+first_number = 150;
 timeStep = 250;
 
 if(a < 10)
@@ -272,11 +272,12 @@ for a = first_number:last_number,
             end;
         end;
     end;
-    if(a == first_number)
-        plot(xe(part_number), gammae(part_number), 'ro', 'MarkerSize', 15);
-        plot(xe(part_number2), gammae(part_number2), 'ro', 'MarkerSize', 15, 'Color','green');
-        plot(xe(part_number3), gammae(part_number3), 'ro', 'MarkerSize', 15, 'Color', 'black');
-    end;
+    %if(a == first_number)
+    %    plot(xe(part_number), gammae(part_number), 'ro', 'MarkerSize', 15);
+    %    plot(xe(part_number2), gammae(part_number2), 'ro', 'MarkerSize', 15, 'Color','green');
+    %    plot(xe(part_number3), gammae(part_number3), 'ro', 'MarkerSize', 15, 'Color', 'black');
+    %end;
+    if(part_number <= Npart)
     x1(a - first_number+1) = xe(part_number);
     y1(a - first_number+1) = ye(part_number);
     g1(a - first_number+1) = gammae(part_number);
@@ -284,6 +285,8 @@ for a = first_number:last_number,
     u1(a - first_number+1) = ue(part_number);
     v1(a - first_number+1) = ve(part_number);
     w1(a - first_number+1) = we(part_number);
+    end;
+    if(part_number2 <= Npart)
     x2(a - first_number+1) = xe(part_number2);
     y2(a - first_number+1) = ye(part_number2);
     g2(a - first_number+1) = gammae(part_number2);
@@ -291,6 +294,8 @@ for a = first_number:last_number,
     u2(a - first_number+1) = ue(part_number2);
     v2(a - first_number+1) = ve(part_number2);
     w2(a - first_number+1) = we(part_number2);
+    end;
+    if(part_number3 <= Npart)
     x3(a - first_number+1) = xe(part_number3);
     y3(a - first_number+1) = ye(part_number3);
     g3(a - first_number+1) = gammae(part_number3);
@@ -298,6 +303,7 @@ for a = first_number:last_number,
     u3(a - first_number+1) = ue(part_number3);
     v3(a - first_number+1) = ve(part_number3);
     w3(a - first_number+1) = we(part_number3);
+    end;
 end;
 plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red',x2(1:(last_number-first_number + 1)),g2(1:(last_number-first_number + 1)),'green', x3(1:(last_number-first_number + 1)),g3(1:(last_number-first_number + 1)),'black');
 grid;
