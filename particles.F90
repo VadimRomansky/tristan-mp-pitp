@@ -1941,7 +1941,9 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 
 	ions0=ions
 
-	call check_overflow_num(numps)	
+	call check_overflow_num(numps)
+
+	print *, 'injecting protons'
 
 	do while(n < int(numps))
 		

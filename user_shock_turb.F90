@@ -310,6 +310,7 @@ subroutine init_particle_distribution_user()
  
 	call inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,&
              gamma_drift,delgam_i,delgam_e,weight,direction)
+	print *,'finish inject plasms region'
 
 
 	call check_overflow()
@@ -2580,7 +2581,7 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 	!be careful, turbulence fraction should be small
 	turbulenceClumpedFraction = 0.5;
 	fieldFraction = 1.0;
-	clumpmaxR = 1000;
+	clumpmaxR = 50;
 	clumpminR = clumpmaxR/4;
 
 	clumpN = turbulenceClumpedFraction*mx0*my0/(clumpmaxR*clumpmaxR);
@@ -2631,7 +2632,8 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 					x = xglob(i*1.0) - clumpx;
 					r = sqrt(x*x + y*y);
 					if(r < clumpR) then
-						bz(i,j,k) = bz(i,j,k) - turbulenceFieldCorrection*Binit*(1.0 - r*r/(clumpR*clumpR));
+						!bz(i,j,k) = bz(i,j,k) - turbulenceFieldCorrection*Binit*(1.0 - r*r/(clumpR*clumpR));
+						bz(i,j,k) = 0;
 
 						!if(r > 0) then
 						!	cosphi = x/r;
