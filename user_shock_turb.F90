@@ -2631,15 +2631,15 @@ subroutine init_turbulent_field_clumped(turbulenceEnergyFraction)
 					x = xglob(i*1.0) - clumpx;
 					r = sqrt(x*x + y*y);
 					if(r < clumpR) then
-						!bz(i,j,k) = bz(i,j,k) - turbulenceFieldCorrection*Binit*(1.0 - r*r/(clumpR*clumpR));
+						bz(i,j,k) = bz(i,j,k) - turbulenceFieldCorrection*Binit*(1.0 - r*r/(clumpR*clumpR));
 
-						if(r > 0) then
-							cosphi = x/r;
-							sinphi = y/r;
+						!if(r > 0) then
+						!	cosphi = x/r;
+						!	sinphi = y/r;
 
-							bx(i,j,k) = bx(i,j,k) + sinphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
-							by(i,j,k) = by(i,j,k) - cosphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
-						end if
+						!	bx(i,j,k) = bx(i,j,k) + sinphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
+						!	by(i,j,k) = by(i,j,k) - cosphi*fieldFraction*Binit*(r/clumpR)*(1 - r/clumpR);
+						!end if
 					end if
 				end do
 			end do

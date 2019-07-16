@@ -1953,17 +1953,17 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 		p(ions)%y=miny+delta_y * random(dseed) 
 		p(ions)%z=minz+delta_z * random(dseed)
 
-		!i = p(ions)%x
-		!j = p(ions)%y
-		!k = p(ions)%z
+		i = p(ions)%x
+		j = p(ions)%y
+		k = p(ions)%z
 
 		!print *, i,j,k
 
-		!B = sqrt(bx(i,j,k)**2 + by(i,j,k)**2 + bz(i,j,k)**2);
-		!level = 1.0 - 0.5*B/Binit;
-		!randomX = rand();
-		!if(randomX < level) then
-		if (.true.) then
+		B = sqrt(bx(i,j,k)**2 + by(i,j,k)**2 + bz(i,j,k)**2);
+		level = 1.0 - 0.5*B/Binit;
+		randomX = rand();
+		if(randomX < level) then
+		!if (.true.) then
 			n=n+1
 			ions=ions+1
 			call maxwell_dist(gamma_drift,c,dseed,p(ions)%u,p(ions)%v,p(ions &
