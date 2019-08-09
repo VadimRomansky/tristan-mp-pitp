@@ -1,5 +1,5 @@
 clear;
-directory_name = './output/';
+directory_name = './output1/';
 file_name = 'spect';
 file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
@@ -22,7 +22,7 @@ Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
 me = 0.91*10^-27;
-mass_ratio = 16;
+mass_ratio = 25;
 mp = me*mass_ratio;
 c = 2.99792458*10^10;
 Te = 5*10^9;
@@ -95,3 +95,8 @@ title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
 grid ;
+
+dlmwrite('Pp.dat',Pp,'delimiter','\n');
+dlmwrite('Pe.dat',Pe,'delimiter','\n');
+dlmwrite('Fp.dat',Fp,'delimiter','\n');
+dlmwrite('Fe.dat',Fe,'delimiter','\n');

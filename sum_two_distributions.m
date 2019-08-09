@@ -5,8 +5,8 @@ file_number = '.010';
 Nd = 2;
 start = 0;
 
-Color = {'red','blue'};
-LegendTitle = {'0.004','0.04'};
+Color = {'red','blue','green'};
+LegendTitle = {'zmodes','ymodes'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -22,6 +22,12 @@ Pe(1:Nd,1:Np)=0;
 
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
+
+gsum(1:Np) = 0;
+Ppsum(1:Np) = 0;
+Pesum(1:Np) = 0;
+Fpsum(1:Np) = 0;
+Fesum(1:Np) = 0;
 
 me = 0.91*10^-27;
 mass_ratio = 25;
@@ -84,6 +90,93 @@ for j = 1:Nd,
     end;
 end;
 
+gmin1 = g(1,1);
+gmax1 = g(1,Np);
+gmin2 = g(2,1);
+gmax2 = g(2,Np);
+gmin = 0;
+gmax = 0;
+if(gmin1 < gmin2)
+    gmin = gmin1;
+else
+    gmin = gmin2;
+end;
+if(gmax1 > gmax2)
+    gmax = gmax1;
+else
+    gmax = gmax2;
+end;
+factor = (gmax/gmin)^(1.0/(Np-1));
+
+for i = 1:Np,
+    gsum(i) = gmin*factor^(i-1);
+end;
+for i = 1:Np,
+    Ppsum(i) = sqrt((gsum(i)+1)^2 - 1);
+    Pesum(i) = sqrt((gsum(i)+1)^2 - 1);
+end;
+
+for i = 1:Np,
+    if(Ppsum(i) < Pp(1,1))
+        Fpsum(i) = Fpsum(i) + 0;
+    else if (Ppsum(i) > Pp(1,Np))
+            Fpsum(i) = Fpsum(i) + 0;
+        else
+            cur = 1;
+            for j = 1:Np,
+                if(Ppsum(i) >= Pp(1,j))
+                    cur = j+1;
+                end;
+            end;
+            Fpsum(i) = Fpsum(i) + (Fp(1,cur-1)*(Pp(1,cur) - Ppsum(i)) + Fp(1,cur)*(Ppsum(i) - Pp(1,cur-1)))/(Pp(1,cur) - Pp(1,cur-1));
+        end;
+    end;
+    if(Pesum(i) < Pe(1,1))
+        Fesum(i) = Fesum(i) + 0;
+    else if (Pesum(i) > Pe(1,Np))
+            Fesum(i) = Fesum(i) + 0;
+        else
+            cur = 1;
+            for j = 1:Np,
+                if(Pesum(i) >= Pe(1,j))
+                    cur = j+1;
+                end;
+            end;
+            Fesum(i) = Fesum(i) + (Fe(1,cur-1)*(Pe(1,cur) - Pesum(i)) + Fe(1,cur)*(Pesum(i) - Pe(1,cur-1)))/(Pe(1,cur) - Pe(1,cur-1));
+        end;
+    end;
+    
+    
+    if(Ppsum(i) < Pp(2,1))
+        Fpsum(i) = Fpsum(i) + 0;
+    else if (Ppsum(i) >= Pp(2,Np))
+            Fpsum(i) = Fpsum(i) + 0;
+        else
+            cur = 1;
+            for j = 1:Np,
+                if(Ppsum(i) >= Pp(2,j))
+                    cur = j+1;
+                end;
+            end;
+            Fpsum(i) = Fpsum(i) + (Fp(2,cur-1)*(Pp(2,cur) - Ppsum(i)) + Fp(2,cur)*(Ppsum(i) - Pp(2,cur-1)))/(Pp(2,cur) - Pp(2,cur-1));
+        end;
+    end;
+    if(Pesum(i) < Pe(2,1))
+        Fesum(i) = Fesum(i) + 0;
+    else if (Pesum(i) > Pe(2,Np))
+            Fesum(i) = Fesum(i) + 0;
+        else
+            cur = 1;
+            for j = 1:Np,
+                if(Pesum(i) >= Pe(2,j))
+                    cur = j+1;
+                end;
+            end;
+            Fesum(i) = Fesum(i) + (Fe(2,cur-1)*(Pe(2,cur) - Pesum(i)) + Fe(2,cur)*(Pesum(i) - Pe(2,cur-1)))/(Pe(2,cur) - Pe(2,cur-1));
+        end;
+    end;
+end;
+
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
 figure(1);
@@ -91,11 +184,8 @@ hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
-for j=1:Nd,
-    plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
-end;
+plot (Ppsum(1, 1:Np),Fpsum(1:Np),'color',Color{1});
 %plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
-legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 %legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
 grid ;
 
@@ -107,7 +197,7 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
+plot (Pesum(1:Np),Fesum(1:Np),'color',Color{Nd+1});
 %plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
-legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
-%legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'sum','Location','southeast');
 grid ;

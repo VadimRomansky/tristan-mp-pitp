@@ -1,17 +1,14 @@
 clear;
-directory_name = './output2/';
+directory_name = './output/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 7;
 start = 0;
 
-me=0.9*10^-27;
-mp=25*me;
-c=3*10^10;
-
-Color = {'magenta','cyan','green','black','red','blue','yellow'};
+Color = {'blue','yellow','green','black','red','magenta','cyan',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'B normal','B quasiparallel', 'anisotropic turbulence bz', 'isotropic turbulence','anisotropic turbulence by','maltese cross','anisotropic 50%'};
+%LegendTitle = {'90', '75', '60', '45','30','15'};
+LegendTitle = {'2-10','2-20', '0.1-5', '2-5','2-20','2-40','2-5'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -66,25 +63,24 @@ end;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
-set(0, 'DefaultLineLineWidth', 1);
 figure(1);
 hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
-ylabel ('Fp*p^4');
+ylabel ('Fp p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7},'Location','northwest');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
 grid ;
 
 figure(2);
 hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
-ylabel ('F_e*p^4');
+ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7},'Location','northwest');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
 grid ;

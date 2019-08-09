@@ -5,7 +5,7 @@ file_number = '.010';
 Nd = 4;
 start = 0;
 
-Color = {'red','blue','green','black'};
+Color = {'red','blue','green','black','magenta'};
 LegendTitle = {'sin modes','curles','holes','regular'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -20,6 +20,22 @@ Fp(1:Nd,1:Np)=0;
 Fe(1:Nd,1:Np)=0;
 Pp(1:Nd,1:Np)=0;
 Pe(1:Nd,1:Np)=0;
+
+Fejuttner(1:Np)=0;
+Fpjuttner(1:Np)=0;
+
+me = 0.91*10^-27;
+mass_ratio = 25;
+mp = me*mass_ratio;
+
+Te = 0.4*10^10;
+Tp = 2.7*10^10;
+kB = 1.3806488*10^-16;
+c = 2.99792458*10^10;
+thetae = kB*Te/(me*c*c);
+thetap = kB*Tp/(mp*c*c);
+fractione = 1;
+fractionp = 1;
 
 
 for j = 1:Nd,
@@ -38,6 +54,24 @@ for j = 1:Nd,
         Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
         Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));
     end;
+end;
+
+for i = 1:Np,
+    %exp1 = exp(-sqrt(1+Pe(i)*Pe(i)/(me*me*c*c))/thetae);
+    exp1 = exp(-sqrt(1+Pe(1,i)*Pe(1,i))/thetae);
+    bes = besselk(2, 1/thetae);
+    p = Pe(1,i);
+    p3 = (p)^3;
+    Fejuttner(i) = fractione*(1.0/(thetae*bes))*exp1*p3*Pe(1,i);
+    
+    
+    
+    %exp1 = exp(-sqrt(1+Pp(i)*Pp(i)/(mp*mp*c*c))/thetap);
+    exp1 = exp(-sqrt(1+Pp(1,i)*Pp(1,i))/thetap);
+    bes = besselk(2, 1/thetap);
+    p = Pp(1,i);
+    p3 = (p)^3;
+    Fpjuttner(i) = fractionp*(1.0/(thetap*bes))*exp1*p3*Pp(1,i);
 end;
 
 norm = 1;
@@ -69,7 +103,8 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+plot (Pp(1, 1:Np),Fpjuttner(1:Np),'color',Color{Nd+1});
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Maxwell','Location','southeast');
 grid ;
 
 figure(2);
@@ -80,5 +115,6 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
+plot (Pe(1, 1:Np),Fejuttner(1:Np),'color',Color{Nd+1});
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Maxwell','Location','southeast');
 grid ;
