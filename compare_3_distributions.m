@@ -1,12 +1,12 @@
 clear;
-directory_name = './output1/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.008';
+file_number = '.010';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'holes','regular','sin'};
+LegendTitle = {'t1','t2','t3'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,7 +14,10 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx(1:Nd) = 0;
+endx(1) = 40000;
+endx(2) = 40000;
+endx(3) = 40000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -32,7 +35,7 @@ for j = 1:Nd,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = startx:endx,
+        for k = startx:endx(j),
             Fp(j,i) = Fp(j,i) + fp(k,i);
             Fe(j,i) = Fe(j,i) + fe(k,i);
         end;

@@ -1,12 +1,12 @@
 clear;
-directory_name = './output/';
+directory_name = './output1/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
-LegendTitle = {'sin modes','curles','holes','regular'};
+LegendTitle = {'mp/me = 25','mp/me = 50','mp/me = 100','mp/me = 100, regular'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -25,16 +25,16 @@ Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
 me = 0.91*10^-27;
-mass_ratio = 25;
+mass_ratio = 100;
 mp = me*mass_ratio;
 
-Te = 0.4*10^10;
-Tp = 2.7*10^10;
+Te = 1.2*10^10;
+Tp = 1*10^11;
 kB = 1.3806488*10^-16;
 c = 2.99792458*10^10;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
-fractione = 1;
+fractione = 0.8;
 fractionp = 1;
 
 
