@@ -20,18 +20,27 @@ Pp(1:Np)=0;
 Pe(1:Np)=0;
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
+Fekappa(1:Np) = 0;
+Fpkappa(1:Np) = 0;
 
 me = 0.91*10^-27;
-mass_ratio = 25;
+mass_ratio = 100;
 mp = me*mass_ratio;
 c = 2.99792458*10^10;
 Te = 5*10^9;
 Tp = 3.5*10^10;
+Pekappa = 14*me*c;
+Ppkappa = mp*c;
+kappa = 4;
 kB = 1.3806488*10^-16;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
 fractione = 0.5;
 fractionp = 0.5;
+
+Apkappa = ((pi*(kappa - 1.5))^(-1.5))*gamma(kappa + 1)/(gamma(kappa - 0.5)*(Ppkappa/(mp*c))^3);
+Aekappa = ((pi*(kappa - 1.5))^(-1.5))*gamma(kappa + 1)/(gamma(kappa - 0.5)*(Pekappa/(me*c))^3);
+
 
 normp = 0;
 norme = 0;
@@ -55,7 +64,7 @@ for i = 1:Np,
     p = Pe(i);
     p3 = (p)^3;
     Fejuttner(i) = fractione*(1.0/(thetae*bes))*exp1*p3*Pe(i);
-    
+    Fekappa(i) = Aekappa*(1 + ((Pe(i)*me*c/Pekappa)^2)/(kappa-3/2))^(-(kappa + 1))*4*pi*p3*Pe(i);
     
     
     %exp1 = exp(-sqrt(1+Pp(i)*Pp(i)/(mp*mp*c*c))/thetap);
@@ -64,14 +73,17 @@ for i = 1:Np,
     p = Pp(i);
     p3 = (p)^3;
     Fpjuttner(i) = fractionp*(1.0/(thetap*bes))*exp1*p3*Pp(i);
+    Fpkappa(i) = Apkappa*(1 + (Pp(i)*me*c/Ppkappa)^2)^(-(kappa + 1));
 end;
 
 normp = (Fp(1)/(Pp(2)^2))*(Pp(2) - Pp(1));
 norme = (Fe(1)/(Pe(2)^2))*(Pe(2) - Pe(1));
+normkappae = (Fekappa(1)/(Pe(2)^2))*(Pe(2) - Pe(1));
 
 for i = 2:Np,
     normp = normp + (Fp(i)/(Pp(i)^2))*(Pp(i) - Pp(i-1));
     norme = norme + (Fe(i)/(Pe(i)^2))*(Pe(i) - Pe(i-1));
+    normkappae = normkappae + (Fekappa(i)/(Pe(i)^2))*(Pe(i) - Pe(i-1));
 end;
 
 for i = 1:Np,
@@ -90,7 +102,7 @@ grid ;
 
 figure(2);
 %plot (Pe(1:Np),Fe(1:Np), 'red');
-plot (Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue');
+plot (Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');

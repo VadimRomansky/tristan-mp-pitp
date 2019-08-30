@@ -70,6 +70,7 @@ factor = 1.0;
 figure(1);
 hold on;
 plot(radiation(1:N,1),radiation(1:N,5),'red');
+plot(radiation(1:N,1),radiation(1:N,7),'green');
 plot(augx(1:5),augy(1:5)*factor,'blue');
 title ('I_{\nu}');
 xlabel ('{\nu}/{\nu}_c');
