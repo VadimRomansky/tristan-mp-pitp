@@ -1,5 +1,5 @@
 clear;
-directory_name = './output10/';
+directory_name = './output2/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 10;
@@ -7,7 +7,7 @@ start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'noturb B in plane', 'noturb B out plane','turb 0.5 iso B in plane', 'turb 0.5 iso B out plane', 'turb 0.5 aniso B in plane', 'turb 0.5 aniso B out plane','turb 0.9 iso B in plane', 'turb 0.9 iso B out plane', 'turb 0.9 aniso B in plane', 'turb 0.9 aniso B out plane'};
+LegendTitle = {'{\theta} = 20', '{\theta} = 30','{\theta} = 40', '{\theta} = 42', '{\theta} = 44', '{\theta} = 46','{\theta} = 48', '{\theta} = 50', '{\theta} = 55', '{\theta} = 60'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -84,3 +84,37 @@ for j=1:Nd,
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8}, LegendTitle{9}, LegendTitle{10},'Location','northwest');
 grid ;
+
+spectrum(1:Np,1:20) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+    
+    spectrum(i,5) = Pe(3,i);
+    spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+    
+    spectrum(i,9) = Pe(5,i);
+    spectrum(i,10) = Fe(5,i);
+    
+    spectrum(i,11) = Pe(6,i);
+    spectrum(i,12) = Fe(6,i);
+    
+    spectrum(i,13) = Pe(7,i);
+    spectrum(i,14) = Fe(7,i);
+    
+    spectrum(i,15) = Pe(8,i);
+    spectrum(i,16) = Fe(8,i);
+    
+    spectrum(i,17) = Pe(9,i);
+    spectrum(i,18) = Fe(9,i);
+    
+    spectrum(i,19) = Pe(10,i);
+    spectrum(i,20) = Fe(10,i);
+end;
+dlmwrite('spectrum10.dat',spectrum,'delimiter',' ');

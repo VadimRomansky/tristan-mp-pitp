@@ -1,14 +1,14 @@
 clear;
-directory_name = './output/';
+directory_name = './output1/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.005';
 Nd = 6;
 start = 0;
 
-Color = {'blue','yellow','green','black','red','magenta','cyan',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
+Color = {'blue','red','green','black','yellow','magenta','cyan',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
 %LegendTitle = {'90', '75', '60', '45','30','15'};
-LegendTitle = {'2-10','2-20', '0.1-5', '2-5','2-20','2-40'};
+LegendTitle = {'0','90', '70', '50','30','10'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -16,7 +16,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = 20000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -84,3 +84,25 @@ for j=1:Nd,
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
 grid ;
+
+spectrum(1:Np,1:12) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+    
+    spectrum(i,5) = Pe(3,i);
+    spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+    
+    spectrum(i,9) = Pe(5,i);
+    spectrum(i,10) = Fe(5,i);
+    
+    spectrum(i,11) = Pe(6,i);
+    spectrum(i,12) = Fe(6,i);
+end;
+dlmwrite('spectrum6.dat',spectrum,'delimiter',' ');

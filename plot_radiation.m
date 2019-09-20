@@ -69,12 +69,12 @@ factor = 1.0;
 
 figure(1);
 hold on;
-plot(radiation(1:N,1),radiation(1:N,5),'red');
-plot(radiation(1:N,1),radiation(1:N,7),'green');
+plot(radiation(1:N,1),radiation(1:N,2),'red');
+%plot(radiation(1:N,1),radiation(1:N,7),'green');
 plot(augx(1:5),augy(1:5)*factor,'blue');
 title ('I_{\nu}');
-xlabel ('{\nu}/{\nu}_c');
-ylabel ('I_{\nu} erg/cm^{-3} sr');
+xlabel ('{\nu} GHz');
+ylabel ('I_{\nu} erg/Hz cm^{3} sr');
 grid ;
 
 figure(2);
@@ -90,3 +90,11 @@ title ('t');
 xlabel ('{\nu}/{\nu}_c');
 ylabel ('t');
 grid ;
+
+radiation_wrt(1:N,2) = 0;
+for i = 1:N
+    radiation_wrt(i,1) = radiation(i,1);
+    radiation_wrt(i,2) = radiation(i,2);
+end;
+
+dlmwrite('radiation.dat',radiation_wrt,'delimiter',' ');

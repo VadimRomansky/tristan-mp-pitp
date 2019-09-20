@@ -1,12 +1,13 @@
 clear;
-directory_name = './output2/';
+directory_name = './output10/';
 file_name = 'spect';
 file_number = '.010';
-Nd = 3;
+Nd = 9;
 start = 0;
 
-Color = {'red','blue','green'};
-LegendTitle = {'mp/me = 25','mp/me = 50','mp/me = 100'};
+Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
+%LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
+LegendTitle = {'{\theta} = 20', '{\theta} = 30','{\theta} = 40', '{\theta} = 42', '{\theta} = 44', '{\theta} = 46','{\theta} = 48', '{\theta} = 50', '{\theta} = 55', '{\theta} = 60'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -14,10 +15,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx(1:Nd) = 0;
-endx(1) = 20000;
-endx(2) = 28000;
-endx(3) = 20000;
+endx = Nx/4;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -35,7 +33,7 @@ for j = 1:Nd,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = startx:endx(j),
+        for k = startx:endx,
             Fp(j,i) = Fp(j,i) + fp(k,i);
             Fe(j,i) = Fe(j,i) + fe(k,i);
         end;
@@ -61,31 +59,33 @@ for j = 1:Nd,
     end;
 end;
 
+
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
+set(0, 'DefaultLineLineWidth', 1.5);
 figure(1);
 hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
-ylabel ('Fp p^4');
+ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8}, LegendTitle{9}, LegendTitle{10},'Location','northwest');
 grid ;
 
 figure(2);
 hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
-ylabel ('F_e p^4');
+ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8}, LegendTitle{9}, LegendTitle{10},'Location','northwest');
 grid ;
 
-spectrum(1:Np,1:6) = 0;
+spectrum(1:Np,1:20) = 0;
 for i = 1:Np,
     spectrum(i,1) = Pe(1,i);
     spectrum(i,2) = Fe(1,i);
@@ -95,5 +95,26 @@ for i = 1:Np,
     
     spectrum(i,5) = Pe(3,i);
     spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+    
+    spectrum(i,9) = Pe(5,i);
+    spectrum(i,10) = Fe(5,i);
+    
+    spectrum(i,11) = Pe(6,i);
+    spectrum(i,12) = Fe(6,i);
+    
+    spectrum(i,13) = Pe(7,i);
+    spectrum(i,14) = Fe(7,i);
+    
+    spectrum(i,15) = Pe(8,i);
+    spectrum(i,16) = Fe(8,i);
+    
+    spectrum(i,17) = Pe(9,i);
+    spectrum(i,18) = Fe(9,i);
+    
+    spectrum(i,19) = Pe(10,i);
+    spectrum(i,20) = Fe(10,i);
 end;
-dlmwrite('spectrum3.dat',spectrum,'delimiter',' ');
+dlmwrite('spectrum10.dat',spectrum,'delimiter',' ');

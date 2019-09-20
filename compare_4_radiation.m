@@ -72,7 +72,7 @@ figure(1);
 hold on;
 title ('I_{\nu}');
 xlabel ('{\nu} GHz');
-ylabel ('I_{\nu} erg/cm^{-3} sr');
+ylabel ('I_{\nu} erg/Hz cm^{3} sr');
 
 plot(radiation0(1:N0,1),radiation0(1:N0,4),'red',radiation1(1:N1,1),radiation1(1:N1,4),'blue',radiation2(1:N2,1),radiation2(1:N2,4),'green',radiation3(1:N3,1),radiation3(1:N3,4),'black');
 
@@ -92,3 +92,21 @@ plot(aprx(1:4), apry(1:4),'red',mayx(1:3), mayy(1:3),'blue',junx(1:4),juny(1:4),
 legend('April','May','June','August','April','May','June','August');
 
 grid ;
+
+radiation(1:N0,1:8) = 0;
+for i = 1:N0,
+    radiation(i,1) = radiation0(i,1);
+    radiation(i,2) = radiation0(i,6);
+    
+    radiation(i,3) = radiation1(i,1);
+    radiation(i,4) = radiation1(i,6);
+    
+    radiation(i,5) = radiation2(i,1);
+    radiation(i,6) = radiation2(i,6);
+    
+    radiation(i,7) = radiation3(i,1);
+    radiation(i,8) = radiation3(i,6);
+end;
+
+dlmwrite('radiation.dat',radiation,'delimiter',' ');
+%writematrix(radiation,'radiation.dat','delimiter',' ');

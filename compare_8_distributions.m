@@ -84,3 +84,31 @@ for j=1:Nd,
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8},'Location','northwest');
 grid ;
+
+spectrum(1:Np,1:16) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+    
+    spectrum(i,5) = Pe(3,i);
+    spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+    
+    spectrum(i,9) = Pe(5,i);
+    spectrum(i,10) = Fe(5,i);
+    
+    spectrum(i,11) = Pe(6,i);
+    spectrum(i,12) = Fe(6,i);
+    
+    spectrum(i,13) = Pe(7,i);
+    spectrum(i,14) = Fe(7,i);
+    
+    spectrum(i,15) = Pe(8,i);
+    spectrum(i,16) = Fe(8,i);
+end;
+dlmwrite('spectrum8.dat',spectrum,'delimiter',' ');

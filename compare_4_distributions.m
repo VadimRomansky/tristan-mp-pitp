@@ -1,19 +1,19 @@
 clear;
 directory_name = './output1/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.010';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
-LegendTitle = {'{\theta} = 20','{\theta} = 30','{\theta} = 35','{\theta} = 40'};
+LegendTitle = {'1.5','1.4','1.3','1.2'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = 20000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -118,3 +118,19 @@ end;
 plot (Pe(1, 1:Np),Fejuttner(1:Np),'color',Color{Nd+1});
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Maxwell','Location','southeast');
 grid ;
+
+spectrum(1:Np,1:8) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+    
+    spectrum(i,5) = Pe(3,i);
+    spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+end;
+dlmwrite('spectrum4.dat',spectrum,'delimiter',' ');

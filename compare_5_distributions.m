@@ -1,13 +1,13 @@
 clear;
-directory_name = './output4/';
+directory_name = './output1/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 5;
 start = 0;
 
-Color = {'red','blue','green','black','magenta'};
+Color = {'green','red','blue','black','magenta'};
 %LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-LegendTitle = {'0.5','0.6','0.7','0.8','0.9'};
+LegendTitle = {'0','0.9','0.7','0.5','0.3'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -65,7 +65,7 @@ figure(1);
 hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
-ylabel ('Fp*p^4');
+ylabel ('Fp p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
@@ -76,9 +76,28 @@ figure(2);
 hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
-ylabel ('F_e*p^4');
+ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5},'Location','southeast');
 grid ;
+
+spectrum(1:Np,1:10) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+    
+    spectrum(i,5) = Pe(3,i);
+    spectrum(i,6) = Fe(3,i);
+    
+    spectrum(i,7) = Pe(4,i);
+    spectrum(i,8) = Fe(4,i);
+    
+    spectrum(i,9) = Pe(5,i);
+    spectrum(i,10) = Fe(5,i);
+end;
+dlmwrite('spectrum5.dat',spectrum,'delimiter',' ');

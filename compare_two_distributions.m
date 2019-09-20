@@ -6,7 +6,7 @@ Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'25','50'};
+LegendTitle = {'regular','turb'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -111,3 +111,13 @@ end;
 legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
 %legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
 grid ;
+
+spectrum(1:Np,1:4) = 0;
+for i = 1:Np,
+    spectrum(i,1) = Pe(1,i);
+    spectrum(i,2) = Fe(1,i);
+    
+    spectrum(i,3) = Pe(2,i);
+    spectrum(i,4) = Fe(2,i);
+end;
+dlmwrite('spectrum2.dat',spectrum,'delimiter',' ');
