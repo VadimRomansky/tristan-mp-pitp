@@ -5,10 +5,10 @@ file_number = '.010';
 Nd = 7;
 start = 0;
 
-Color = {'blue','yellow','green','black','red','magenta','cyan',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
+Color = {'cyan','yellow','green','black','red','magenta','blue',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
 %LegendTitle = {'90', '75', '60', '45','30','15'};
-LegendTitle = {'2-10','2-20', '0.1-5', '2-5','2-20','2-40','2-5'};
+LegendTitle = {'t*{\omega}_p = 900','t*{\omega}_p = 2700', 't*{\omega}_p = 4500', 't*{\omega}_p = 9000','t*{\omega}_p = 13500','t*{\omega}_p = 18000','t*{\omega}_p = 27000'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -16,7 +16,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = 20000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -71,7 +71,7 @@ ylabel ('Fp p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7},'Location','northwest');
 grid ;
 
 figure(2);
@@ -82,7 +82,7 @@ ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6},'Location','northwest');
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7},'Location','northwest');
 grid ;
 
 spectrum(1:Np,1:14) = 0;
