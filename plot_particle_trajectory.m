@@ -1,5 +1,5 @@
 clear;
-directory_name = './output2/';
+directory_name = './output7/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 550;
+last_number = 200;
 a = last_number;
 first_number = 1;
 
@@ -45,10 +45,18 @@ zi = hdf5read(full_part_name, 'zi');
 %Ex = hdf5read(full_name,'ex');
 %Ey = hdf5read(full_name,'ey');
 %Ez = hdf5read(full_name,'ez');
-B0 = 0.03030750;
+
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx/2;
+Nx = Nx;
+
+B0 = 0;
+for i = 1:Nx,
+    for j = 1:Ny,
+        B0 = B0 + Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j);
+    end;
+end;
+B0 = sqrt(B0/(Nx*Ny));
 
 frameTime = 1.0/10;
 
@@ -348,6 +356,9 @@ fig = imagesc((1:Nx)*samplingFactor, (1:Ny)*samplingFactor,Enorm);
 fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 10, 'Color','red','LineWidth',3);
 fig_part2 = plot(xe(part_number2), ye(part_number2), 'ro', 'MarkerSize', 10, 'Color','green','LineWidth',3);
 fig_part3 = plot(xe(part_number3), ye(part_number3), 'ro', 'MarkerSize', 10, 'Color', 'black','LineWidth',3);
+plot(x1(1:(last_number-first_number + 1)),y1(1:(last_number-first_number + 1)),'red');
+plot(x2(1:(last_number-first_number + 1)),y2(1:(last_number-first_number + 1)),'green');
+plot(x3(1:(last_number-first_number + 1)),y3(1:(last_number-first_number + 1)),'black');
 pos = get(gcf, 'Position');
 width = pos(3);
 height = pos(4);

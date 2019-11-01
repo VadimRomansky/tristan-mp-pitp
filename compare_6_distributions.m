@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
+directory_name = './output4/';
 file_name = 'spect';
-file_number = '.005';
+file_number = '.010';
 Nd = 6;
 start = 0;
 

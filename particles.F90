@@ -1748,6 +1748,8 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 	real(sprec), dimension(3) :: values
 
 	real dx, dy, dz, len !hack
+
+	real kx, ky, level, randomX
 	
 !tables for pre-computed maxwellian distributions. Can add more here
 	real, dimension(pdf_sz) :: pdf_table_i, gamma_table_i, pdf_table_e, gamma_table_e
@@ -1943,52 +1945,69 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 
 	do while(n < int(numps))
 		
-		n=n+1
-		ions=ions+1
-
+		!n=n+1
+		!ions=ions+1
+		
 		!  Add some random spread:
 		
 		p(ions)%x=minx+delta_x * random(dseed) 
 		p(ions)%y=miny+delta_y * random(dseed) 
 		p(ions)%z=minz+delta_z * random(dseed) 
-		
-		call maxwell_dist(gamma_drift,c,dseed,p(ions)%u,p(ions)%v,p(ions &
-		)%w,gamma_table_i, pdf_table_i,pdf_sz ) ! , 0., 1.)	
 
-		p(ions)%ch=weight 
+		kx = 2*pi/2000
+		ky = 2*pi/2000
+		level = 0.75 + 0.25*sin(kx*p(ions)%x + ky*p(ions)%y);
+		randomX = rand();
+		if(randomX < level) then
+			print *,'add ion', n
+			n=n+1
+			ions=ions+1
+
+			!if(modulo(ions,10).eq.0) then
+			!	call maxwell_dist(1.5,c,dseed,p(ions)%u,p(ions)%v,p(ions &
+			!	)%w,gamma_table_i, pdf_table_i,pdf_sz ) ! , 0., 1.)	
+			!else then
+				call maxwell_dist(gamma_drift,c,dseed,p(ions)%u,p(ions)%v,p(ions &
+				)%w,gamma_table_i, pdf_table_i,pdf_sz ) ! , 0., 1.)	
+			!endif
+
+			p(ions)%ch=weight 
 	
-		if(direction.eq.2)then
-		   tmp=p(ions)%u
-		   p(ions)%u=p(ions)%v
-		   p(ions)%v=tmp
-		endif
+			if(direction.eq.2)then
+		   		tmp=p(ions)%u
+		  		p(ions)%u=p(ions)%v
+		  		p(ions)%v=tmp
+			endif
 
-		if(direction.eq.3)then
-		   tmp=p(ions)%u
-		   p(ions)%u=p(ions)%w
-		   p(ions)%w=tmp
-		endif
+			if(direction.eq.3)then
+		   		tmp=p(ions)%u
+		   		p(ions)%u=p(ions)%w
+		   		p(ions)%w=tmp
+			endif
 
-		beta_drift=sign(sqrt(1.-1./gamma_drift**2),gamma_drift)
+			beta_drift=sign(sqrt(1.-1./gamma_drift**2),gamma_drift)
 
-		gammaprt=sqrt(1.+p(ions)%u**2+p(ions)%v**2+p(ions)%w**2)
-		gammaperp=1.+p(ions)%v**2+p(ions)%w**2
-		betaxprt=p(ions)%u/gammaprt
-		corrweight=gammaprt**2*(1.+beta_drift*betaxprt)/ &
-		(gammaprt**2+gammaperp*gamma_drift**2-gammaperp)
-		p(ions)%ch=p(ions)%ch*corrweight
+			gammaprt=sqrt(1.+p(ions)%u**2+p(ions)%v**2+p(ions)%w**2)
+			
+				
+			gammaperp=1.+p(ions)%v**2+p(ions)%w**2
+			betaxprt=p(ions)%u/gammaprt
+			corrweight=gammaprt**2*(1.+beta_drift*betaxprt)/ &
+			(gammaprt**2+gammaperp*gamma_drift**2-gammaperp)
+			p(ions)%ch=p(ions)%ch*corrweight
 
 
-		totalpartnum =totalpartnum+1
-		p(ions)%ind=totalpartnum
-		p(ions)%proc=rank
-		p(ions)%splitlev=1
+			totalpartnum =totalpartnum+1
+			p(ions)%ind=totalpartnum
+			p(ions)%proc=rank
+			p(ions)%splitlev=1
 
-		if (use_density_profile) then
-			values(1)=(p(ions)%x-3.)/c_omp
-			values(2)=((p(ions)%y+modulo(rank,sizey)*(myall-5)) -3.)/c_omp
-			values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
-			p(ions)%ch=evalf(1,real(values,8))
+			if (use_density_profile) then
+				values(1)=(p(ions)%x-3.)/c_omp
+				values(2)=((p(ions)%y+modulo(rank,sizey)*(myall-5)) -3.)/c_omp
+				values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
+				p(ions)%ch=evalf(1,real(values,8))
+			endif
 		endif
 
 
@@ -2014,9 +2033,13 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 			values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
 			p(maxhlf+lecs)%ch=evalf(1,real(values,8))
 		endif
-	
-		   call maxwell_dist(gamma_drift,c,dseed,p(lecs+maxhlf)%u,p(lecs+maxhlf)%v,p(lecs &
-		   +maxhlf)%w,gamma_table_e, pdf_table_e,pdf_sz) !, 0., 1.)	
+		   !if(modulo(ions,10).eq.0) then
+		!	call maxwell_dist(1.5,c,dseed,p(lecs+maxhlf)%u,p(lecs+maxhlf)%v,p(lecs &
+		!   	+maxhlf)%w,gamma_table_e, pdf_table_e,pdf_sz) !, 0., 1.)
+		!   else then		
+		   	call maxwell_dist(gamma_drift,c,dseed,p(lecs+maxhlf)%u,p(lecs+maxhlf)%v,p(lecs &
+		   	+maxhlf)%w,gamma_table_e, pdf_table_e,pdf_sz) !, 0., 1.)	
+		!   endif
 
 		   if(direction.eq.2)then
 		      tmp=p(maxhlf+lecs)%u
