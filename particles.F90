@@ -1945,8 +1945,8 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 
 	do while(n < int(numps))
 		
-		!n=n+1
-		!ions=ions+1
+		n=n+1
+		ions=ions+1
 		
 		!  Add some random spread:
 		
@@ -1958,10 +1958,20 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 		ky = 2*pi/2000
 		level = 0.75 + 0.25*sin(kx*p(ions)%x + ky*p(ions)%y);
 		randomX = rand();
-		if(randomX < level) then
-			print *,'add ion', n
-			n=n+1
-			ions=ions+1
+		!print *, 'rand', randomX
+
+		do while (randomX > level)
+			p(ions)%x=minx+delta_x * random(dseed)
+			p(ions)%y=miny+delta_y * random(dseed)
+			p(ions)%z=minz+delta_z * random(dseed)
+
+			level = 0.75 + 0.25*sin(kx*p(ions)%x + ky*p(ions)%y);
+			randomX = rand();
+		enddo
+
+			!print *,'add ion', n
+			!n=n+1
+			!ions=ions+1
 
 			!if(modulo(ions,10).eq.0) then
 			!	call maxwell_dist(1.5,c,dseed,p(ions)%u,p(ions)%v,p(ions &
@@ -2008,7 +2018,6 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 				values(3)=((p(ions)%z+(rank/sizey)*(mzall-5))-3.)/c_omp
 				p(ions)%ch=evalf(1,real(values,8))
 			endif
-		endif
 
 
 		!  Place electrons in the same locations as ions for zero charge
