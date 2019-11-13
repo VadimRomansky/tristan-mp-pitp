@@ -31,6 +31,7 @@ CUSTOM= -DMPI -DHDF5 -DserIO -DtwoD
 # -DtwoD 2D code (ignorable z coordinate), omitting this defaults to 3D
 # -DDEBUG when enabled produces a lot of debugging information
 # -Dturbulence create turbulence field
+# -Ddensturbulece create turbulence density
 # -Dstripedfield create ctreaped field, use only with turbulence
 
 # undocumented options: do not use

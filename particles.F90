@@ -1749,7 +1749,8 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 
 	real dx, dy, dz, len !hack
 
-	real kx, ky, level, randomX
+	real kx, ky, kz, level, randomX, phase, pi, maxLambda
+	integer maxKx, maxKy, maxKz, ki, kj, kk
 	
 !tables for pre-computed maxwellian distributions. Can add more here
 	real, dimension(pdf_sz) :: pdf_table_i, gamma_table_i, pdf_table_e, gamma_table_e
@@ -1943,6 +1944,8 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 
 	call check_overflow_num(numps)	
 
+	pi = 2.0*acos(0.0);
+
 	do while(n < int(numps))
 		
 		n=n+1
@@ -1954,9 +1957,40 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 		p(ions)%y=miny+delta_y * random(dseed) 
 		p(ions)%z=minz+delta_z * random(dseed) 
 
-		kx = 2*pi/2000
-		ky = 2*pi/2000
-		level = 0.75 + 0.25*sin(kx*p(ions)%x + ky*p(ions)%y);
+#ifdef densturbulence
+
+		maxKx = 4;
+		maxKy = 4;
+		maxKz = 4;
+		maxLambda = 2000;
+
+		level = 0.5;
+		call srand(10)
+		do ki = 0, maxKx
+
+			do kj = 0, maxKy
+#ifdef twoD
+				kk = 0
+#else
+				!do kk = 0, mz0-5
+				do kk = 0, maxKz
+#endif
+
+					if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
+
+	
+						kx = ki*2*pi/maxLambda;
+						ky = kj*2*pi/maxLambda;
+						kz = kk*2*pi/maxLambda;
+						phase = 2*pi*rand();
+						level = level + 0.5*sin(kx*xglob(p(ions)%x) + ky*yglob(p(ions)%y) + kz*zglob(p(ions)%z) + phase);
+					endif
+#ifndef twoD
+				enddo
+#endif
+			enddo
+		enddo
+
 		randomX = rand();
 		!print *, 'rand', randomX
 
@@ -1965,9 +1999,34 @@ subroutine inject_plasma_region(x1,x2,y1,y2,z1,z2,ppc,gamma_drift_in, &
 			p(ions)%y=miny+delta_y * random(dseed)
 			p(ions)%z=minz+delta_z * random(dseed)
 
-			level = 0.75 + 0.25*sin(kx*p(ions)%x + ky*p(ions)%y);
-			randomX = rand();
+			level = 0.5;
+			call srand(10)
+			do ki = 0, maxKx
+
+				do kj = 0, maxKy
+#ifdef twoD
+					kk = 0
+#else
+					!do kk = 0, mz0-5
+					do kk = 0, maxKz
+#endif
+
+						if (((ki + kj + kk) .ne. 0) .and. ((kj + kk).ne.0)) then
+
+	
+							kx = ki*2*pi/maxLambda;
+							ky = kj*2*pi/maxLambda;
+							kz = kk*2*pi/maxLambda;
+							phase = 2*pi*rand();
+							level = level + 0.5*sin(kx*xglob(p(ions)%x) + ky*yglob(p(ions)%y) + kz*zglob(p(ions)%z) + phase);
+						endif
+#ifndef twoD
+					enddo
+#endif
+				enddo
+			enddo
 		enddo
+#endif
 
 			!print *,'add ion', n
 			!n=n+1
