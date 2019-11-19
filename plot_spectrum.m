@@ -1,7 +1,7 @@
 clear;
 directory_name = './output5/';
 file_name = 'spect';
-file_number = '.100';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -92,7 +92,7 @@ for i = 1:Np,
 end;
 
 figure(1);
-loglog(Pp(1:Np),Fp(1:Np), 'red');
+loglog(Pp(1:Np),Fp(1:Np),'--','color','red');
 %plot (Pp(1:Np),Fp(1:Np), 'red',Pp(1:Np), Fpjuttner(1:Np), 'blue');
 title ('F_p');
 xlabel ('p/{m_p c}');
