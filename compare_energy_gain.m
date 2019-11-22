@@ -35,15 +35,20 @@ energyFraction3(1:Ns,1:Nd) = 0;
 energyFraction4(1:Ns,1:Nd) = 0;
 totalEnergy = 0;
 highEnergy = 0;
-highEnergy1 = 0;
-highEnergy2 = 0;
-highEnergy3 = 0;
-highEnergy4 = 0;
+highEnergy1(1:Ns,1:Nd) = 0;
+highEnergy2(1:Ns,1:Nd) = 0;
+highEnergy3(1:Ns,1:Nd) = 0;
+highEnergy4(1:Ns,1:Nd) = 0;
 gammaLevel = 100;
-gammaLevel1 = 15;
+gammaLevel1 = 1;
 gammaLevel2 = 50;
 gammaLevel3 = 200;
 gammaLevel4 = 500;
+width(1:Ns) = 0;
+width(1) = 4000;
+width(2) = 2000;
+width(3) = 1000;
+width(4) = 1000;
 
 me = 0.91*10^-27;
 mass_ratio = 25;
@@ -65,10 +70,6 @@ for m = 1:Ns,
         gam=hdf5read(full_name,'gamma');
         totalEnergy = 0;
         highEnergy = 0;
-        highEnergy1 = 0;
-        highEnergy2 = 0;
-        highEnergy3 = 0;
-        highEnergy4 = 0;
         for i = 1:Np,
             Fe(i) = 0;
             Fp(i) = 0;
@@ -84,25 +85,25 @@ for m = 1:Ns,
                 highEnergy = highEnergy + Fe(i)*(Pe(i));
             end;
             if(g(i) > gammaLevel1 - 1)
-                highEnergy1 = highEnergy1 + Fe(i)*(Pe(i));
+                highEnergy1(m,j) = highEnergy1(m,j) + Fe(i)*(Pe(i));
             end;
             if(g(i) > gammaLevel2 - 1)
-                highEnergy2 = highEnergy2 + Fe(i)*(Pe(i));
+                highEnergy2(m,j) = highEnergy2(m,j) + Fe(i)*(Pe(i));
             end;
             if(g(i) > gammaLevel3 - 1)
-                highEnergy3 = highEnergy3 + Fe(i)*(Pe(i));
+                highEnergy3(m,j) = highEnergy3(m,j) + Fe(i)*(Pe(i));
             end;
             if(g(i) > gammaLevel4 - 1)
-                highEnergy4 = highEnergy4 + Fe(i)*(Pe(i));
+                highEnergy4(m,j) = highEnergy4(m,j) + Fe(i)*(Pe(i));
             end;
             Fp(i)=Fp(i)*(Pp(i)^3)/(1+g(i));
             Fe(i)=Fe(i)*(Pe(i)^3)/(1+g(i));
         end;
         energyFraction(m,j) = highEnergy/totalEnergy;
-        energyFraction1(m,j) = highEnergy1/totalEnergy;
-        energyFraction2(m,j) = highEnergy2/totalEnergy;
-        energyFraction3(m,j) = highEnergy3/totalEnergy;
-        energyFraction4(m,j) = highEnergy4/totalEnergy;
+        energyFraction1(m,j) = highEnergy1(m,j)/totalEnergy;
+        energyFraction2(m,j) = highEnergy2(m,j)/totalEnergy;
+        energyFraction3(m,j) = highEnergy3(m,j)/totalEnergy;
+        energyFraction4(m,j) = highEnergy4(m,j)/totalEnergy;
     end;
 end;
 
@@ -120,7 +121,8 @@ end;
 figure(2);
 hold on;
 for m = 1:Ns,
-    plot(1:Nd,energyFraction1(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,energyFraction1(m,1:Nd),'color',Color{m});
+    plot(1:Nd,highEnergy1(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 15');
 xlabel ('Nt');
@@ -131,7 +133,8 @@ grid ;
 figure(3);
 hold on;
 for m = 1:Ns,
-    plot(1:Nd,energyFraction2(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,energyFraction2(m,1:Nd),'color',Color{m});
+    plot(1:Nd,highEnergy2(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 50');
 xlabel ('Nt');
@@ -142,7 +145,8 @@ grid ;
 figure(4);
 hold on;
 for m = 1:Ns,
-    plot(1:Nd,energyFraction3(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,energyFraction3(m,1:Nd),'color',Color{m});
+    plot(1:Nd,highEnergy3(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 200');
 xlabel ('Nt');
@@ -153,7 +157,8 @@ grid ;
 figure(5);
 hold on;
 for m = 1:Ns,
-    plot(1:Nd,energyFraction4(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,energyFraction4(m,1:Nd),'color',Color{m});
+    plot(1:Nd,highEnergy4(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 500');
 xlabel ('Nt');
