@@ -1,5 +1,5 @@
 clear;
-directory_name = './output5/';
+directory_name = './output4/';
 file_name = 'spect';
 file_number = '.000';
 Nd = 10;
@@ -8,7 +8,8 @@ start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 LegendTitle = {'1','2','3','4','5','6','7','8','9','10'};
-FileNumbers = {'.000','.003','.006','.009','.012','.015','.018','.021','.024','.027'};
+%FileNumbers = {'.000','.003','.006','.009','.012','.015','.018','.021','.024','.027'};
+FileNumbers = {'.000','.010','.020','.030','.040','.050','.060','.070','.080','.090'};
 %FileNumbers = {'.000','.001','.002','.003','.004','.005','.006','.007','.008','.009','.010','.011','.012','.013','.014','.015','.016','.017','.018','.019','.020','.021','.022','.023','.024','.025','.026','.027','.028','.029','.030','.031','.032','.033','.034','.035','.036','.037','.038','.039','.040','.041','.042','.043','.044','.045','.046','.047','.048','.049','.050','.051','.052','.053','.054','.055','.056','.057','.058','.059','.060','.061','.062','.063','.064','.065','.066','.067','.068','.069','.070','.071','.072','.073','.074','.075','.076','.077','.078','.079','.080','.081','.082','.083','.084','.085','.086','.087','.088','.089','.090','.091','.092','.093','.094','.095','.096','.097','.098','.099','.100'};
 Specifiers = {'-','--',':','-.'};
 
@@ -121,8 +122,8 @@ end;
 figure(2);
 hold on;
 for m = 1:Ns,
-    %plot(1:Nd,energyFraction1(m,1:Nd),'color',Color{m});
-    plot(1:Nd,highEnergy1(m,1:Nd)/width(m),'color',Color{m});
+    plot(1:Nd,energyFraction1(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,highEnergy1(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 15');
 xlabel ('Nt');
@@ -133,8 +134,8 @@ grid ;
 figure(3);
 hold on;
 for m = 1:Ns,
-    %plot(1:Nd,energyFraction2(m,1:Nd),'color',Color{m});
-    plot(1:Nd,highEnergy2(m,1:Nd)/width(m),'color',Color{m});
+    plot(1:Nd,energyFraction2(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,highEnergy2(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 50');
 xlabel ('Nt');
@@ -145,8 +146,8 @@ grid ;
 figure(4);
 hold on;
 for m = 1:Ns,
-    %plot(1:Nd,energyFraction3(m,1:Nd),'color',Color{m});
-    plot(1:Nd,highEnergy3(m,1:Nd)/width(m),'color',Color{m});
+    plot(1:Nd,energyFraction3(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,highEnergy3(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 200');
 xlabel ('Nt');
@@ -157,8 +158,8 @@ grid ;
 figure(5);
 hold on;
 for m = 1:Ns,
-    %plot(1:Nd,energyFraction4(m,1:Nd),'color',Color{m});
-    plot(1:Nd,highEnergy4(m,1:Nd)/width(m),'color',Color{m});
+    plot(1:Nd,energyFraction4(m,1:Nd),'color',Color{m});
+    %plot(1:Nd,highEnergy4(m,1:Nd)/width(m),'color',Color{m});
 end;
 title ('energy fraction in particles with {\gamma} > 500');
 xlabel ('Nt');
