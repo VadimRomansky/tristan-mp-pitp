@@ -1,7 +1,7 @@
 clear;
 directory_name = './output5/';
 file_name = 'flds.tot';
-file_number = '.000';
+file_number = '.050';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -13,12 +13,18 @@ mp = 1.67262177E-24;
 me = mp/100;
 c = 2.99792458E10;
 n = 1;
-ntristan = 4;
+ntristan = 2;
 sigma = 4.0;
 gamma = 1.5;
-fieldScale = sqrt(4*3.14*(n/ntristan)*(me/1)*(c*c/(0.45*0.45)));
-B1 = sqrt(gamma*n*(1 + me/mp)*me*c*c*sigma)/fieldScale;
-B0 = 0.03030750;
+ctristan = 0.45;
+comp = 5;
+omp = ctristan/comp;
+qtristan = omp*omp*gamma/(ntristan*(1 + me/mp));
+metristan = qtristan;
+fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
+B1 = sqrt(4*3.14*gamma*n*(1 + me/mp)*me*c*c*sigma)/fieldScale;
+%Binit=sqrt(gamma0*ppc0*.5*c**2*(me*(1+me/mi))*sigma)
+B0 = Bz(10,10);
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 

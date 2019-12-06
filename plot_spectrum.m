@@ -1,7 +1,7 @@
 clear;
 directory_name = './output5/';
 file_name = 'spect';
-file_number = '.000';
+file_number = '.050';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
