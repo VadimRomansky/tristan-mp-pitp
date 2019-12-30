@@ -1,5 +1,5 @@
 clear;
-load ./output5/energy
+load ./output/energy
 
 N1 = 1;
 N2 = size(energy,1);
