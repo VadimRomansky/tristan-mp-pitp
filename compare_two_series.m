@@ -1,20 +1,21 @@
 clear;
-directory_name = './output5/';
+directory_name = './output/';
 file_name = 'spect';
-file_number = '.000';
-Nd = 8;
+file_number = '.050';
+Nd = 3;
 Ns = 2;
-start = 1;
+start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 LegendTitle = {'1','2','3','4','5','6','7','8','9','10'};
-FileNumbers = {'.000','.005','.010','.015','.020','.025','.030','.035','.040','.045'};
+FileNumbers = {'.050','.100','.150','.015','.020','.025','.030','.035','.040','.045'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = fix(size(fp,1)/4);
 %Nx = 12500;
+Nx = 50000;
 
 g(1:Ns,1:Nd,1:Np) = 0;
 Fp(1:Ns,1:Nd,1:Np)=0;
@@ -39,7 +40,7 @@ fractionp = 1.0;
 
 for m = 1:Ns,
     for j = 1:Nd,
-        full_name = strcat(directory_name, file_name, num2str(m), FileNumbers{j});
+        full_name = strcat(directory_name, file_name, num2str(start + m - 1), FileNumbers{j});
         fp = hdf5read(full_name,'specp');
         fe = hdf5read(full_name,'spece');
         gam=hdf5read(full_name,'gamma');
@@ -97,10 +98,10 @@ hold on;
 title ('F_p');
 xlabel ('p/{m_p c}');
 ylabel ('Fp*p^4');
+p(1:Np) = 0;
+f(1:Np) = 0;
 for m = 1:Ns,
 for j=1:Nd,
-    p(1:Np) = 0;
-    f(1:Np) = 0;
     for k = 1:Np,
         p(k) = Pp(m,j, k);
         f(k) = Fp(m,j, k);
@@ -118,10 +119,10 @@ hold on;
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
+p(1:Np) = 0;
+f(1:Np) = 0;
 for m = 1:Ns,
 for j=1:Nd,
-    p(1:Np) = 0;
-    f(1:Np) = 0;
     for k = 1:Np,
         p(k) = Pe(m,j, k);
         f(k) = Fe(m,j, k);

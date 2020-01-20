@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.100';
+file_number = '.020';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -25,6 +25,12 @@ fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
 B1 = sqrt(4*3.14*gamma*n*(1 + me/mp)*me*c*c*sigma)/fieldScale;
 %Binit=sqrt(gamma0*ppc0*.5*c**2*(me*(1+me/mi))*sigma)
 B0 = Bz(10,10);
+samplingFactor = 20;
+
+rho = samplingFactor;
+
+
+
 Nx = size(Bx, 1);
 Ny = size(By, 2);
 
@@ -89,25 +95,6 @@ end;
 %    end;
 %end;
 
-Nskinlength = 10;
-
-c0 = 2.998*10^10;
-mass_ratio = 20;
-mp = 1.67262*10^-24;
-me = mp/mass_ratio;
-q = 4.80320427*10^-10;
-n = 10^-4;
-
-omega = sqrt(4*pi*n*q*q/me);
-
-rho = c0/(omega*Nskinlength);
-rho = 0.2;
-c1=0.45;
-
-tau = c1*rho/c0;
-samplingFactor = 5;
-fieldFactor = me*rho/(q*tau*tau);
-rho = rho*samplingFactor;
 
 figure(1);
 colormap Jet;

@@ -1,7 +1,7 @@
 clear;
-directory_name = './output5/';
+directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.000';
+file_number = '.012';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
@@ -9,7 +9,7 @@ ne = hdf5read(full_name,'dens');
 Nx = size(np, 1);
 Ny = size(np, 2);
 
-offsetx = 0;
+offsetx = 20;
 offsety = 0;
 
 ne1(1:Nx-2*offsetx,1:Ny-2*offsety)=0;
