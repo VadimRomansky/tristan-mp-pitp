@@ -1,5 +1,5 @@
 clear;
-directory_name = './output7/';
+directory_name = './output3/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -46,17 +46,38 @@ zi = hdf5read(full_part_name, 'zi');
 %Ey = hdf5read(full_name,'ey');
 %Ez = hdf5read(full_name,'ez');
 
+Nskinlength = 5;
+
+c0 = 2.998*10^10;
+mass_ratio = 20;
+mp = 1.67262*10^-24;
+me = mp/mass_ratio;
+q = 4.80320427*10^-10;
+n = 10^-4;
+
+omega = sqrt(4*pi*n*q*q/me);
+
+rho = c0/(omega*Nskinlength);
+rho = 0.1;
+c1=0.45;
+
+tau = c1*rho/c0;
+samplingFactor = 20;
+fieldFactor = me*rho/(q*tau*tau);
+rho = rho*samplingFactor;
+rho = 20;
+
 Nx = size(Bx, 1);
 Ny = size(By, 2);
-Nx = Nx;
+endx = Nx/10;
 
 B0 = 0;
-for i = 1:Nx,
+for i = 1:endx,
     for j = 1:Ny,
         B0 = B0 + Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j);
     end;
 end;
-B0 = sqrt(B0/(Nx*Ny));
+B0 = sqrt(B0/(endx*Ny));
 
 frameTime = 1.0/10;
 
@@ -67,6 +88,7 @@ max_number2 = 1;
 maxGamma3 = 1.0;
 max_number3 = 1;
 for i = 1: size(gammae,1),
+    if(xe(i) < (endx/2)*samplingFactor)
     if (gammae(i) > maxGamma1)        
         max_number3 = max_number2;
         maxGamma3 = maxGamma2;
@@ -86,6 +108,7 @@ for i = 1: size(gammae,1),
                 maxGamma3 = gammae(i);
             end
         end
+    end
     end
 end;
 
@@ -110,12 +133,12 @@ part_proc2 = proce(part_number2);
 part_index3 = inde(part_number3);
 part_proc3 = proce(part_number3);
 
-Bnorm(1:Ny, 1:Nx) = 0;
-Enorm(1:Ny, 1:Nx) = 0;
+Bnorm(1:Ny, 1:endx) = 0;
+Enorm(1:Ny, 1:endx) = 0;
 
 
 
-for i=1:Nx,
+for i=1:endx,
     for j = 1:Ny,
         Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
         Bnorm(j,i) = sqrt(Ex(i,j)*Ex(i,j) + Ey(i,j)*Ey(i,j) + Ez(i,j)*Ez(i,j));
@@ -129,27 +152,6 @@ end;
 %        Bnorm(i,j) = Bnorm(i,k);
 %    end;
 %end;
-
-Nskinlength = 10;
-
-c0 = 2.998*10^10;
-mass_ratio = 20;
-mp = 1.67262*10^-24;
-me = mp/mass_ratio;
-q = 4.80320427*10^-10;
-n = 10^-4;
-
-omega = sqrt(4*pi*n*q*q/me);
-
-rho = c0/(omega*Nskinlength);
-rho = 0.1;
-c1=0.45;
-
-tau = c1*rho/c0;
-samplingFactor = 20;
-fieldFactor = me*rho/(q*tau*tau);
-rho = rho*samplingFactor;
-rho = 5;
 
 
 
@@ -218,7 +220,7 @@ for a = first_number:last_number,
 end;
 plot(x1(1:(last_number-first_number + 1)),g1(1:(last_number-first_number + 1)),'red',x2(1:(last_number-first_number + 1)),g2(1:(last_number-first_number + 1)),'green', x3(1:(last_number-first_number + 1)),g3(1:(last_number-first_number + 1)),'black');
 grid;
-timeStep = 500;
+timeStep = 1;
 %figure(2);
 figure('Position', [10 50 1200 600]);
 %title ('E_x');
@@ -275,7 +277,7 @@ hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
 caxis ([0 3])
-fig = imagesc((1:Nx)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
+fig = imagesc((1:endx)*samplingFactor, (1:Ny)*samplingFactor,Bnorm);
 fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 10, 'Color','red','LineWidth',3);
 fig_part2 = plot(xe(part_number2), ye(part_number2), 'ro', 'MarkerSize', 10, 'Color','green','LineWidth',3);
 fig_part3 = plot(xe(part_number3), ye(part_number3), 'ro', 'MarkerSize', 10, 'Color', 'black','LineWidth',3);
@@ -307,7 +309,7 @@ for a = first_number:last_number,
     Bz = hdf5read(full_name,'bz');
     
     
-    for i=1:Nx,
+    for i=1:endx,
         for j = 1:Ny,
             Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j))/B0;
         % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
@@ -352,7 +354,7 @@ hold on;
 %axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
 caxis ([0 3])
-fig = imagesc((1:Nx)*samplingFactor, (1:Ny)*samplingFactor,Enorm);
+fig = imagesc((1:endx)*samplingFactor, (1:Ny)*samplingFactor,Enorm);
 fig_part = plot(xe(part_number), ye(part_number), 'ro', 'MarkerSize', 10, 'Color','red','LineWidth',3);
 fig_part2 = plot(xe(part_number2), ye(part_number2), 'ro', 'MarkerSize', 10, 'Color','green','LineWidth',3);
 fig_part3 = plot(xe(part_number3), ye(part_number3), 'ro', 'MarkerSize', 10, 'Color', 'black','LineWidth',3);
@@ -382,7 +384,7 @@ for a = first_number:last_number,
     Ey = hdf5read(full_name,'ey');
     Ez = hdf5read(full_name,'ez');
     
-    for i=1:Nx,
+    for i=1:endx,
         for j = 1:Ny,
             Enorm(j,i) = sqrt(Ex(i,j)*Ex(i,j) + Ey(i,j)*Ey(i,j) + Ez(i,j)*Ez(i,j))/B0;
         % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));

@@ -423,6 +423,7 @@ subroutine field_bc_user(time)
 		!print *, 'Binit', Binit
 		!print *, 'Bamplitude', Bamplitude
 		evaluate_turbulent_b = Bamplitude
+		!evaluate_turbulent_b = 1.0
 	end function evaluate_turbulent_b
 
 	real function evaluate_turbulent_b_slab(kx, ky, kz)
@@ -463,6 +464,7 @@ subroutine field_bc_user(time)
 		!print *, 'Binit', Binit
 		!print *, 'Bamplitude', Bamplitude
 		evaluate_turbulent_b_2d = Bamplitude
+		!evaluate_turbulent_b_2d = 1.0
 	end function evaluate_turbulent_b_2d
 
 !------------------------------------------------------------------------------
@@ -577,6 +579,7 @@ subroutine init_turbulent_field
 	turbulenceSeed = values(8) + values(7)*1000
 	print *, 'seed', turbulenceSeed
 	call MPI_Bcast(turbulenceSeed, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+	!turbulenceSeed = 10;
 	print *, 'seed common', turbulenceSeed
 	call srand(turbulenceSeed)
 	!print *, rand(), rand(), rand()
@@ -586,12 +589,12 @@ subroutine init_turbulent_field
 	print *, mx0, my0, mz0
 
 	maxTurbulentLambdaX = 2000;
-	minTurbulentLambdaX = 500;
+	minTurbulentLambdaX = 125;
 	maxTurbulentLambdaY = 2000;
-	minTurbulentLambdaY = 500;
+	minTurbulentLambdaY = 125;
 	maxTurbulentLambdaZ = 2000;
-	minTurbulentLambdaZ = 500;
-	turbulenceEnergyFraction = 0.9
+	minTurbulentLambdaZ = 125;
+	turbulenceEnergyFraction = 0.3
 	
 	call init_turbulent_field_isotropic_plasma_frame(turbulenceEnergyFraction)
 	!call init_turbulent_field_clumped(turbulenceEnergyFraction)

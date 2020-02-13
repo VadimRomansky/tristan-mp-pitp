@@ -7,7 +7,7 @@ Ns = 2;
 start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
-LegendTitle = {'1','2','3','4','5','6','7','8','9','10'};
+LegendTitle = {'90%','30%','3','4','5','6','7','8','9','10'};
 FileNumbers = {'.002','.004','.006','.008','.010','.012','.014','.016','.018','.020'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -43,7 +43,8 @@ title ('{\gamma}');
 xlabel ('N');
 ylabel ('{\gamma}');
 for s = 1:Ns,
-    plot(1:Nd,gmax(s,1:Nd),'Color',Color{j});
+    plot(1:Nd,gmax(s,1:Nd),'Color',Color{s});
 end;
+legend(LegendTitle{1},LegendTitle{2},'Location','southeast');
 
 grid ;
