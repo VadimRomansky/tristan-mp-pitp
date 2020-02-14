@@ -86,7 +86,7 @@ title ('I_{\nu}');
 xlabel ('{\nu} GHz');
 ylabel ('mJy');
 
-plot(radiation0(1:N0,1),radiation0(1:N0,6),'red',radiation1(1:N1,1),radiation1(1:N1,6),'blue',radiation2(1:N2,1),radiation2(1:N2,6),'green',radiation3(1:N3,1),radiation3(1:N3,6),'black');
+plot(radiation0(1:N0,1),radiation0(1:N0,9),'red',radiation1(1:N1,1),radiation1(1:N1,9),'blue',radiation2(1:N2,1),radiation2(1:N2,9),'green',radiation3(1:N3,1),radiation3(1:N3,9),'black');
 plot(aprx(1:4), apry(1:4),'red',mayx(1:3), mayy(1:3),'blue',junx(1:4),juny(1:4),'green',augx(1:5),augy(1:5),'black');
 
 legend('April','May','June','August','April','May','June','August');
