@@ -78,7 +78,7 @@ plot(radiation0(1:N0,1),radiation0(1:N0,4),'red',radiation1(1:N1,1),radiation1(1
 
 legend('April','May','June','August');
 
-grid ;
+grid;
 
 figure(2);
 hold on;

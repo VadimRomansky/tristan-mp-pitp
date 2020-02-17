@@ -594,7 +594,7 @@ subroutine init_turbulent_field
 	minTurbulentLambdaY = 125;
 	maxTurbulentLambdaZ = 2000;
 	minTurbulentLambdaZ = 125;
-	turbulenceEnergyFraction = 0.3
+	turbulenceEnergyFraction = 0.5
 	
 	call init_turbulent_field_isotropic_plasma_frame(turbulenceEnergyFraction)
 	!call init_turbulent_field_clumped(turbulenceEnergyFraction)
