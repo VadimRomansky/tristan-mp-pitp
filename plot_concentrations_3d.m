@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.012';
+file_number = '.000';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
@@ -48,7 +48,7 @@ densityFactor = 1.0/(rho*rho*rho);
 set(0,'DefaultFigureColormap',feval('jet'));
 figure(1);
 [X, Y] = meshgrid((1+offsety:Ny-offsety)*rho, (1+offsetx:Nx-offsetx)*rho);
-surf(X, Y, np1*densityFactor);
+surf(X, Y, np1);
 shading interp;
 title ('np');
 xlabel ('y');
@@ -58,7 +58,7 @@ grid ;
 
 figure(2);
 [X, Y] = meshgrid((1+offsety:Ny-offsety)*rho, (1+offsetx:Nx-offsetx)*rho);
-surf(X, Y, ne1*densityFactor);
+surf(X, Y, ne1);
 shading interp;
 title ('ne');
 xlabel ('y');
