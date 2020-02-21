@@ -16,6 +16,9 @@ endx = 40000;
 Fp(1:Np)=0;
 Fe(1:Np)=0;
 
+Fpold(1:Np)=0;
+Feold(1:Np)=0;
+
 Pp(1:Np)=0;
 Pe(1:Np)=0;
 Fejuttner(1:Np)=0;
@@ -46,17 +49,21 @@ normp = 0;
 norme = 0;
 norm = 1;
 
-for i = 1:Np,
+for i = 2:Np,
     %Pp(i) = sqrt((g(i)+1)^2 - 1)*mp*c;
     %Pe(i) = sqrt((g(i)+1)^2 - 1)*me*c;
     Pp(i) = sqrt((g(i)+1)^2 - 1);
     Pe(i) = sqrt((g(i)+1)^2 - 1);
     for j = startx:endx,
-        Fp(i) = Fp(i) + fp(j,i);
-        Fe(i) = Fe(i) + fe(j,i);
+        Fp(i) = Fp(i) + fp(j,i)*g(i)/(g(i) - g(i-1));
+        Fe(i) = Fe(i) + fe(j,i)*g(i)/(g(i) - g(i-1));
+        Fpold(i) = Fpold(i) + fp(j,i);
+        Feold(i) = Feold(i) + fe(j,i);
     end;
     Fp(i)=Fp(i)*(Pp(i)^3)/(1+g(i));
     Fe(i)=Fe(i)*(Pe(i)^3)/(1+g(i));
+    Fpold(i)=Fpold(i)*(Pp(i)^3)/(1+g(i));
+    Feold(i)=Feold(i)*(Pe(i)^3)/(1+g(i));
     
     %exp1 = exp(-sqrt(1+Pe(i)*Pe(i)/(me*me*c*c))/thetae);
     exp1 = exp(-sqrt(1+Pe(i)*Pe(i))/thetae);
@@ -89,6 +96,8 @@ end;
 for i = 1:Np,
     Fp(i) = Fp(i)*norm/normp;
     Fe(i) = Fe(i)*norm/norme;
+    Fpold(i) = Fpold(i)*norm/normp;
+    Feold(i) = Feold(i)*norm/norme;
 end;
 
 figure(1);
@@ -102,10 +111,12 @@ grid ;
 
 figure(2);
 %plot (Pe(1:Np),Fe(1:Np), 'red');
-loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
+%loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
+loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Feold(1:Np), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
+legend('new','old','Location','southeast');
 grid ;
 
 dlmwrite('Pp.dat',Pp,'delimiter','\n');

@@ -2,7 +2,7 @@ clear;
 
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.000';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = h5info(full_name);
 fp = hdf5read(full_name,'specp');
@@ -22,7 +22,7 @@ mp = 1.67262177E-24;
 me = mp/100;
 c = 2.99792458E10;
 n = 1;
-ntristan = 8; %0.5*ppc0 maybe
+ntristan = 4; %0.5*ppc0 maybe
 sigma = 4.0;
 gamma = 1.5;
 v = c*sqrt(1 - 1/(gamma*gamma));
@@ -33,13 +33,13 @@ qtristan = omp*omp*gamma/(ntristan*(1 + me/mp));
 metristan = qtristan;
 fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
 
-samplingFactor = 5;
+samplingFactor = 20;
 
 Nx = size(Bx,1);
 Ny = size(Bx,2);
 Np = size(g, 1);
 startx = 10;
-endx = Nx;
+endx = Nx/8;
 fieldStartx = startx;
 fieldEndx = endx;
 magneticDensity = 0;
@@ -52,31 +52,40 @@ for i = fieldStartx:fieldEndx,
 end;
 magneticDensity = magneticDensity/((fieldEndx - fieldStartx + 1)*Ny);
 
-electronDensity = 0;
+electronEnergyDensity = 0;
+electronHighEnergyDensity = 0;
 for i = startx*samplingFactor:endx*samplingFactor,
-    for j = 2:Np,
-        electronDensity = electronDensity + me*c*c*(n/ntristan)*fe(i,j)*(g(j)+1)*(g(j) - g(j-1))/(Ny*samplingFactor);
-        dense(i) = dense(i) + fe(i,j)/(Ny*samplingFactor);
+    for j = 1:Np,
+        electronEnergyDensity = electronEnergyDensity + me*c*c*(n/ntristan)*fe(i,j)*g(j)*(g(j)+1)/(Ny*samplingFactor);
+        if(g(j) > 300)
+            electronHighEnergyDensity = electronHighEnergyDensity + me*c*c*(n/ntristan)*fe(i,j)*g(j)*(g(j)+1)/(Ny*samplingFactor);
+        end;
+        dense(i) = dense(i) + fe(i,j)*g(j)/(Ny*samplingFactor);
     end;
 end;
-electronDensity = electronDensity/(endx*samplingFactor - startx*samplingFactor + 1);
+electronEnergyDensity = electronEnergyDensity/(endx*samplingFactor - startx*samplingFactor + 1);
+electronHighEnergyDensity = electronHighEnergyDensity/(endx*samplingFactor - startx*samplingFactor + 1);
+
+electronMeanGamma = electronEnergyDensity/(n*me*c*c);
 
 protonDensity = 0;
 for i = startx*samplingFactor:endx*samplingFactor,
-    for j = 2:Np,
-        protonDensity = protonDensity + mp*c*c*(n/ntristan)*fp(i,j)*(g(j)+1)*(g(j) - g(j-1))/(Ny*samplingFactor);
-        densp(i) = densp(i) + fe(i,j)*(g(j) - g(j-1))/(Ny*samplingFactor);
+    for j = 1:Np,
+        protonDensity = protonDensity + mp*c*c*(n/ntristan)*fp(i,j)*g(j)*(g(j)+1)/(Ny*samplingFactor);
+        densp(i) = densp(i) + fp(i,j)*g(j)/(Ny*samplingFactor);
     end;
 end;
 protonDensity = protonDensity/(endx*samplingFactor - startx*samplingFactor + 1);
 
 ramPressure = n*gamma*(me + mp)*v*v;
 
-energyDensity = n*mp*c*c;
+energyDensity = n*gamma*mp*c*c;
 
 epsilonB = magneticDensity/ramPressure;
-epsilonE = electronDensity/ramPressure;
+epsilonE = electronHighEnergyDensity/ramPressure;
 epsilonP = protonDensity/ramPressure;
+
+epsilonECrumley = (electronHighEnergyDensity/electronEnergyDensity)*me*(electronMeanGamma - 1)/(mp*(gamma - 1));
 
 protonEnergyFrac = protonDensity/energyDensity;
 

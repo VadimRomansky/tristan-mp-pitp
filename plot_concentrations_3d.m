@@ -39,8 +39,8 @@ densityFactor = 1/8;
 
 for i=1:Nx-2*offsetx,
     for j=1:Ny-2*offsety,
-        ne1(i,j)=ne(i+offsetx,j+offsety);
-        np1(i,j)=ne(i+offsetx,j+offsety);
+        ne1(i,j)=ne(i+offsetx,j+offsety) - np(i+offsetx,j+offsety);
+        np1(i,j)=np(i+offsetx,j+offsety);
     end;
 end;
 
