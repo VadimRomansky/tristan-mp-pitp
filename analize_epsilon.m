@@ -2,7 +2,7 @@ clear;
 
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.008';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = h5info(full_name);
 fp = hdf5read(full_name,'specp');
@@ -22,7 +22,7 @@ mp = 1.67262177E-24;
 me = mp/100;
 c = 2.99792458E10;
 n = 1;
-ntristan = 4; %0.5*ppc0 maybe
+ntristan = 2; %0.5*ppc0 maybe
 sigma = 4.0;
 gamma = 1.5;
 v = c*sqrt(1 - 1/(gamma*gamma));
@@ -39,7 +39,7 @@ Nx = size(Bx,1);
 Ny = size(Bx,2);
 Np = size(g, 1);
 startx = 10;
-endx = Nx/8;
+endx = 800;
 fieldStartx = startx;
 fieldEndx = endx;
 magneticDensity = 0;

@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'flds.tot';
-file_number = '.020';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 Bx = hdf5read(full_name,'bx');
 By = hdf5read(full_name,'by');
@@ -24,7 +24,7 @@ metristan = qtristan;
 fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
 B1 = sqrt(4*3.14*gamma*n*(1 + me/mp)*me*c*c*sigma)/fieldScale;
 %Binit=sqrt(gamma0*ppc0*.5*c**2*(me*(1+me/mi))*sigma)
-B0 = Bz(10,10);
+B0 = Bz(1,1);
 samplingFactor = 20;
 
 rho = samplingFactor;
@@ -98,7 +98,7 @@ end;
 
 figure(1);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Bx);
 shading interp;
 title ('Bx');
@@ -109,7 +109,7 @@ grid ;
 
 figure(2);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, By);
 shading interp;
 title ('By');
@@ -120,7 +120,7 @@ grid ;
 
 figure(3);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Bz);
 shading interp;
 title ('Bz');
@@ -131,7 +131,7 @@ grid ;
 
 figure(4);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Ex);
 shading interp;
 title ('Ex');
@@ -142,7 +142,7 @@ zlabel ('Ex');
 
 figure(5);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Ey);
 shading interp;
 title ('Ey');
@@ -153,7 +153,7 @@ grid ;
 
 figure(6);
 colormap Jet;
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Ez);
 shading interp;
 title ('Ez');
@@ -165,7 +165,7 @@ grid ;
 figure(7);
 colormap Jet;
 caxis ([0 8])
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Bnorm/B0);
 shading interp;
 title ('B/B_0');
@@ -190,7 +190,7 @@ grid ;
 figure(9);
 colormap Jet;
 caxis ([0 8])
-[X, Y] = meshgrid((1:Ny)*rho, (1:Nx)*rho);
+[X, Y] = meshgrid((1:Ny), (1:Nx));
 surf(X, Y, Ediff);
 shading interp;
 title ('(E-vxB)/B');
@@ -202,7 +202,7 @@ grid ;
 figure(10);
 colormap Jet;
 caxis ([0 8])
-[X, Y] = meshgrid((1:10)*rho, (1:10)*rho);
+[X, Y] = meshgrid((1:10), (1:10));
 surf(X, Y, miniFourierBx);
 shading interp;
 title ('Bx(k)');
@@ -214,7 +214,7 @@ grid ;
 figure(11);
 colormap Jet;
 caxis ([0 8])
-[X, Y] = meshgrid((1:10)*rho, (1:10)*rho);
+[X, Y] = meshgrid((1:10), (1:10));
 surf(X, Y, miniFourierBy);
 shading interp;
 title ('Bx(k)');
@@ -226,7 +226,7 @@ grid ;
 figure(12);
 colormap Jet;
 caxis ([0 8])
-[X, Y] = meshgrid((1:10)*rho, (1:10)*rho);
+[X, Y] = meshgrid((1:10), (1:10));
 surf(X, Y, miniFourierBz);
 shading interp;
 title ('Bx(k)');

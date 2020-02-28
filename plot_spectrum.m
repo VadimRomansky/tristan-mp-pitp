@@ -10,7 +10,7 @@ g=hdf5read(full_name,'gamma');
 Nx = size(fp,1);
 Np = size(fp,2);
 
-startx = 10000;
+startx = 10;
 endx = 40000;
 
 Fp(1:Np)=0;
