@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.009';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -11,7 +11,7 @@ Nx = size(fp,1);
 Np = size(fp,2);
 
 startx = 10;
-endx = 40000;
+endx = 10000;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
@@ -27,8 +27,10 @@ Fekappa(1:Np) = 0;
 Fpkappa(1:Np) = 0;
 
 me = 0.91*10^-27;
-mass_ratio = 100;
+mass_ratio = 64;
 mp = me*mass_ratio;
+gam = 1.5;
+beta = sqrt(1 - 1/(gam*gam));
 c = 2.99792458*10^10;
 Te = 5*10^9;
 Tp = 3.5*10^10;
@@ -60,10 +62,10 @@ for i = 2:Np,
         Fpold(i) = Fpold(i) + fp(j,i);
         Feold(i) = Feold(i) + fe(j,i);
     end;
-    Fp(i)=Fp(i)*(Pp(i)^3)/(1+g(i));
-    Fe(i)=Fe(i)*(Pe(i)^3)/(1+g(i));
-    Fpold(i)=Fpold(i)*(Pp(i)^3)/(1+g(i));
-    Feold(i)=Feold(i)*(Pe(i)^3)/(1+g(i));
+    Fp(i)=Fp(i)*(1/(gam*beta))*(Pp(i)^3)/(1+g(i));
+    Fe(i)=Fe(i)*(me/(gam*beta*mp))*(Pe(i)^3)/(1+g(i));
+    Fpold(i)=Fpold(i)*(1/(gam*beta))*(Pp(i)^3)/(1+g(i));
+    Feold(i)=Feold(i)*(me/(gam*beta*mp))*(Pe(i)^3)/(1+g(i));
     
     %exp1 = exp(-sqrt(1+Pe(i)*Pe(i)/(me*me*c*c))/thetae);
     exp1 = exp(-sqrt(1+Pe(i)*Pe(i))/thetae);
@@ -112,7 +114,7 @@ grid ;
 figure(2);
 %plot (Pe(1:Np),Fe(1:Np), 'red');
 %loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
-loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Feold(1:Np), 'blue');
+loglog(Pe(1:Np)*me/(gam*beta*mp),Fe(1:Np), 'red',Pe(1:Np)*me/(gam*beta*mp), Feold(1:Np), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
