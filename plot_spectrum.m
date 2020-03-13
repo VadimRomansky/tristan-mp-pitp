@@ -1,7 +1,7 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.009';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -11,7 +11,7 @@ Nx = size(fp,1);
 Np = size(fp,2);
 
 startx = 10;
-endx = 10000;
+endx = 20000;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
@@ -114,11 +114,12 @@ grid ;
 figure(2);
 %plot (Pe(1:Np),Fe(1:Np), 'red');
 %loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
-loglog(Pe(1:Np)*me/(gam*beta*mp),Fe(1:Np), 'red',Pe(1:Np)*me/(gam*beta*mp), Feold(1:Np), 'blue');
+%loglog(Pe(1:Np)*me/(gam*beta*mp),Fe(1:Np), 'red',Pe(1:Np)*me/(gam*beta*mp), Feold(1:Np), 'blue');
+loglog(Pe(1:Np),Fe(1:Np)*(me*c), 'red');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
-legend('new','old','Location','southeast');
+%legend('new','old','Location','southeast');
 grid ;
 
 dlmwrite('Pp.dat',Pp,'delimiter','\n');
