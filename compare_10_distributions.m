@@ -1,5 +1,5 @@
 clear;
-directory_name = './output1/';
+directory_name = './output3/';
 file_name = 'spect';
 file_number = '.010';
 Nd = 10;
@@ -7,7 +7,8 @@ start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'{\theta} = 20', '{\theta} = 30','{\theta} = 40', '{\theta} = 42', '{\theta} = 44', '{\theta} = 46','{\theta} = 48', '{\theta} = 50', '{\theta} = 55', '{\theta} = 60'};
+%LegendTitle = {'{\theta} = 0', '{\theta} = 10','{\theta} = 20', '{\theta} = 30', '{\theta} = 40', '{\theta} = 50','{\theta} = 60', '{\theta} = 70', '{\theta} = 80', '{\theta} = 90'};
+LegendTitle = {'turb = 0%', 'turb = 10%','turb = 20%', 'turb = 30%', 'turb = 40%', 'turb = 50%','turb = 60%', 'turb = 70%', 'turb = 80%', 'turb = 90%'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -15,7 +16,7 @@ fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
 startx = 1;
-endx = Nx/4;
+endx = 30000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -29,13 +30,15 @@ for j = 1:Nd,
     fp = hdf5read(full_name,'specp');
     fe = hdf5read(full_name,'spece');
     gam=hdf5read(full_name,'gamma');
-    for i = 1:Np,
+    for i = 2:Np,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
         for k = startx:endx,
-            Fp(j,i) = Fp(j,i) + fp(k,i);
-            Fe(j,i) = Fe(j,i) + fe(k,i);
+            Fp(j,i) = Fp(j,i) + fp(k,i)*gam(i)/(gam(i) - gam(i-1));
+            Fe(j,i) = Fe(j,i) + fe(k,i)*gam(i)/(gam(i) - gam(i-1));
+            %Fp(j,i) = Fp(j,i) + fp(k,i);
+            %Fe(j,i) = Fe(j,i) + fe(k,i);
         end;
         Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
         Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));

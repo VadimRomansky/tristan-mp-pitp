@@ -1,7 +1,7 @@
 clear;
-directory_name = './output/';
+directory_name = './output5/';
 file_name = 'spect';
-file_number = '.020';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -11,10 +11,11 @@ Nx = size(fp,1);
 Np = size(fp,2);
 
 startx = 10;
-endx = 20000;
+endx = 30000;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
+Fekappa(1:Np) = 0;
 
 Fpold(1:Np)=0;
 Feold(1:Np)=0;
@@ -26,9 +27,9 @@ Fpjuttner(1:Np)=0;
 Fekappa(1:Np) = 0;
 Fpkappa(1:Np) = 0;
 
-me = 0.91*10^-27;
-mass_ratio = 64;
-mp = me*mass_ratio;
+mp = 1.67*10^-24;
+mass_ratio = 100;
+me = mp/mass_ratio;
 gam = 1.5;
 beta = sqrt(1 - 1/(gam*gam));
 c = 2.99792458*10^10;
@@ -40,8 +41,8 @@ kappa = 4;
 kB = 1.3806488*10^-16;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
-fractione = 0.5;
-fractionp = 0.5;
+fractione = 1.0;
+fractionp = 1.0;
 
 Apkappa = ((pi*(kappa - 1.5))^(-1.5))*gamma(kappa + 1)/(gamma(kappa - 0.5)*(Ppkappa/(mp*c))^3);
 Aekappa = ((pi*(kappa - 1.5))^(-1.5))*gamma(kappa + 1)/(gamma(kappa - 0.5)*(Pekappa/(me*c))^3);
@@ -98,8 +99,17 @@ end;
 for i = 1:Np,
     Fp(i) = Fp(i)*norm/normp;
     Fe(i) = Fe(i)*norm/norme;
+    Fekappa(i) = Fe(i);
     Fpold(i) = Fpold(i)*norm/normp;
     Feold(i) = Feold(i)*norm/norme;
+end;
+
+index1 = 165;
+index2 = 175;
+
+s = log(Fe(index1)/Fe(index2))/log(Pe(index2)/Pe(index1));
+for i = 170:Np,
+    Fekappa(i) = Fekappa(170)*(Pe(i)/Pe(170))^(-s);
 end;
 
 figure(1);
@@ -112,10 +122,12 @@ legend('Fp','Location','southeast');
 grid ;
 
 figure(2);
+hold on;
 %plot (Pe(1:Np),Fe(1:Np), 'red');
 %loglog(Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue', Pe(1:Np), Fekappa(1:Np),'green');
 %loglog(Pe(1:Np)*me/(gam*beta*mp),Fe(1:Np), 'red',Pe(1:Np)*me/(gam*beta*mp), Feold(1:Np), 'blue');
 loglog(Pe(1:Np),Fe(1:Np)*(me*c), 'red');
+loglog(Pe(1:Np),Fekappa(1:Np)*(me*c), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
@@ -125,4 +137,4 @@ grid ;
 dlmwrite('Pp.dat',Pp,'delimiter','\n');
 dlmwrite('Pe.dat',Pe,'delimiter','\n');
 dlmwrite('Fp.dat',Fp,'delimiter','\n');
-dlmwrite('Fe.dat',Fe,'delimiter','\n');
+dlmwrite('Fe.dat',Fekappa,'delimiter','\n');

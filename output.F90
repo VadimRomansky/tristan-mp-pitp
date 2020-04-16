@@ -512,8 +512,7 @@ subroutine save_spectrum()
 				gbin=int((alog10(gam-1)-alog10(gammin-1))/dgam+1)
 				if(gbin .ge. 1 .and. gbin .le. gambins ) then 				
 					specp(xbin,gbin)=specp(xbin,gbin)+real(splitratio)**(1. &
-					-real(p(i)%splitlev))*p(i)%ch  
-					!specp(xbin,gbin)=specp(xbin,gbin) + 1.0                                                       
+					-real(p(i)%splitlev))*p(i)%ch                                                     
 				endif
 				!energy sepectrum in the flow rest frame
 				!Lorentz transformation in the flow rest frame
@@ -594,8 +593,7 @@ subroutine save_spectrum()
 				gbin=int((alog10(gam-1)-alog10(gammin-1))/dgam+1)
 				if(gbin .ge. 1 .and. gbin .le. gambins ) then 				
 					spece(xbin,gbin)=spece(xbin,gbin)+real(splitratio)**(1. &
-					-real(p(i)%splitlev))*p(i)%ch   
-					!spece(xbin,gbin)=spece(xbin,gbin)+1.0                                            
+					-real(p(i)%splitlev))*p(i)%ch                                             
 				endif
 				!energy sepectrum in the flow rest frame
 				!Lorentz transformation in the flow rest frame
@@ -4829,7 +4827,6 @@ subroutine output_hug()
              filespace(iv),dset_id(iv), error)
         call h5sclose_f(filespace(iv), error)
         call h5dget_space_f(dset_id(iv), filespace(iv), error)
-
 
         !
         ! Create property list for collective dataset write

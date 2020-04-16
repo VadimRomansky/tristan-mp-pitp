@@ -1,19 +1,19 @@
 clear;
-directory_name = './output1/';
+directory_name = './output4/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.005';
 Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'5 rg','10 rg'};
+LegendTitle = {'0.04','0.004'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 %Nx = fix(size(fp,1)/4);
 %Nx = 12500;
-Nx = 40000;
+Nx = 10000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -27,9 +27,10 @@ Fpjuttner(1:Np)=0;
 me = 0.91*10^-27;
 mass_ratio = 25;
 mp = me*mass_ratio;
+mp = 1.67*10^-24;
 c = 2.99792458*10^10;
 Te = 9*10^9;
-Tp = 3.5*10^10;
+Tp = 0.4*10^13;
 kB = 1.3806488*10^-16;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
@@ -95,9 +96,9 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-%plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
-legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
-%legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
+plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
+%legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
+legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
 grid ;
 
 figure(2);

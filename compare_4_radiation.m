@@ -68,30 +68,32 @@ aprmaxy = 19.3;
 
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
+
 figure(1);
-hold on;
-title ('I_{\nu}');
-xlabel ('{\nu} GHz');
-ylabel ('I_{\nu} erg/Hz cm^{3} sr');
-
-plot(radiation0(1:N0,1),radiation0(1:N0,4),'red',radiation1(1:N1,1),radiation1(1:N1,4),'blue',radiation2(1:N2,1),radiation2(1:N2,4),'green',radiation3(1:N3,1),radiation3(1:N3,4),'black');
-
-legend('April','May','June','August');
-
-grid;
-
-figure(2);
 hold on;
 title ('I_{\nu}');
 xlabel ('{\nu} GHz');
 ylabel ('mJy');
 
-plot(radiation0(1:N0,1),radiation0(1:N0,9),'red',radiation1(1:N1,1),radiation1(1:N1,9),'blue',radiation2(1:N2,1),radiation2(1:N2,9),'green',radiation3(1:N3,1),radiation3(1:N3,9),'black');
-plot(aprx(1:4), apry(1:4),'red',mayx(1:3), mayy(1:3),'blue',junx(1:4),juny(1:4),'green',augx(1:5),augy(1:5),'black');
+plot(radiation3(1:N3,1),radiation3(1:N3,9),'red');
+plot(augx(1:5),augy(1:5),'--o');
 
-legend('April','May','June','August','April','May','June','August');
+legend('August theory', 'August observation');
 
 grid ;
+
+%figure(2);
+%hold on;
+%title ('I_{\nu}');
+%xlabel ('{\nu} GHz');
+%ylabel ('mJy');
+
+%plot(radiation0(1:N0,1),radiation0(1:N0,9),'red',radiation1(1:N1,1),radiation1(1:N1,9),'blue',radiation2(1:N2,1),radiation2(1:N2,9),'green',radiation3(1:N3,1),radiation3(1:N3,9),'black');
+%plot(aprx(1:4), apry(1:4),'--red',mayx(1:3), mayy(1:3),'--blue',junx(1:4),juny(1:4),'--green',augx(1:5),augy(1:5),'--black');
+
+%legend('April','May','June','August','April','May','June','August');
+
+%grid ;
 
 radiation(1:N0,1:8) = 0;
 for i = 1:N0,

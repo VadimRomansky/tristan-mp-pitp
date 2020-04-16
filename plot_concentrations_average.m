@@ -1,7 +1,8 @@
 clear;
-directory_name = './output/';
+directory_name = './output6/';
 file_name = 'flds.tot';
-file_number = '.003';
+number = 10;
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
 ne = hdf5read(full_name,'dens');
@@ -20,37 +21,52 @@ for i=1:Nx,
     end;
 end;
 
-Nskinlength = 10;
+mp = 1.67262177E-24;
+q = 4.84*10^-10;
+me = mp/100;
+c = 2.99792458E10;
+n = 1;
+ntristan = 2;
+sigma = 0.04;
+gamma = 10.0;
+ctristan = 0.45;
+comp = 5;
+omp = ctristan/comp;
+qtristan = omp*omp*gamma/(ntristan*(1 + me/mp));
+metristan = qtristan;
+fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
+samplingFactor = 20;
+timestep = 10000;
 
-c0 = 2.998*10^10;
-mass_ratio = 20;
-mp = 1.67262*10^-24;
-me = mp/mass_ratio;
-q = 4.80320427*10^-10;
-n = 10^-4;
+omega = sqrt(4*3.14*n*q*q/(gamma*(me*mp)/(me + mp)));
+dt = ctristan/(comp*omega);
+dx = samplingFactor*c*dt/ctristan;
+dt = dt*timestep;
 
-omega = sqrt(4*pi*n*q*q/me);
+t = dt*number;
+x = 0;
 
-rho = c0/(omega*Nskinlength);
-c1=0.45;
-samplingFactor = 10;
-tau = c1*rho/c0;
-rho =0.1;
+for i = Nx/2:Nx,
+    if(npa(Nx - i + 1) > 2*ntristan)
+        x = (Nx - i + 1)*dx;
+        break;
+    end;
+end;
 
-%densityFactor = 1.0/(rho*rho*rho);
-rho = rho*samplingFactor;
-densityFactor = 1/8;
 
-figure(1);
-plot ((1:Nx)*rho,npa(1:Nx)*densityFactor, 'red');
-title ('np');
-xlabel ('x');
-ylabel ('np');
-grid ;
+%figure(1);
+%plot ((1:Nx)*dx,npa(1:Nx)/ntristan, 'red');
+%title ('np');
+%xlabel ('x');
+%ylabel ('np');
+%grid ;
 
-figure(2);
-plot ((1:Nx)*rho,nea(1:Nx)*densityFactor, 'red');
-title ('ne');
-xlabel ('x');
-ylabel ('ne');
-grid ;
+%figure(2);
+%plot ((1:Nx)*dx,nea(1:Nx)/ntristan, 'red');
+%title ('ne');
+%xlabel ('x');
+%ylabel ('ne');
+%grid ;
+
+%dlmwrite('np.dat',np,'delimiter',' ');
+%dlmwrite('ne.dat',ne,'delimiter',' ');
