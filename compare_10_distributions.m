@@ -7,16 +7,16 @@ start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-%LegendTitle = {'{\theta} = 0', '{\theta} = 10','{\theta} = 20', '{\theta} = 30', '{\theta} = 40', '{\theta} = 50','{\theta} = 60', '{\theta} = 70', '{\theta} = 80', '{\theta} = 90'};
-LegendTitle = {'turb = 0%', 'turb = 10%','turb = 20%', 'turb = 30%', 'turb = 40%', 'turb = 50%','turb = 60%', 'turb = 70%', 'turb = 80%', 'turb = 90%'};
+LegendTitle = {'{\theta} = 0', '{\theta} = 10','{\theta} = 20', '{\theta} = 30', '{\theta} = 40', '{\theta} = 50','{\theta} = 60', '{\theta} = 70', '{\theta} = 80', '{\theta} = 90'};
+%LegendTitle = {'turb = 10%','turb = 30%','turb = 50%','turb = 70%', 'turb = 90%', 'turb = 90%'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
-startx = 1;
-endx = 30000;
+startx = 1000;
+endx = 5000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -74,6 +74,7 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
+%legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5});
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8}, LegendTitle{9}, LegendTitle{10},'Location','northwest');
 grid ;
 
@@ -85,6 +86,7 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
+%legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5});
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4}, LegendTitle{5}, LegendTitle{6}, LegendTitle{7}, LegendTitle{8}, LegendTitle{9}, LegendTitle{10},'Location','northwest');
 grid ;
 
@@ -122,93 +124,148 @@ for i = 1:Np,
 end;
 dlmwrite('spectrum10.dat',spectrum,'delimiter',' ');
 
-tempSpectrum(1:Np) = 0;
+tempSpectrum(1:Np,2) = 0;
 for i = 1:Np,
-    tempSpectrum(i) = Pe(1,i);
-end;
-dlmwrite('Pe0.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(1,i);
+    tempSpectrum(i,1) = Pe(1,i);
+    tempSpectrum(i,2) = Fe(1,i);
 end;
 dlmwrite('Fe0.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(2,i);
+    tempSpectrum(i,1) = Pe(2,i);
+    tempSpectrum(i,2) = Fe(2,i);
 end;
-dlmwrite('Pe1.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(2,i);
-end;
-dlmwrite('Fe1.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe10.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(3,i);
+    tempSpectrum(i,1) = Pe(3,i);
+    tempSpectrum(i,2) = Fe(3,i);
 end;
-dlmwrite('Pe2.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(3,i);
-end;
-dlmwrite('Fe2.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe20.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(4,i);
+    tempSpectrum(i,1) = Pe(4,i);
+    tempSpectrum(i,2) = Fe(4,i);
 end;
-dlmwrite('Pe3.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(4,i);
-end;
-dlmwrite('Fe3.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe30.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(5,i);
+    tempSpectrum(i,1) = Pe(5,i);
+    tempSpectrum(i,2) = Fe(5,i);
 end;
-dlmwrite('Pe4.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(5,i);
-end;
-dlmwrite('Fe4.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe40.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(6,i);
+    tempSpectrum(i,1) = Pe(6,i);
+    tempSpectrum(i,2) = Fe(6,i);
 end;
-dlmwrite('Pe5.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(6,i);
-end;
-dlmwrite('Fe5.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe50.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(7,i);
+    tempSpectrum(i,1) = Pe(7,i);
+    tempSpectrum(i,2) = Fe(7,i);
 end;
-dlmwrite('Pe6.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(7,i);
-end;
-dlmwrite('Fe6.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe60.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(8,i);
+    tempSpectrum(i,1) = Pe(8,i);
+    tempSpectrum(i,2) = Fe(8,i);
 end;
-dlmwrite('Pe7.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(8,i);
-end;
-dlmwrite('Fe7.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe70.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(9,i);
+    tempSpectrum(i,1) = Pe(9,i);
+    tempSpectrum(i,2) = Fe(9,i);
 end;
-dlmwrite('Pe8.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(9,i);
-end;
-dlmwrite('Fe8.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe80.dat',tempSpectrum,'delimiter',' ');
 
 for i = 1:Np,
-    tempSpectrum(i) = Pe(10,i);
+    tempSpectrum(i,1) = Pe(10,i);
+    tempSpectrum(i,2) = Fe(10,i);
 end;
-dlmwrite('Pe9.dat',tempSpectrum,'delimiter',' ');
-for i = 1:Np,
-    tempSpectrum(i) = Fe(10,i);
-end;
-dlmwrite('Fe9.dat',tempSpectrum,'delimiter',' ');
+dlmwrite('Fe90.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(1,i);
+%end;
+%dlmwrite('Fe0.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(2,i);
+%end;
+%dlmwrite('Pe1.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(2,i);
+%end;
+%dlmwrite('Fe1.dat',tempSpectrum,'delimiter',' ');
+%
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(3,i);
+%end;
+%dlmwrite('Pe2.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(3,i);
+%end;
+%dlmwrite('Fe2.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(4,i);
+%end;
+%dlmwrite('Pe3.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(4,i);
+%end;
+%dlmwrite('Fe3.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(5,i);
+%end;
+%dlmwrite('Pe4.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(5,i);
+%end;
+%dlmwrite('Fe4.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(6,i);
+%end;
+%dlmwrite('Pe5.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(6,i);
+%end;
+%dlmwrite('Fe5.dat',tempSpectrum,'delimiter',' ');
+%
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(7,i);
+%end;
+%dlmwrite('Pe6.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(7,i);
+%end;
+%dlmwrite('Fe6.dat',tempSpectrum,'delimiter',' ');
+%
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(8,i);
+%end;
+%dlmwrite('Pe7.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(8,i);
+%end;
+%dlmwrite('Fe7.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(9,i);
+%end;
+%dlmwrite('Pe8.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(9,i);
+%end;
+%dlmwrite('Fe8.dat',tempSpectrum,'delimiter',' ');
+
+%for i = 1:Np,
+%    tempSpectrum(i) = Pe(10,i);
+%end;
+%dlmwrite('Pe9.dat',tempSpectrum,'delimiter',' ');
+%for i = 1:Np,
+%    tempSpectrum(i) = Fe(10,i);
+%end;
+%dlmwrite('Fe9.dat',tempSpectrum,'delimiter',' ');

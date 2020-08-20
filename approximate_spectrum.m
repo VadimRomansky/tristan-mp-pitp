@@ -1,7 +1,7 @@
 clear;
-directory_name = './output/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.007';
+file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
 fe = hdf5read(full_name,'spece');
@@ -10,14 +10,14 @@ g=hdf5read(full_name,'gamma');
 Nx = size(fp,1);
 Np = size(fp,2);
 
-startx = 1;
-endx = fix(Nx/4);
+startx = 5000;
+endx = 10000;
 
 startPowerP = 130;
 endPowerP = 155;
 
 startPowerE = 180;
-endPowerE = 190;
+endPowerE = 187;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
@@ -37,7 +37,7 @@ ap = 1;
 ae = 1;
 
 me = 0.91*10^-27;
-mass_ratio = 16;
+mass_ratio = 64;
 mp = me*mass_ratio;
 c = 2.99792458*10^10;
 Te = 9*10^9;
@@ -130,10 +130,10 @@ legend('Fp', name,'Location','southeast');
 grid ;
 
 figure(2);
-plot (Pe(1:Np),Fe(1:Np), 'red',Pe(startPowerE:endPowerE), Fea(startPowerE:endPowerE),'blue');
+plot (Pe(1:Np)/(9*mass_ratio/8),Fe(1:Np), 'red',Pe(startPowerE:endPowerE)/(9*mass_ratio/8), Fea(startPowerE:endPowerE),'blue');
 %plot (Pe(1:Np),Fe(1:Np), 'red',Pe(1:Np), Fejuttner(1:Np), 'blue');
 title ('F_e');
-xlabel ('p/{m_e c}');
+xlabel ('p/{\gamma\beta m_p c}');
 ylabel ('F_e*p^4');
 name = strcat('approximation gamma = ',num2str(gammae - 4));
 legend('Fe', name,'Location','southeast');

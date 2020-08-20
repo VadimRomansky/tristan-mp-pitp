@@ -1,11 +1,11 @@
 clear;
-directory_name = './output6/';
+directory_name = './output/';
 file_name = 'flds';
 file_number = '.tot.010';
 Nd = 2;
 start = 0;
 Color = {'red','blue'};
-LegendTitle = {'0','90'};
+LegendTitle = {'out','in'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 Bx0 = hdf5read(full_name,'bx');

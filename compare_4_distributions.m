@@ -1,19 +1,19 @@
 clear;
-directory_name = './output5/';
+directory_name = './output3/';
 file_name = 'spect';
-file_number = '.025';
+file_number = '.010';
 Nd = 4;
 start = 0;
 
 Color = {'red','blue','green','black','magenta'};
-LegendTitle = {'1.5','1.4','1.3','1.2'};
+LegendTitle = {'{\theta} = 0', '{\theta} = 10','{\theta} = 20', '{\theta} = 30'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
-startx = 1;
-endx = 20000;
+startx = 10000;
+endx = 15000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -34,7 +34,7 @@ kB = 1.3806488*10^-16;
 c = 2.99792458*10^10;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
-fractione = 0.8;
+fractione = 1;
 fractionp = 1;
 
 
@@ -43,13 +43,13 @@ for j = 1:Nd,
     fp = hdf5read(full_name,'specp');
     fe = hdf5read(full_name,'spece');
     gam=hdf5read(full_name,'gamma');
-    for i = 1:Np,
+    for i = 2:Np,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
         for k = startx:endx,
-            Fp(j,i) = Fp(j,i) + fp(k,i);
-            Fe(j,i) = Fe(j,i) + fe(k,i);
+            Fp(j,i) = Fp(j,i) + fp(k,i)*gam(i)/(gam(i) - gam(i-1));
+            Fe(j,i) = Fe(j,i) + fe(k,i)*gam(i)/(gam(i) - gam(i-1));
         end;
         Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
         Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));
@@ -103,8 +103,8 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-plot (Pp(1, 1:Np),Fpjuttner(1:Np),'color',Color{Nd+1});
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Maxwell','Location','southeast');
+%plot (Pp(1, 1:Np),Fpjuttner(1:Np),'color',Color{Nd+1});
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 grid ;
 
 figure(2);
@@ -115,8 +115,8 @@ ylabel ('F_e*p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
 end;
-plot (Pe(1, 1:Np),Fejuttner(1:Np),'color',Color{Nd+1});
-legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Maxwell','Location','southeast');
+%plot (Pe(1, 1:Np),Fejuttner(1:Np),'color',Color{Nd+1});
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3}, LegendTitle{4},'Location','southeast');
 grid ;
 
 spectrum(1:Np,1:8) = 0;

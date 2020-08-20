@@ -1,34 +1,31 @@
 clear;
-radiation = importdata('radiation3.dat');
-N = size(radiation,1);
 
-index(1:N) = 0;
-for i = 2:N,
-    index(i) = (log(radiation(i,2)) - log(radiation(i-1,2)))/(log(radiation(i,1)) - log(radiation(i-1,1)));
-end;
-index(1) = index(2);
+load radiation.dat;
+
+N = size(radiation,1);
+Nr = size(radiation,2);
 
 augx(1:5) = 0;
-augx(1) = 0.335;
-augx(2) = 0.625;
-augx(3) = 1.46;
-augx(4) = 4.92;
-augx(5) = 8.57;
+augx(1) = 0.332;
+augx(2) = 0.617;
+augx(3) = 1.43;
+augx(4) = 4.86;
+augx(5) = 8.46;
 augy(1:5) = 0;
-augy(1) = 3.29;
-augy(2) = 7.77;
-augy(3) = 8.53;
-augy(4) = 2.42;
-augy(5) = 1.06;
+augy(1) = 3.3;
+augy(2) = 7.9;
+augy(3) = 8.68;
+augy(4) = 2.47;
+augy(5) = 1.084;
 
 augmax = 0.886;
 augmaxy = 11.2;
 
 junx(1:4) = 0;
-junx(1) = 0.628;
-junx(2) = 1.45;
-junx(3) = 4.89;
-junx(4) = 8.53;
+junx(1) = 0.617;
+junx(2) = 1.43;
+junx(3) = 4.86;
+junx(4) = 8.46;
 juny(1:4) = 0;
 juny(1) = 2.98;
 juny(2) = 12.3;
@@ -39,62 +36,79 @@ junmaxx = 1.65;
 junmaxy = 13.2;
 
 mayx(1:3) = 0;
-mayx(1) = 1.46;
-mayx(2) = 4.94;
-mayx(3) = 8.62;
+mayx(1) = 1.43;
+mayx(2) = 4.86;
+mayx(3) = 8.46;
 mayy(1:3) = 0;
-mayy(1) = 4.91;
-mayy(2) = 12.0;
-mayy(3) = 6.67;
+mayy(1) = 4.93;
+mayy(2) = 12.2;
+mayy(3) = 6.82;
 
 maymaxx = 2.96;
 maymaxy = 15.2;
 
 aprx(1:4) = 0;
-aprx(1) = 1.44;
-aprx(2) = 4.91;
-aprx(3) = 8.58;
-aprx(4) = 22.8;
+aprx(1) = 1.43;
+aprx(2) = 4.86;
+aprx(3) = 8.46;
+aprx(4) = 22.5;
 apry(1:4) = 0;
-apry(1) = 0.993;
-apry(2) = 13.9;
-apry(3) = 17.1;
-apry(4) = 5.11;
+apry(1) = 1.3;
+apry(2) = 12.86;
+apry(3) = 17.57;
+apry(4) = 5.2;
 
 aprmaxx = 6.50;
 aprmaxy = 19.3;
 
+r = 5.17E16;
+d = 40*3*10^24;
+B = 0.346;
+n = 2912;
+me = 0.91*10^-27;
+c = 3*10^10;
+c1 = 6.27*10^18;
+c5 = 7.25*10^-24;
+c6 = 7.97*10^-41;
+g = 3;
+E0 = me*c*c;
+N0 = n*(g-1)*(E0^(g-1));
+f = 0.5;
+s = 4*f*r/3;
 
-factor = 1.0;
+theorRadiation(1:N) = 0;
 
-figure(1);
-hold on;
-plot(radiation(1:N,1),radiation(1:N,2),'red');
-%plot(radiation(1:N,1),radiation(1:N,7),'green');
-plot(augx(1:5),augy(1:5)*factor,'blue');
-title ('I_{\nu}');
-xlabel ('{\nu} GHz');
-ylabel ('I_{\nu} erg/Hz cm^{3} sr');
-grid ;
-
-figure(2);
-plot(radiation(1:N,1),index(1:N),'red');
-title ('{\gamma}');
-xlabel ('{\nu}/{\nu}_c');
-ylabel ('{\gamma}');
-grid ;
-
-figure(3);
-plot(radiation(1:N,1),radiation(1:N,3),'red');
-title ('t');
-xlabel ('{\nu}/{\nu}_c');
-ylabel ('t');
-grid ;
-
-radiation_wrt(1:N,2) = 0;
-for i = 1:N
-    radiation_wrt(i,1) = radiation(i,1);
-    radiation_wrt(i,2) = radiation(i,2);
+nu1 = 2*c1*((s*c6)^(2/(g+4)))*(N0^(2/(g+4)))*B^((g+2)/(g+4));
+for i = 1:N,
+    %if (radiation(i,1)*(10^9) < nu1)
+        theorRadiation(i) = (10^26)*(3.14*r*r/d^2)*(c5/c6)*(B^-0.5)*((radiation(i,1)*(10^9)/(2*c1))^2.5)*(1 - exp(-((radiation(i,1)*(10^9)/nu1)^(-(g+4)/2))));
+    %else 
+    %    theorRadiation(i) = (10^26)*
+    %end;
 end;
 
-dlmwrite('radiation.dat',radiation_wrt,'delimiter',' ');
+set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
+set(0,'DefaultTextFontSize',20,'DefaultTextFontName','Times New Roman'); 
+
+figure(2);
+hold on;
+title ('I_{\nu}');
+xlabel ('{\nu} GHz');
+ylabel ('mJy');
+
+plot(radiation(1:N,1),radiation(1:N,2),'red','LineWidth',2);
+plot(radiation(1:N,1),radiation(1:N,3),'green','LineWidth',2);
+plot(radiation(1:N,1),radiation(1:N,4),'blue','LineWidth',2);
+plot(radiation(1:N,1),radiation(1:N,5),'magenta','LineWidth',2);
+%for i = 3:Nr,
+ %   plot(radiation(1:N,1),radiation(1:N,i),'red');
+%end;
+%plot(radiation(1:N,1),theorRadiation(1:N),'green');
+plot(aprx(1:4),apry(1:4),'--o','Color','red','LineWidth',2);
+plot(mayx(1:3),mayy(1:3),'--o','Color','green','LineWidth',2);
+plot(junx(1:4),juny(1:4),'--o','Color','blue','LineWidth',2);
+plot(augx(1:5),augy(1:5),'--o','Color','magenta','LineWidth',2);
+
+%legend('theory', 'shevalier', 'observation');
+
+grid ;

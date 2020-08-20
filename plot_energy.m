@@ -1,5 +1,5 @@
 clear;
-load ./output5/energy
+load ./output/energy
 
 N1 = 1;
 N2 = size(energy,1);
@@ -7,7 +7,7 @@ N2 = size(energy,1);
 Nskinlength = 10;
 
 c0 = 2.998*10^10;
-mass_ratio = 64;
+mass_ratio = 100;
 %mp = 1.67262*10^-24;
 %me = mp/mass_ratio;
 me = 9.1*10^-28;

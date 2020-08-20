@@ -1,7 +1,7 @@
 clear;
-directory_name = './output6/';
+directory_name = './output/';
 file_name = 'flds.tot';
-number = 10;
+number = 2;
 file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 np = hdf5read(full_name,'densi');
@@ -27,8 +27,8 @@ me = mp/100;
 c = 2.99792458E10;
 n = 1;
 ntristan = 2;
-sigma = 0.04;
-gamma = 10.0;
+sigma = 0.004;
+gamma = 1.5;
 ctristan = 0.45;
 comp = 5;
 omp = ctristan/comp;
@@ -54,19 +54,19 @@ for i = Nx/2:Nx,
 end;
 
 
-%figure(1);
-%plot ((1:Nx)*dx,npa(1:Nx)/ntristan, 'red');
-%title ('np');
-%xlabel ('x');
-%ylabel ('np');
-%grid ;
+figure(1);
+plot ((1:Nx),npa(1:Nx)/ntristan, 'red');
+title ('np');
+xlabel ('x');
+ylabel ('np');
+grid ;
 
-%figure(2);
-%plot ((1:Nx)*dx,nea(1:Nx)/ntristan, 'red');
-%title ('ne');
-%xlabel ('x');
-%ylabel ('ne');
-%grid ;
+figure(2);
+plot ((1:Nx),nea(1:Nx)/ntristan, 'red');
+title ('ne');
+xlabel ('x');
+ylabel ('ne');
+grid ;
 
 %dlmwrite('np.dat',np,'delimiter',' ');
 %dlmwrite('ne.dat',ne,'delimiter',' ');

@@ -1,19 +1,19 @@
 clear;
-directory_name = './output4/';
+directory_name = './output/';
 file_name = 'spect';
-file_number = '.005';
+file_number = '.010';
 Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'0.04','0.004'};
+LegendTitle = {'out','in'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 %Nx = fix(size(fp,1)/4);
 %Nx = 12500;
-Nx = 10000;
+
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -24,8 +24,15 @@ Pe(1:Nd,1:Np)=0;
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
+startx(1:Nd) = 1;
+endx(1:Nd) = 0;
+endx(1) = 5000;
+endx(2) = 5000;
+startx(1) = 1000;
+startx(2) = 1000;
+
 me = 0.91*10^-27;
-mass_ratio = 25;
+mass_ratio = 100;
 mp = me*mass_ratio;
 mp = 1.67*10^-24;
 c = 2.99792458*10^10;
@@ -42,13 +49,13 @@ for j = 1:Nd,
     fp = hdf5read(full_name,'specp');
     fe = hdf5read(full_name,'spece');
     gam=hdf5read(full_name,'gamma');
-    for i = 1:Np,
+    for i = 2:Np,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = 1:Nx,
-            Fp(j,i) = Fp(j,i) + fp(k,i);
-            Fe(j,i) = Fe(j,i) + fe(k,i);
+        for k = startx(j):endx(j),
+            Fp(j,i) = Fp(j,i) + fp(k,i)*gam(i)/(gam(i) - gam(i-1));
+            Fe(j,i) = Fe(j,i) + fe(k,i)*gam(i)/(gam(i) - gam(i-1));
         end;
         Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
         Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));
@@ -96,9 +103,9 @@ ylabel ('Fp*p^4');
 for j=1:Nd,
     plot (Pp(j, 1:Np),Fp(j, 1:Np),'color',Color{j});
 end;
-plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
-%legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
-legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
+%plot (Pp(j, 1:Np),Fpjuttner(1:Np),'color','green');
+legend(LegendTitle{1}, LegendTitle{2},'Location','southeast');
+%legend(LegendTitle{1}, LegendTitle{2},'juttner','Location','southeast');
 grid ;
 
 figure(2);

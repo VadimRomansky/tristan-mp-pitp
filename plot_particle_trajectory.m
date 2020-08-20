@@ -1,5 +1,5 @@
 clear;
-directory_name = './output3/';
+directory_name = './output4/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
 file_number = '.005';
@@ -12,7 +12,7 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 200;
+last_number = 50;
 a = last_number;
 first_number = 1;
 

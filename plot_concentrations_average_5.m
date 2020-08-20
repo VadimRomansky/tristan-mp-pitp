@@ -60,12 +60,12 @@ fieldScale = sqrt(4*3.14*(n/ntristan)*(me/metristan)*(c*c/(ctristan*ctristan)));
 samplingFactor = 20;
 timestep = 10000;
 
-omega = sqrt(4*3.14*n*q*q/(gamma*me));
+omega = sqrt(4*3.14*n*q*q/(gamma*(me*mp/(mp + me))));
 dt = ctristan/(comp*omega);
 dx = samplingFactor*c*dt/ctristan;
 dt = dt*timestep;
 
-figure(1);
+figure(2);
 plot ((1:Nx)*dx,npa(1:Nx,1)/ntristan, 'magenta',(1:Nx)*dx,npa(1:Nx,2)/ntristan, 'black',(1:Nx)*dx,npa(1:Nx,3)/ntristan, 'green',(1:Nx)*dx,npa(1:Nx,4)/ntristan, 'blue',(1:Nx)*dx,npa(1:Nx,5)/ntristan, 'red');
 title ('density');
 xlabel ('x cm');

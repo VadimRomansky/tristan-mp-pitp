@@ -1,7 +1,7 @@
 clear;
-directory_name = './output3/';
+directory_name = './output2/';
 file_name = 'spect';
-file_number = '.050';
+file_number = '.006';
 Nd = 3;
 start = 0;
 
@@ -13,11 +13,14 @@ full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
 Np = size(fp,2);
 Nx = size(fp,1);
-startx = 1;
+startx(1:Nd) = 1;
 endx(1:Nd) = 0;
 endx(1) = 20000;
 endx(2) = 28000;
 endx(3) = 20000;
+startx(1) = 1000;
+startx(2) = 1000;
+startx(3) = 1000;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -35,7 +38,7 @@ for j = 1:Nd,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = startx:endx(j),
+        for k = startx(j):endx(j),
             Fp(j,i) = Fp(j,i) + fp(k,i);
             Fe(j,i) = Fe(j,i) + fe(k,i);
         end;

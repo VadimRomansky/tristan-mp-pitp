@@ -1,8 +1,8 @@
 clear;
-directory_name = './output6/';
+directory_name = './output4/';
 file_name = 'flds.tot';
 part_name = 'prtl.tot';
-file_number = '.005';
+file_number = '.050';
 full_name = strcat(directory_name, file_name, file_number);
 full_part_name = strcat(directory_name, part_name, file_number);
 bounds_name = strcat(directory_name, 'bounds');
@@ -14,9 +14,9 @@ Ex = hdf5read(full_name,'ex');
 Ey = hdf5read(full_name,'ey');
 Ez = hdf5read(full_name,'ez');
 fileinfo = hdf5info(full_part_name);
-last_number = 200;
+last_number = 50;
 a = last_number;
-first_number = 001;
+first_number = 1;
 timeStep = 200;
 
 if(a < 10)
@@ -167,13 +167,14 @@ Bnorm(1:Ny, 1:Nx) = 0;
 Enorm(1:Ny, 1:Nx) = 0;
 
 Baverage(first_number:last_number, 1:Nx) = 0;
+Eaverage(first_number:last_number, 1:Nx) = 0;
 
 
 
 for i=1:Nx,
     for j = 1:Ny,
         Bnorm(j,i) = sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
-        Bnorm(j,i) = sqrt(Ex(i,j)*Ex(i,j) + Ey(i,j)*Ey(i,j) + Ez(i,j)*Ez(i,j));
+        Enorm(j,i) = sqrt(Ex(i,j)*Ex(i,j) + Ey(i,j)*Ey(i,j) + Ez(i,j)*Ez(i,j));
        % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
     end;
 end;
@@ -436,13 +437,18 @@ for a = first_number:last_number,
     Bx = hdf5read(full_name,'bx');
     By = hdf5read(full_name,'by');
     Bz = hdf5read(full_name,'bz');
+    Ex = hdf5read(full_name,'ex');
+    Ey = hdf5read(full_name,'ey');
+    Ez = hdf5read(full_name,'ez');
     
     for i=1:Nx,
         for j = 1:Ny,
             Baverage(a,i) = Baverage(a,i) + sqrt(Bx(i,j)*Bx(i,j) + By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j))/B0;
+            Eaverage(a,i) = Eaverage(a,i) + sqrt(Ex(i,j)*Ex(i,j) + Ey(i,j)*Ey(i,j) + Ez(i,j)*Ez(i,j))/B0;
         % Bperp(i,j) = sqrt(By(i,j)*By(i,j) + Bz(i,j)*Bz(i,j));
         end;
         Baverage(a,i) = sqrt(Baverage(a,i)/Ny);
+        Eaverage(a,i) = sqrt(Eaverage(a,i)/Ny);
     end;
 end;
 
@@ -457,6 +463,41 @@ hold on;
 %fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
 caxis ([0 2.5])
 fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number)*timeStep,Baverage);
+plot(x1(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'red');
+plot(x2(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'green');
+plot(x3(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'black');
+m=0;
+%for m = 1:Nmpi,
+%    xtemp(1:2) = 0;
+%    xtemp(1) = bounds(m,1);
+%    xtemp(2) = bounds(m,1);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'red');
+%    xtemp(1) = bounds(m,2);
+%    xtemp(2) = bounds(m,2);
+%    plot(xtemp(1:2),(0:1)*(last_number-first_number) + first_number,'black');
+%end;
+
+pos = get(gcf, 'Position');
+width = pos(3);
+height = pos(4);
+mov(1:height, 1:width, 1:1)=0;
+f = getframe(gcf);
+[mov(:,:,1), map]=rgb2ind(f.cdata, colorcube(256));
+outname = strcat(directory_name,'Tt',int2str(a),'.jpg');
+imwrite(rgb2ind(f.cdata, map), map, outname);
+
+
+%figure(7);
+figure('Position', [10 50 1200 600]);
+%title ('E_x');
+xlabel ('Nx');
+ylabel ('Nt');
+grid on;
+hold on;
+%axis([Xgrid(1) Xgrid(Nx-1) minEx maxEx]);
+%fig = plot (Xgrid(1:Nx-1),Ex(1:Nx-1), 'red');
+caxis ([0 2.5])
+fig = imagesc((1:Nx)*samplingFactor, (first_number:last_number)*timeStep,Eaverage);
 plot(x1(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'red');
 plot(x2(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'green');
 plot(x3(1:(last_number-first_number + 1)),(first_number:last_number)*timeStep,'black');
