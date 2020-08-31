@@ -1,6 +1,6 @@
 clear;
 directory_name = './output/';
-file_name = 'spect';
+file_name = 'spect0';
 file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
 fp = hdf5read(full_name,'specp');
@@ -41,7 +41,7 @@ Tpmin = 0.5*10^12;
 Tpmax = 10^13;
 Pekappa = 14*me*c;
 Ppkappa = mp*c;
-kappa = 4;
+kappa = 15;
 kB = 1.3806488*10^-16;
 thetae = kB*Te/(me*c*c);
 thetap = kB*Tp/(mp*c*c);
@@ -71,7 +71,7 @@ for i = 2:Np,
     Fe(i)=Fe(i)*(me/(gam*beta*mp))*(Pe(i)^3)/(1+g(i));
     p3 = Pe(i)*Pe(i)*Pe(i);
     %Fekappa(i) = Aekappa*(1 + ((Pe(i)*me*c/Pekappa)^2)/(kappa-3/2))^(-(kappa + 1))*4*pi*p3*Pe(i);
-    Fekappa(i) = Aekappa*(Pe(i)^4)*(1 + (Pe(i)*me*c/Pekappa)^2)^(-(kappa + 1));
+    Fekappa(i) = (Pe(i)^4)*(1 + (sqrt(1.0 + Pe(i)*Pe(i)) - 1.0)/(thetae*thetae*kappa))^(-(kappa + 1));
     Fpkappa(i) = Apkappa*(1 + (Pp(i)*mp*c/Ppkappa)^2)^(-(kappa + 1));
     Fpold(i)=Fpold(i)*(1/(gam*beta))*(Pp(i)^3)/(1+g(i));
     Feold(i)=Feold(i)*(me/(gam*beta*mp))*(Pe(i)^3)/(1+g(i));
@@ -99,17 +99,17 @@ type kappafit;
 fun = @(x)kappafit(x,Pe,Fe, Np);
 
 x0(1:2) = 0;
-x0(1) = Pekappa/(me*c);
+x0(1) = thetae;
 x0(2) = kappa;
 
-bestx(1) = Pekappa/(me*c);
+bestx(1) = thetae;
 bestx(2) = kappa;
 
 bestx = fminsearch(fun,x0);
 
 Fekappa(1:Np) = 0;
 for i = 1:Np,
-    Fekappa(i) = (Pe(i)^4)*(1 + (Pe(i)/bestx(1))^2)^(-(bestx(2) + 1));
+    Fekappa(i) = (Pe(i)^4)*(1 + (sqrt(1.0 + Pe(i)*Pe(i)) - 1.0)/(bestx(1)*bestx(1)*bestx(2)))^(-(bestx(2) + 1));
 end;
 
 normkappae = (Fekappa(1)/(Pe(2)^2))*(Pe(2) - Pe(1));

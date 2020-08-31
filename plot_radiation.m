@@ -1,6 +1,6 @@
 clear;
 
-load radiation.dat;
+radiation = importdata('output1/radiation6.dat');
 
 N = size(radiation,1);
 Nr = size(radiation,2);

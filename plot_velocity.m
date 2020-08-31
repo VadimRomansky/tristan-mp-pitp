@@ -1,7 +1,7 @@
 clear;
-directory_name = './output1/';
-file_name = 'flds4.tot';
-file_number = '.020';
+directory_name = './output/';
+file_name = 'flds.tot';
+file_number = '.002';
 full_name = strcat(directory_name, file_name, file_number);
 fileinfo = hdf5info(full_name);
 Upx = hdf5read(full_name,'v4xi');
@@ -57,15 +57,26 @@ for i = 1:Nx,
     end;
 end;
 
+Vexa(1:Nx) = 0;
+Vpxa(1:Nx) = 0;
+for i = 1:Nx,
+    for j = 1:Ny,
+        Vexa(i) = Vexa(i) + Vex(i,j);
+        Vpxa(i) = Vpxa(i) + Vpx(i,j);
+    end;
+    Vexa(i) = Vexa(i)/Ny;
+    Vpxa(i) = Vpxa(i)/Ny;
+end;
+
 figure(1);
-plot ((1:Nx)*rho,Vpx(1:Nx, fix(Ny/2)+1), 'red');
+plot ((1:Nx),Vpxa(1:Nx), 'red');
 title ('Vp');
 xlabel ('x');
 ylabel ('Vp');
 grid ;
 
 figure(2);
-plot ((1:Nx)*rho,Vex(1:Nx, fix(Ny/2)+1), 'red');
+plot ((1:Nx),Vexa(1:Nx), 'red');
 title ('Ve');
 xlabel ('x');
 ylabel ('Ve');
