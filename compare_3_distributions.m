@@ -1,12 +1,12 @@
 clear;
-directory_name = './output2/';
+directory_name = './output/';
 file_name = 'spect';
-file_number = '.006';
+file_number = '.007';
 Nd = 3;
 start = 0;
 
 Color = {'red','blue','green'};
-LegendTitle = {'2.5 rg','10 rg','15 rg'};
+LegendTitle = {'mp/me 100','mp/me 50','mp/me 25'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
@@ -15,9 +15,9 @@ Np = size(fp,2);
 Nx = size(fp,1);
 startx(1:Nd) = 1;
 endx(1:Nd) = 0;
-endx(1) = 20000;
-endx(2) = 28000;
-endx(3) = 20000;
+endx(1) = 3000;
+endx(2) = 3000;
+endx(3) = 3000;
 startx(1) = 1000;
 startx(2) = 1000;
 startx(3) = 1000;
@@ -84,6 +84,21 @@ xlabel ('p/{m_e c}');
 ylabel ('F_e p^4');
 for j=1:Nd,
     plot (Pe(j, 1:Np),Fe(j, 1:Np),'color',Color{j});
+end;
+legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
+grid ;
+
+factor(1:Nd) = 0;
+factor(1) = 1;
+factor(2) = sqrt(2);
+factor(3) = 2;
+figure(3);
+hold on;
+title ('F_e');
+xlabel ('p/{m_e c} * sqrt(me/me0)');
+ylabel ('F_e p^4  * sqrt(me/me0)');
+for j=1:Nd,
+    plot (Pe(j, 1:Np)*factor(j),Fe(j, 1:Np)*factor(j),'color',Color{j});
 end;
 legend(LegendTitle{1}, LegendTitle{2}, LegendTitle{3},'Location','southeast');
 grid ;
