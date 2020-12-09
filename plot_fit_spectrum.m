@@ -3,15 +3,20 @@ directory_name = './output/';
 file_name = 'spect';
 file_number = '.010';
 full_name = strcat(directory_name, file_name, file_number);
-fp = hdf5read(full_name,'specp');
-fe = hdf5read(full_name,'spece');
+fp = hdf5read(full_name,'specprest');
+fe = hdf5read(full_name,'specerest');
 g=hdf5read(full_name,'gamma');
 
 Nx = size(fp,1);
 Np = size(fp,2);
 
-startx = 1000;
-endx = 5000;
+samplingFactor = 20;
+
+startFieldX = 5450;
+endFieldX = 5500;
+
+startx = startFieldX*samplingFactor;
+endx = endFieldX*samplingFactor;
 
 Fp(1:Np)=0;
 Fe(1:Np)=0;
@@ -33,12 +38,12 @@ me = mp/mass_ratio;
 gam = 1.5;
 beta = sqrt(1 - 1/(gam*gam));
 c = 2.99792458*10^10;
-Te = 2.6*10^11;
-Temin = 10^11;
-Temax = 10^12;
-Tp = 2.4*10^12;
-Tpmin = 0.5*10^12;
-Tpmax = 10^13;
+Te = 2.6*10^9;
+Temin = 10^8;
+Temax = 10^10;
+Tp = 2*10^9;
+Tpmin = 10^8;
+Tpmax = 10^11;
 Pekappa = 14*me*c;
 Ppkappa = mp*c;
 kappa = 4;
@@ -91,7 +96,7 @@ for i = 1:Np,
     Feold(i) = Feold(i)*norm/norme;
 end;
 
-index1 = 120;
+index1 = 100;
 index2 = 180;
 
 Tpleft = Tpmin;
@@ -194,14 +199,14 @@ end;
 figure(2);
 %hold on;
 %plot (Pe(1:Np),Fe(1:Np), 'red');
-loglog(Pe(1:Np),Fe(1:Np)*10^5, 'red',Pe(1:Np), Fejuttner(1:Np)*10^5, 'blue', Pe(1:Np),Fekappa(1:Np), 'green');
+loglog(Pe(1:Np),Fe(1:Np)*10^5, 'red',Pe(1:Np), Fejuttner(1:Np)*10^5, 'blue');
 %loglog(Pe(1:Np)*me/(gam*beta*mp),Fe(1:Np), 'red',Pe(1:Np)*me/(gam*beta*mp), Feold(1:Np), 'blue');
 %loglog(Pe(1:Np),Fe(1:Np)*(me*c), 'red');
 %loglog(Pe(1:Np),Fekappa(1:Np)*(me*c), 'blue');
 title ('F_e');
 xlabel ('p/{m_e c}');
 ylabel ('F_e*p^4');
-legend('Fe','Maxwell-Juttner fit','kappa','Location','southeast');
+legend('Fe','Maxwell-Juttner fit','Location','southeast');
 %legend('new','old','Location','southeast');
 grid ;
 

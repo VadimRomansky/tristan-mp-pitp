@@ -1,20 +1,37 @@
 clear;
-directory_name = './output5/';
+directory_name = './output/';
 file_name = 'spect';
-file_number = '.025';
+file_number = '.020';
 Nd = 5;
 start = 0;
 
 Color = {'green','red','blue','black','magenta'};
 %LegendTitle = {'l = 6 rg','l = 11 rg','l = 22 rg', 'l = 33 rg', 'l = 45 rg'};
-LegendTitle = {'0','30%','50%','70%','90%'};
+LegendTitle = {'1','2','3','4','5'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
-fp = hdf5read(full_name,'specp');
+fp = hdf5read(full_name,'specprest');
 Np = size(fp,2);
 Nx = size(fp,1);
-startx = 1;
-endx = fix(Nx/4);
+
+samplingfactor = 20;
+startx(1:Nd) = 0;
+endx(1:Nd) = 0;
+
+startx(1) = 500*samplingfactor;
+endx(1) = startx(1) + 320*samplingfactor;
+
+startx(2) = 700*samplingfactor;
+endx(2) = startx(2) + 320*samplingfactor;
+
+startx(3) = 900*samplingfactor;
+endx(3) = startx(3) + 320*samplingfactor;
+
+startx(4) = 1100*samplingfactor;
+endx(4) = startx(4) + 320*samplingfactor;
+
+startx(5) = 1300*samplingfactor;
+endx(5) = startx(5) + 320*samplingfactor;
 
 g(1:Nd,1:Np) = 0;
 Fp(1:Nd,1:Np)=0;
@@ -25,16 +42,16 @@ Pe(1:Nd,1:Np)=0;
 
 for j = 1:Nd,
     full_name = strcat(directory_name, file_name, num2str(start + j-1), file_number);
-    fp = hdf5read(full_name,'specp');
-    fe = hdf5read(full_name,'spece');
+    fp = hdf5read(full_name,'specprest');
+    fe = hdf5read(full_name,'specerest');
     gam=hdf5read(full_name,'gamma');
-    for i = 1:Np,
+    for i = 2:Np,
         g(j, i) = gam(i);
         Pp(j,i) = sqrt((g(j,i)+1)^2 - 1);
         Pe(j,i) = sqrt((g(j,i)+1)^2 - 1);
-        for k = startx:endx,
-            Fp(j,i) = Fp(j,i) + fp(k,i);
-            Fe(j,i) = Fe(j,i) + fe(k,i);
+        for k = startx(j):endx(j),
+            Fp(j,i) = Fp(j,i) + fp(k,i)*gam(i)/(gam(i) - gam(i-1));
+            Fe(j,i) = Fe(j,i) + fe(k,i)*gam(i)/(gam(i) - gam(i-1));
         end;
         Fp(j,i)=Fp(j,i)*(Pp(j,i)^3)/(1+g(j,i));
         Fe(j,i)=Fe(j,i)*(Pe(j,i)^3)/(1+g(j,i));

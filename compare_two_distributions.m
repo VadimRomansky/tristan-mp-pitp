@@ -1,12 +1,12 @@
 clear;
 directory_name = './output/';
 file_name = 'spect';
-file_number = '.010';
+file_number = '.020';
 Nd = 2;
 start = 0;
 
 Color = {'red','blue'};
-LegendTitle = {'out','in'};
+LegendTitle = {'start','end'};
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
 fp = hdf5read(full_name,'specp');
@@ -24,12 +24,14 @@ Pe(1:Nd,1:Np)=0;
 Fejuttner(1:Np)=0;
 Fpjuttner(1:Np)=0;
 
+samplingFactor = 20;
+
 startx(1:Nd) = 1;
 endx(1:Nd) = 0;
-endx(1) = 5000;
-endx(2) = 5000;
-startx(1) = 1000;
-startx(2) = 1000;
+startx(1) = 10*samplingFactor;
+startx(2) = 10*samplingFactor;
+endx(1) = 80*samplingFactor;
+endx(2) = 80*samplingFactor;
 
 me = 0.91*10^-27;
 mass_ratio = 100;
