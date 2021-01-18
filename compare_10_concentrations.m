@@ -1,5 +1,5 @@
 clear;
-directory_name = './output10/';
+directory_name = './output4/';
 file_name = 'flds';
 file_number = '.tot.010';
 Nd = 10;
@@ -7,7 +7,7 @@ start = 0;
 
 Color = {'red','blue','green','black','cyan','magenta','yellow',[0.75,0,0.67],[0.5,0.5,0.0],[.98,.5,.44]};
 %LegendTitle = {'t*{\Omega} = 30','t*{\Omega} = 60','t*{\Omega} = 90', 't*{\Omega} = 120', 't*{\Omega} = 150','t*{\Omega} = 180'};
-LegendTitle = {'noturb B in plane', 'noturb B out plane','turb 0.5 iso B in plane', 'turb 0.5 iso B out plane', 'turb 0.5 aniso B in plane', 'turb 0.5 aniso B out plane','turb 0.9 iso B in plane', 'turb 0.9 iso B out plane', 'turb 0.9 aniso B in plane', 'turb 0.9 aniso B out plane'};
+LegendTitle = {'{\theta} = 0', '{\theta} = 10','{\theta} = 20', '{\theta} = 30', '{\theta} = 40', '{\theta} = 50','{\theta} = 60', '{\theta} = 70', '{\theta} = 80', '{\theta} = 90'};
 
 
 full_name = strcat(directory_name, file_name, num2str(start), file_number);
