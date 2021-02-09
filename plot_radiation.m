@@ -143,7 +143,7 @@ plot(radiation(1:N,1),radiation(1:N,2),'red','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,3),'green','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,4),'blue','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,5),'magenta','LineWidth',2);
-plot(radiation(1:N,1),radiation(1:N,6),[1.0,0.6,0],'LineWidth',2);
+plot(radiation(1:N,1),radiation(1:N,6),'Color',[1.0,0.6,0],'LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,7),'black','LineWidth',2);
 %for i = 3:Nr,
  %   plot(radiation(1:N,1),radiation(1:N,i),'red');
