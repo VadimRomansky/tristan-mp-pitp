@@ -143,8 +143,8 @@ plot(radiation(1:N,1),radiation(1:N,2),'red','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,3),'green','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,4),'blue','LineWidth',2);
 plot(radiation(1:N,1),radiation(1:N,5),'magenta','LineWidth',2);
-plot(radiation(1:N,1),radiation(1:N,6),'Color',[1.0,0.6,0],'LineWidth',2);
-plot(radiation(1:N,1),radiation(1:N,7),'black','LineWidth',2);
+%plot(radiation(1:N,1),radiation(1:N,6),'Color',[1.0,0.6,0],'LineWidth',2);
+%plot(radiation(1:N,1),radiation(1:N,7),'black','LineWidth',2);
 %for i = 3:Nr,
  %   plot(radiation(1:N,1),radiation(1:N,i),'red');
 %end;
@@ -153,8 +153,10 @@ plot(aprx(1:4),apry(1:4),'--o','Color','red','LineWidth',2);
 plot(mayx(1:3),mayy(1:3),'--o','Color','green','LineWidth',2);
 plot(junx(1:4),juny(1:4),'--o','Color','blue','LineWidth',2);
 plot(augx(1:5),augy(1:5),'--o','Color','magenta','LineWidth',2);
-plot(octx(1:3),octy(1:3),'--o','Color',[1.0,0.6,0],'LineWidth',2);
-plot(decx(1:3),decy(1:3),'--o','Color','black','LineWidth',2);
+
+%plot(octx(1:3),octy(1:3),'--o','Color',[1.0,0.6,0],'LineWidth',2);
+%plot(decx(1:3),decy(1:3),'--o','Color','black','LineWidth',2);
+
 %plot(apr11x(1:3),apr11y(1:3),'--o','Color','cyan','LineWidth',2);
 %plot(jan12x(1:3),jan12y(1:3),'--o','Color',[0.75,0,0.67],'LineWidth',2);
 %plot(jul12x(1:2),jul12y(1:2),'--o','Color',[1.0,0.6,0],'LineWidth',2);
